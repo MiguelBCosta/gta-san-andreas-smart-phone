@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release GTA-SA|Win32">
       <Configuration>Release GTA-SA</Configuration>
@@ -66,7 +66,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_NON_CONFORMING_SWPRINTFS;TARGET_NAME=R"($(TargetName))";GTASA;GTAGAME_NAME="San Andreas";GTAGAME_ABBR="SA";GTAGAME_ABBRLOW="sa";GTAGAME_PROTAGONISTNAME="CJ";GTAGAME_CITYNAME="San Andreas";_DX9_SDK_INSTALLED;PLUGIN_SGV_10US;RW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)source\imgui;$(ProjectDir)source\imgui\backends;$(ProjectDir)source\kiero;$(ProjectDir)source\minhook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -95,7 +95,9 @@ if defined GTA_SA_DIR (
 
 taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING" 
 
-xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\scripts" 
+xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
+xcopy /Y "$(ProjectDir)vendor\fontawesome\fa-solid-900.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
+xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
 )</Command>
     </PostBuildEvent>
@@ -105,7 +107,7 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\scripts"
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;_CRT_NON_CONFORMING_SWPRINTFS;TARGET_NAME=R"($(TargetName))";GTASA;GTAGAME_NAME="San Andreas";GTAGAME_ABBR="SA";GTAGAME_ABBRLOW="sa";GTAGAME_PROTAGONISTNAME="CJ";GTAGAME_CITYNAME="San Andreas";_DX9_SDK_INSTALLED;PLUGIN_SGV_10US;RW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)source\imgui;$(ProjectDir)source\imgui\backends;$(ProjectDir)source\kiero;$(ProjectDir)source\minhook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -128,32 +130,43 @@ if defined GTA_SA_DIR (
 
 taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING" 
 
-xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\scripts" 
+xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
+xcopy /Y "$(ProjectDir)vendor\fontawesome\fa-solid-900.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
+xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
 )</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\Main.cpp" />
-    <ClCompile Include="source\Phone.cpp" />
-    <ClCompile Include="source\imgui\imgui.cpp" />
-    <ClCompile Include="source\imgui\imgui_demo.cpp" />
-    <ClCompile Include="source\imgui\imgui_draw.cpp" />
-    <ClCompile Include="source\imgui\imgui_tables.cpp" />
-    <ClCompile Include="source\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="source\imgui\backends\imgui_impl_dx9.cpp" />
-    <ClCompile Include="source\imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="source\minhook\src\buffer.c" />
-    <ClCompile Include="source\minhook\src\hook.c" />
-    <ClCompile Include="source\minhook\src\trampoline.c" />
-    <ClCompile Include="source\minhook\src\hde\hde32.c" />
+    <ClCompile Include="source\gta\Main.cpp" />
+    <ClCompile Include="source\core\Phone.cpp" />
+    <ClCompile Include="source\core\apps\CalculatorApp.cpp" />
+    <ClCompile Include="vendor\imgui\imgui.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="vendor\minhook\src\buffer.c" />
+    <ClCompile Include="vendor\minhook\src\hook.c" />
+    <ClCompile Include="vendor\minhook\src\trampoline.c" />
+    <ClCompile Include="vendor\minhook\src\hde\hde32.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Phone.h" />
-    <ClInclude Include="source\PhoneApp.h" />
-    <ClInclude Include="source\apps\NotesApp.h" />
-    <ClInclude Include="source\apps\PlaceholderApps.h" />
-  </ItemGroup>
+    <ClInclude Include="source\core\providers\IClockProvider.h" />
+    <ClInclude Include="source\core\providers\IWeatherProvider.h" />
+    <ClInclude Include="source\core\providers\IScreenProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaClockProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaWeatherProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaScreenProvider.h" />
+    <ClInclude Include="source\core\Phone.h" />
+    <ClInclude Include="source\core\PhoneApp.h" />
+    <ClInclude Include="source\core\apps\NotesApp.h" />
+    <ClInclude Include="source\core\apps\WeatherApp.h" />
+    <ClInclude Include="source\core\apps\PlaceholderApps.h" />
+    <ClInclude Include="source\core\apps\ClockApp.h" />
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" /></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

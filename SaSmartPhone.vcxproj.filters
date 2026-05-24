@@ -1,34 +1,123 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="source">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <UniqueIdentifier>{AC239DED-9FE9-4C4C-8DE1-B65B441B553B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\apps">
-      <UniqueIdentifier>{8A2B3C4D-5E6F-7G8H-9I0J-1K2L3M4N5O6P}</UniqueIdentifier>
+    <Filter Include="source\core">
+      <UniqueIdentifier>{92524F53-3B2A-4E7D-AC88-BEB1AD1848F3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\core\apps">
+      <UniqueIdentifier>{D4C45BD9-D81D-4173-A4C8-619E98ABA1AE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\core\providers">
+      <UniqueIdentifier>{E48F4DEF-C5EA-4FF3-A2DC-94F54AF1927D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\gta">
+      <UniqueIdentifier>{56CD2BA4-1CB6-407A-B674-38DE6D727183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\gta\providers">
+      <UniqueIdentifier>{A4209237-6AEA-47A4-AAAF-DD59535479D4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{826F63EE-21C2-401E-A6C7-FC966C44D66E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imgui">
+      <UniqueIdentifier>{1F1D4A2D-A973-4159-997A-AD603F0B6F14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imgui\backends">
+      <UniqueIdentifier>{5AD79655-A3ED-4161-8D1E-74C8FDB56282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\minhook">
+      <UniqueIdentifier>{87BB0445-E25D-4346-9997-7A904CFFF9E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\minhook\src">
+      <UniqueIdentifier>{E0F3A613-9CB9-4F76-AE47-3A2CB5ED08DE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\minhook\src\hde">
+      <UniqueIdentifier>{D95AFE10-0494-4659-B1AD-8D130538F477}</UniqueIdentifier>
+    </Filter>
+  <Filter Include="vendor\fontawesome"><UniqueIdentifier>{AB4C6E9F-F9F6-4C51-8446-1B99648AC008}</UniqueIdentifier></Filter></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\gta\Main.cpp">
+      <Filter>source\gta</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\Phone.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\CalculatorApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_demo.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_draw.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_tables.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_widgets.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_dx9.cpp">
+      <Filter>vendor\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>vendor\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\minhook\src\buffer.c">
+      <Filter>vendor\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\minhook\src\hook.c">
+      <Filter>vendor\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\minhook\src\trampoline.c">
+      <Filter>vendor\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\minhook\src\hde\hde32.c">
+      <Filter>vendor\minhook\src\hde</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Main.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Phone.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="source\Phone.h">
-      <Filter>source</Filter>
+    <ClInclude Include="source\core\providers\IClockProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\PhoneApp.h">
-      <Filter>source</Filter>
+    <ClInclude Include="source\core\providers\IWeatherProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\apps\NotesApp.h">
-      <Filter>source\apps</Filter>
+    <ClInclude Include="source\core\providers\IScreenProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\apps\PlaceholderApps.h">
-      <Filter>source\apps</Filter>
+    <ClInclude Include="source\gta\providers\GtaClockProvider.h">
+      <Filter>source\gta\providers</Filter>
     </ClInclude>
-  </ItemGroup>
+    <ClInclude Include="source\gta\providers\GtaWeatherProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaScreenProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Phone.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\PhoneApp.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\NotesApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\WeatherApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\PlaceholderApps.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\ClockApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h"><Filter>vendor\fontawesome</Filter></ClInclude></ItemGroup>
 </Project>

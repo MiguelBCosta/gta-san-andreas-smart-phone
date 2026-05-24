@@ -1,5 +1,12 @@
+# Pastas de build
+/bin/
+/obj/
+/SaSmartPhone/bin/
+/SaSmartPhone/obj/
+
+# Arquivos locais do Visual Studio
 .vs/
-bin/
-**bin/
-obj/
-**/obj
+*.user
+*.suo
+*.db
+*.sln.docstates

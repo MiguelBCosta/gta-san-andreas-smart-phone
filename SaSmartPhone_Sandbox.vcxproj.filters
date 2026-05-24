@@ -1,34 +1,105 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="source">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <UniqueIdentifier>{B6725D97-36CB-49FF-8708-324A53CFFC4D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\apps">
-      <UniqueIdentifier>{8A2B3C4D-5E6F-7G8H-9I0J-1K2L3M4N5O6P}</UniqueIdentifier>
+    <Filter Include="source\core">
+      <UniqueIdentifier>{C3D12AF1-54CE-4303-9207-246487EC8420}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\core\apps">
+      <UniqueIdentifier>{CCEAF05C-C360-45B0-AAB9-730AEE678091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\core\providers">
+      <UniqueIdentifier>{E46D9DE7-D021-4054-B404-272A6BF3EBF4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\sandbox">
+      <UniqueIdentifier>{FC76175B-F7B0-44FB-9FED-F8E18D16DD15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\sandbox\providers">
+      <UniqueIdentifier>{FF4BC45A-9225-47CE-BA9B-BFC6D76B24D8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{58E36F61-9D70-447B-838B-DDA5A1B4C90A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imgui">
+      <UniqueIdentifier>{C09DD4C0-34DD-49A4-B296-18759C9FF2A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imgui\backends">
+      <UniqueIdentifier>{2D826707-977D-4DFD-B1FC-E46987F51E20}</UniqueIdentifier>
+    </Filter>
+  <Filter Include="vendor\fontawesome"><UniqueIdentifier>{0CE21B54-3A3A-4728-AE9E-91775BEA680A}</UniqueIdentifier></Filter></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\sandbox\SandboxMain.cpp">
+      <Filter>source\sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\Phone.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\CalculatorApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_demo.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_draw.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_tables.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\imgui_widgets.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_dx9.cpp">
+      <Filter>vendor\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>vendor\imgui\backends</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\SandboxMain.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Phone.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="source\Phone.h">
-      <Filter>source</Filter>
+    <ClInclude Include="source\core\providers\IClockProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\PhoneApp.h">
-      <Filter>source</Filter>
+    <ClInclude Include="source\core\providers\IWeatherProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\apps\NotesApp.h">
-      <Filter>source\apps</Filter>
+    <ClInclude Include="source\core\providers\IScreenProvider.h">
+      <Filter>source\core\providers</Filter>
     </ClInclude>
-    <ClInclude Include="source\apps\PlaceholderApps.h">
-      <Filter>source\apps</Filter>
+    <ClInclude Include="source\sandbox\providers\SandboxClockProvider.h">
+      <Filter>source\sandbox\providers</Filter>
     </ClInclude>
-  </ItemGroup>
+    <ClInclude Include="source\sandbox\providers\SandboxWeatherProvider.h">
+      <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxScreenProvider.h">
+      <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Phone.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\PhoneApp.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\NotesApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\WeatherApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\CalculatorApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\PlaceholderApps.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\ClockApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h"><Filter>vendor\fontawesome</Filter></ClInclude></ItemGroup>
 </Project>
