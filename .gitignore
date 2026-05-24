@@ -10,3 +10,19 @@
 *.suo
 *.db
 *.sln.docstates
+
+# ImGui Config
+imgui.ini
+
+# Outros temporários do compilador
+*.VC.db
+*.VC.opendb
+*.sdf
+*.opensdf
+*.ipch/
+x64/
+Debug/
+Release/
+source/temp/
+
+
