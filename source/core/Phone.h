@@ -66,9 +66,9 @@ public:
 
     // ---- Public API ----
     void setClockProvider(IClockProvider* provider);
-    IClockProvider* getClockProvider() const { return clockProvider; }
+    IClockProvider* getClockProvider() const { return m_clockProvider; }
     void setScreenProvider(IScreenProvider* provider);
-    IScreenProvider* getScreenProvider() const { return screenProvider; }
+    IScreenProvider* getScreenProvider() const { return m_screenProvider; }
     void registerApp(PhoneApp* app);
     void openApp(PhoneApp* app);
     void closeApp();
@@ -78,6 +78,7 @@ public:
     void open(PhoneAnimMode mode);
     void close(PhoneAnimMode mode);
     void update(float dt);
+    void process(float dt);
     bool isVisible() const;
     bool isOpen() const { return m_isOpen; }
 
@@ -86,11 +87,11 @@ public:
 
 
 private:
-    std::vector<PhoneApp*> apps;
-    std::vector<PhoneApp*> dockApps;
-    PhoneApp* currentApp = nullptr;
-    IClockProvider* clockProvider = nullptr;
-    IScreenProvider* screenProvider = nullptr;
+    std::vector<PhoneApp*> m_apps;
+    std::vector<PhoneApp*> m_dockApps;
+    PhoneApp* m_currentApp = nullptr;
+    IClockProvider* m_clockProvider = nullptr;
+    IScreenProvider* m_screenProvider = nullptr;
 
     bool m_isOpen = false;
     float m_animProgress = 0.0f;

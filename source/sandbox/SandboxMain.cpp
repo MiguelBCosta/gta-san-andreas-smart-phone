@@ -16,6 +16,8 @@
 #include "../core/apps/ClockApp.h"
 #include "providers/SandboxScreenProvider.h"
 #include "providers/SandboxStorageProvider.h"
+#include "providers/SandboxGarageProvider.h"
+#include "../core/apps/GarageApp.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -87,6 +89,7 @@ SandboxClockProvider sandboxClock;
 SandboxScreenProvider sandboxScreen;
 static SandboxStorageProvider sandboxStorage;
 static SandboxWeatherProvider sandboxWeather;
+static SandboxGarageProvider sandboxGarage;
 static CalculatorApp calcApp;
 static CameraApp     cameraApp;
 ClockApp      clockApp;
@@ -139,6 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     phone.setScreenProvider(&sandboxScreen);
     phone.getStorage().setStorageProvider(&sandboxStorage);
     weatherApp.SetWeatherProvider(&sandboxWeather);
+    garageApp.SetGarageProvider(&sandboxGarage);
     phone.registerApp(&calcApp);
     phone.registerApp(&cameraApp);
     phone.registerApp(&clockApp);
@@ -190,7 +194,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         float dt = ImGui::GetIO().DeltaTime;
         phone.update(dt);
-        clockApp.update(dt, &sandboxClock);
+        phone.process(dt);
 
         // Draw phone if visible
         if (phone.isVisible()) {
@@ -294,6 +298,98 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::SameLine();
         if (ImGui::Button("Wipe", ImVec2(100, 30))) {
             phone.getStorage().onNewGame();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::Text("Controle do Relogio");
+        bool canSkip = sandboxClock.CanSkipTime();
+        if (ImGui::Checkbox("Permitir Descansar", &canSkip)) {
+            sandboxClock.SetCanSkipTime(canSkip);
+        }
+
+        ImGui::End();
+
+        // Control panel for garage simulation in sandbox
+        ImGui::SetNextWindowPos(ImVec2(430, 300), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(360, 250), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Controles da Garagem (Sandbox)", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Simulador da Garagem");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // 1. Inside check
+        bool inside = sandboxGarage.GetInside();
+        if (ImGui::Checkbox("Jogador em Interior", &inside)) {
+            sandboxGarage.SetInside(inside);
+        }
+
+        // 2. Mission check
+        bool mission = sandboxGarage.GetOnMission();
+        if (ImGui::Checkbox("Jogador em Missao", &mission)) {
+            sandboxGarage.SetOnMission(mission);
+        }
+
+        // 3. In Car check
+        bool inCar = sandboxGarage.GetPlayerInAnyCar();
+        if (ImGui::Checkbox("Jogador em Veiculo", &inCar)) {
+            sandboxGarage.SetPlayerInAnyCar(inCar);
+        }
+
+        if (inCar) {
+            ImGui::Indent(15.0f);
+            auto& mockV = sandboxGarage.GetMockCurrentVehicle();
+            
+            // Edit vehicle name
+            char nameBuf[128];
+            strncpy_s(nameBuf, sizeof(nameBuf), mockV.name.c_str(), _TRUNCATE);
+            if (ImGui::InputText("Nome do Carro", nameBuf, sizeof(nameBuf))) {
+                mockV.name = nameBuf;
+            }
+
+            // Edit vehicle model
+            ImGui::InputInt("ID Modelo", &mockV.model);
+            
+            // Checkboxes
+            ImGui::Checkbox("Hidraulica", &mockV.hydraulics);
+            ImGui::Unindent(15.0f);
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Entregas Ativas:");
+        
+        auto& deliveries = sandboxGarage.GetDeliveries();
+        if (deliveries.empty()) {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Nenhuma entrega ativa.");
+        } else {
+            for (size_t i = 0; i < deliveries.size(); i++) {
+                auto& del = deliveries[i];
+                ImGui::Text("ID: %d | Distancia: %.1fm %s", del.id, del.distance, del.delivered ? "(Entregue)" : "(A caminho)");
+                if (del.delivered) {
+                    ImGui::SameLine();
+                    std::string btnId = "Entrar##del_enter_" + std::to_string(del.id);
+                    if (ImGui::Button(btnId.c_str())) {
+                        // Simulate entering the delivered car
+                        sandboxGarage.SetPlayerInAnyCar(true);
+                        sandboxGarage.GetMockCurrentVehicle().model = 411; // Infernus
+                        // Clean up delivery
+                        deliveries.erase(deliveries.begin() + i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        const std::string& lastMsg = sandboxGarage.GetLastMessage();
+        if (!lastMsg.empty()) {
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "%s", lastMsg.c_str());
+            if (ImGui::Button("Limpar Mensagem")) {
+                sandboxGarage.ClearLastMessage();
+            }
         }
 
         ImGui::End();

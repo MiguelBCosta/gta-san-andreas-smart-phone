@@ -26,6 +26,9 @@ public:
     // Draw your ImGui widgets here.
     virtual void onDraw() = 0;
 
+    // Called every frame on the main game loop thread.
+    virtual void update(float dt) {}
+
     // ---- Persistence callbacks (optional) ----
     
     // Called when the game/session is saved. Write your data into 'out'.

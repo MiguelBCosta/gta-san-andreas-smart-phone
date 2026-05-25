@@ -116,6 +116,10 @@
     <ClCompile Include="source\core\Phone.cpp" />
     <ClCompile Include="source\core\PhoneStorage.cpp" />
     <ClCompile Include="source\core\apps\CalculatorApp.cpp" />
+    <ClCompile Include="source\core\apps\ClockApp.cpp" />
+    <ClCompile Include="source\core\apps\WeatherApp.cpp" />
+    <ClCompile Include="source\core\apps\NotesApp.cpp" />
+    <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -129,6 +133,7 @@
     <ClInclude Include="source\core\providers\IWeatherProvider.h" />
     <ClInclude Include="source\core\providers\IScreenProvider.h" />
     <ClInclude Include="source\core\providers\IStorageProvider.h" />
+    <ClInclude Include="source\core\providers\WeatherCommon.h" />
     <ClInclude Include="source\sandbox\providers\SandboxClockProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxWeatherProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxScreenProvider.h" />
@@ -141,6 +146,9 @@
     <ClInclude Include="source\core\apps\WeatherApp.h" />
     <ClInclude Include="source\core\apps\PlaceholderApps.h" />
     <ClInclude Include="source\core\apps\ClockApp.h" />
+    <ClInclude Include="source\core\apps\GarageApp.h" />
+    <ClInclude Include="source\core\providers\IGarageProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxGarageProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

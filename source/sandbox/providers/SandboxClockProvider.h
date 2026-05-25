@@ -8,8 +8,17 @@ private:
     int m_overrideHour = 0;
     int m_overrideMin = 0;
     int m_overrideDay = 1;
+    bool m_canSkipTime = true;
 
 public:
+    bool CanSkipTime() override {
+        return m_canSkipTime;
+    }
+
+    void SetCanSkipTime(bool canSkip) {
+        m_canSkipTime = canSkip;
+    }
+
     PhoneTime GetTime() override {
         if (m_hasOverride) {
             return { m_overrideHour, m_overrideMin, 0, m_overrideDay };

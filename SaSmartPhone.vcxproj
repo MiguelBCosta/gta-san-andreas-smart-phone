@@ -142,6 +142,10 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClCompile Include="source\core\Phone.cpp" />
     <ClCompile Include="source\core\PhoneStorage.cpp" />
     <ClCompile Include="source\core\apps\CalculatorApp.cpp" />
+    <ClCompile Include="source\core\apps\ClockApp.cpp" />
+    <ClCompile Include="source\core\apps\WeatherApp.cpp" />
+    <ClCompile Include="source\core\apps\NotesApp.cpp" />
+    <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -159,6 +163,7 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClInclude Include="source\core\providers\IWeatherProvider.h" />
     <ClInclude Include="source\core\providers\IScreenProvider.h" />
     <ClInclude Include="source\core\providers\IStorageProvider.h" />
+    <ClInclude Include="source\core\providers\WeatherCommon.h" />
     <ClInclude Include="source\gta\providers\GtaClockProvider.h" />
     <ClInclude Include="source\gta\providers\GtaWeatherProvider.h" />
     <ClInclude Include="source\gta\providers\GtaScreenProvider.h" />
@@ -170,6 +175,9 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClInclude Include="source\core\apps\WeatherApp.h" />
     <ClInclude Include="source\core\apps\PlaceholderApps.h" />
     <ClInclude Include="source\core\apps\ClockApp.h" />
+    <ClInclude Include="source\core\apps\GarageApp.h" />
+    <ClInclude Include="source\core\providers\IGarageProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaGarageProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" /></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

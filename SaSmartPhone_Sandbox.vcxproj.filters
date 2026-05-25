@@ -36,8 +36,23 @@
     <ClCompile Include="source\core\Phone.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\PhoneStorage.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
     <ClCompile Include="source\core\apps\CalculatorApp.cpp">
       <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\ClockApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\WeatherApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\NotesApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\providers\WeatherCommon.cpp">
+      <Filter>source\core\providers</Filter>
     </ClCompile>
     <ClCompile Include="vendor\imgui\imgui.cpp">
       <Filter>vendor\imgui</Filter>
@@ -71,6 +86,12 @@
     <ClInclude Include="source\core\providers\IScreenProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\providers\IStorageProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\providers\WeatherCommon.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\sandbox\providers\SandboxClockProvider.h">
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
@@ -81,6 +102,9 @@
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
     <ClInclude Include="source\core\Phone.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\PhoneStorage.h">
       <Filter>source\core</Filter>
     </ClInclude>
     <ClInclude Include="source\core\PhoneApp.h">
@@ -100,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="source\core\apps\ClockApp.h">
       <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\GarageApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\providers\IGarageProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxGarageProvider.h">
+      <Filter>source\sandbox\providers</Filter>
     </ClInclude>
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h"><Filter>vendor\fontawesome</Filter></ClInclude></ItemGroup>
 </Project>

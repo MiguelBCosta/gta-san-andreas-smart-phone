@@ -19,15 +19,6 @@ public:
 
 
 
-class GarageApp : public PhoneApp {
-public:
-    GarageApp() {
-        id = "garage"; icon = ICON_FA_CAR; name = "Garagem";
-        color = ImVec4(0.20f, 0.65f, 0.85f, 1.0f);
-    }
-    void onDraw() override { ImGui::Text("Garagem - Em breve"); }
-};
-
 class MapsApp : public PhoneApp {
 public:
     MapsApp() {

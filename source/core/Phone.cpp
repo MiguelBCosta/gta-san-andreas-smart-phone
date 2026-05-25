@@ -7,11 +7,11 @@
 // ============================================================
 
 void Phone::setClockProvider(IClockProvider* provider) {
-    clockProvider = provider;
+    m_clockProvider = provider;
 }
 
 void Phone::setScreenProvider(IScreenProvider* provider) {
-    screenProvider = provider;
+    m_screenProvider = provider;
 }
 
 void Phone::toggle(PhoneAnimMode mode) {
@@ -30,8 +30,8 @@ void Phone::close(PhoneAnimMode mode) {
 }
 
 void Phone::update(float dt) {
-    if (screenProvider) {
-        screenProvider->Update(dt);
+    if (m_screenProvider) {
+        m_screenProvider->Update(dt);
     }
     float speed = 5.0f;
     if (m_isOpen) {
@@ -43,33 +43,42 @@ void Phone::update(float dt) {
     }
 }
 
+void Phone::process(float dt) {
+    for (auto* app : m_apps) {
+        app->update(dt);
+    }
+    for (auto* app : m_dockApps) {
+        app->update(dt);
+    }
+}
+
 bool Phone::isVisible() const {
     return m_animProgress > 0.0f;
 }
 
 void Phone::registerApp(PhoneApp* app) {
     if (app->dock) {
-        dockApps.push_back(app);
-        std::sort(dockApps.begin(), dockApps.end(), [](PhoneApp* a, PhoneApp* b) {
+        m_dockApps.push_back(app);
+        std::sort(m_dockApps.begin(), m_dockApps.end(), [](PhoneApp* a, PhoneApp* b) {
             return a->dockOrder < b->dockOrder;
         });
         // Max 4 in dock
-        if (dockApps.size() > 4) dockApps.resize(4);
+        if (m_dockApps.size() > 4) m_dockApps.resize(4);
     } else {
-        apps.push_back(app);
+        m_apps.push_back(app);
     }
     m_storage.addApp(app);
 }
 
 void Phone::openApp(PhoneApp* app) {
-    currentApp = app;
+    m_currentApp = app;
     app->onOpen();
 }
 
 void Phone::closeApp() {
-    if (currentApp) {
-        currentApp->onClose();
-        currentApp = nullptr;
+    if (m_currentApp) {
+        m_currentApp->onClose();
+        m_currentApp = nullptr;
     }
 }
 
@@ -131,7 +140,7 @@ void Phone::drawHomeGrid(ImDrawList* draw, ImVec2 winPos) {
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 0.95f));
 
-    for (auto* app : apps) {
+    for (auto* app : m_apps) {
         if (curY + ICON_SZ > maxY) break;
 
         ImGui::PushID(app->id.c_str());
@@ -160,7 +169,7 @@ void Phone::drawHomeGrid(ImDrawList* draw, ImVec2 winPos) {
 }
 
 void Phone::drawHomeDock(ImDrawList* draw, ImVec2 winPos) {
-    if (!dockApps.empty()) {
+    if (!m_dockApps.empty()) {
         float dkX = winPos.x + BEZEL;
         float dkY = winPos.y + DOCK_Y;
 
@@ -173,7 +182,7 @@ void Phone::drawHomeDock(ImDrawList* draw, ImVec2 winPos) {
             24.0f
         );
 
-        int n = (int)dockApps.size();
+        int n = (int)m_dockApps.size();
         float totW = n * DOCK_ICON_SZ + (n - 1) * DOCK_GAP;
         float sx = BEZEL + std::floor((SCREEN_W - totW) / 2.0f);
         float iy = DOCK_Y + std::floor((DOCK_H - 16.0f - DOCK_ICON_SZ) / 2.0f);
@@ -181,9 +190,9 @@ void Phone::drawHomeDock(ImDrawList* draw, ImVec2 winPos) {
         for (int i = 0; i < n; i++) {
             float ix = sx + i * (DOCK_ICON_SZ + DOCK_GAP);
             
-            ImGui::PushID(dockApps[i]->id.c_str());
-            if (drawIcon(dockApps[i], draw, winPos, ix, iy, DOCK_ICON_SZ, DOCK_ICON_R, "##icon")) {
-                openApp(dockApps[i]);
+            ImGui::PushID(m_dockApps[i]->id.c_str());
+            if (drawIcon(m_dockApps[i], draw, winPos, ix, iy, DOCK_ICON_SZ, DOCK_ICON_R, "##icon")) {
+                openApp(m_dockApps[i]);
             }
             ImGui::PopID();
         }
@@ -195,7 +204,7 @@ void Phone::drawHomeDock(ImDrawList* draw, ImVec2 winPos) {
 // ============================================================
 
 void Phone::drawCurrentApp(ImDrawList* draw, ImVec2 winPos) {
-    PhoneApp* app = currentApp;
+    PhoneApp* app = m_currentApp;
 
     // Header: back button + title
     ImGui::SetCursorPos(ImVec2(BEZEL + 4.0f, HEADER_Y_POS));
@@ -299,20 +308,20 @@ void Phone::draw() {
     draw->AddRectFilled(pMin, pMax, IM_COL32(0x4B, 0x1A, 0x7A, 0xFF), SCR_R);  // base
 
     // 2. If app is open, draw dark overlay
-    if (currentApp) {
+    if (m_currentApp) {
         draw->AddRectFilled(pMin, pMax,
             ImGui::GetColorU32(ImVec4(0.05f, 0.05f, 0.07f, 0.97f)), SCR_R);
     }
 
     // 3. Main content
-    if (currentApp) {
+    if (m_currentApp) {
         drawCurrentApp(draw, winPos);
     } else {
         drawHome(draw, winPos);
     }
 
     // 4. Home indicator bar (only visible and interactive if an app is open)
-    if (currentApp) {
+    if (m_currentApp) {
         float barW = 100.0f;
         float barH = 5.0f;
         float bx = winPos.x + std::floor((PH_W - barW) / 2.0f);
@@ -356,8 +365,8 @@ void Phone::draw() {
 
 void Phone::drawStatusBar() {
     int h = 0, m = 0;
-    if (clockProvider) {
-        PhoneTime time = clockProvider->GetTime();
+    if (m_clockProvider) {
+        PhoneTime time = m_clockProvider->GetTime();
         h = time.hours;
         m = time.minutes;
     }

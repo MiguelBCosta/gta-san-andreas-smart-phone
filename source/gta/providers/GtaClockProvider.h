@@ -2,6 +2,7 @@
 #include "../../core/providers/IClockProvider.h"
 #include <game_sa/CClock.h>
 #include <game_sa/CGameLogic.h>
+#include <game_sa/CTheScripts.h>
 
 class GtaClockProvider : public IClockProvider {
 public:
@@ -16,5 +17,9 @@ public:
 
     void SkipTime(int hoursToPass) override {
         CGameLogic::PassTime(hoursToPass * 60);
+    }
+
+    bool CanSkipTime() override {
+        return !CTheScripts::IsPlayerOnAMission();
     }
 };

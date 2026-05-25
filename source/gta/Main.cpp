@@ -23,6 +23,8 @@
 #include "providers/GtaScreenProvider.h"
 #include "providers/GtaStorageProvider.h"
 #include <game_sa/CGenericGameStorage.h>
+#include "providers/GtaGarageProvider.h"
+#include "../core/apps/GarageApp.h"
 
 using namespace plugin;
 
@@ -43,6 +45,7 @@ static GtaClockProvider gtaClock;
 static GtaWeatherProvider gtaWeather;
 static GtaScreenProvider gtaScreen;
 static GtaStorageProvider gtaStorage;
+static GtaGarageProvider gtaGarage;
 
 // ---- App Instances (static lifetime) ----
 static CalculatorApp calcApp;
@@ -366,6 +369,7 @@ public:
         phone.setScreenProvider(&gtaScreen);
         phone.getStorage().setStorageProvider(&gtaStorage);
         weatherApp.SetWeatherProvider(&gtaWeather);
+        garageApp.SetGarageProvider(&gtaGarage);
 
         // Register all apps (order = order on home screen)
         phone.registerApp(&calcApp);
@@ -408,7 +412,7 @@ public:
                 phone.closeApp();
             }
 
-            clockApp.update(dt, &gtaClock);
+            phone.process(dt);
         };
     }
 } gSmartPhone;
