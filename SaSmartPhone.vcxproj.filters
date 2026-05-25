@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="source">
@@ -12,6 +12,9 @@
     </Filter>
     <Filter Include="source\core\providers">
       <UniqueIdentifier>{E48F4DEF-C5EA-4FF3-A2DC-94F54AF1927D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\core\resources">
+      <UniqueIdentifier>{596CAD39-137B-41FC-B2A7-640D8E96C9A8}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\gta">
       <UniqueIdentifier>{56CD2BA4-1CB6-407A-B674-38DE6D727183}</UniqueIdentifier>
@@ -37,7 +40,10 @@
     <Filter Include="vendor\minhook\src\hde">
       <UniqueIdentifier>{D95AFE10-0494-4659-B1AD-8D130538F477}</UniqueIdentifier>
     </Filter>
-  <Filter Include="vendor\fontawesome"><UniqueIdentifier>{AB4C6E9F-F9F6-4C51-8446-1B99648AC008}</UniqueIdentifier></Filter></ItemGroup>
+    <Filter Include="vendor\fontawesome">
+      <UniqueIdentifier>{AB4C6E9F-F9F6-4C51-8446-1B99648AC008}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\gta\Main.cpp">
       <Filter>source\gta</Filter>
@@ -62,6 +68,12 @@
     </ClCompile>
     <ClCompile Include="source\core\providers\WeatherCommon.cpp">
       <Filter>source\core\providers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\GarageApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp">
+      <Filter>source\gta\providers</Filter>
     </ClCompile>
     <ClCompile Include="vendor\imgui\imgui.cpp">
       <Filter>vendor\imgui</Filter>
@@ -122,6 +134,9 @@
     <ClInclude Include="source\gta\providers\GtaScreenProvider.h">
       <Filter>source\gta\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaStorageProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\Phone.h">
       <Filter>source\core</Filter>
     </ClInclude>
@@ -135,6 +150,9 @@
       <Filter>source\core\apps</Filter>
     </ClInclude>
     <ClInclude Include="source\core\apps\WeatherApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\CalculatorApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
     <ClInclude Include="source\core\apps\PlaceholderApps.h">
@@ -152,5 +170,27 @@
     <ClInclude Include="source\gta\providers\GtaGarageProvider.h">
       <Filter>source\gta\providers</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h"><Filter>vendor\fontawesome</Filter></ClInclude></ItemGroup>
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h">
+      <Filter>vendor\fontawesome</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\resources\resource.h">
+      <Filter>source\core\resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\core\resources\resources.rc">
+      <Filter>source\core\resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vendor\fontawesome\fa-solid-900.ttf">
+      <Filter>vendor\fontawesome</Filter>
+    </None>
+    <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf">
+      <Filter>vendor\imgui</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\core\resources\resources.rc" />
+  </ItemGroup>
 </Project>

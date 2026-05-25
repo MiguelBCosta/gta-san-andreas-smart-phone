@@ -1,8 +1,14 @@
 #include "PhoneStorage.h"
+#include "Phone.h"
 #include <nlohmann/json.hpp>
+#include <algorithm>
 
 void PhoneStorage::setStorageProvider(IStorageProvider* provider) {
     m_provider = provider;
+}
+
+void PhoneStorage::setPhone(Phone* phone) {
+    m_phone = phone;
 }
 
 void PhoneStorage::addApp(PhoneApp* app) {
@@ -27,6 +33,25 @@ void PhoneStorage::onGameSave(int slot) {
         }
     }
     root["apps"] = appsJson;
+
+    // Save layout ordering
+    if (m_phone) {
+        nlohmann::json layoutJson = nlohmann::json::object();
+        
+        nlohmann::json gridOrder = nlohmann::json::array();
+        for (auto* app : m_phone->m_apps) {
+            gridOrder.push_back(app->id);
+        }
+        layoutJson["grid"] = gridOrder;
+
+        nlohmann::json dockOrder = nlohmann::json::array();
+        for (auto* app : m_phone->m_dockApps) {
+            dockOrder.push_back(app->id);
+        }
+        layoutJson["dock"] = dockOrder;
+
+        root["layout"] = layoutJson;
+    }
 
     m_provider->WriteSlotData(slot, root.dump(4));
 }
@@ -56,6 +81,45 @@ void PhoneStorage::onGameLoad(int slot) {
                 app->onWipe();
             }
         }
+
+        // Load layout ordering
+        if (m_phone && root.contains("layout")) {
+            nlohmann::json layoutJson = root["layout"];
+            
+            if (layoutJson.contains("grid") && layoutJson["grid"].is_array()) {
+                std::vector<std::string> gridOrder = layoutJson["grid"].get<std::vector<std::string>>();
+                std::vector<PhoneApp*> newOrder;
+                for (const auto& id : gridOrder) {
+                    auto it = std::find_if(m_phone->m_apps.begin(), m_phone->m_apps.end(), [&](PhoneApp* a) {
+                        return a->id == id;
+                    });
+                    if (it != m_phone->m_apps.end()) {
+                        newOrder.push_back(*it);
+                    }
+                }
+                // Append missing/new apps
+                for (auto* app : m_phone->m_apps) {
+                    if (std::find(newOrder.begin(), newOrder.end(), app) == newOrder.end()) {
+                        newOrder.push_back(app);
+                    }
+                }
+                m_phone->m_apps = newOrder;
+            }
+
+            if (layoutJson.contains("dock") && layoutJson["dock"].is_array()) {
+                std::vector<std::string> dockOrder = layoutJson["dock"].get<std::vector<std::string>>();
+                std::vector<PhoneApp*> newDock;
+                for (const auto& id : dockOrder) {
+                    auto it = std::find_if(m_phone->m_apps.begin(), m_phone->m_apps.end(), [&](PhoneApp* a) {
+                        return a->id == id;
+                    });
+                    if (it != m_phone->m_apps.end()) {
+                        newDock.push_back(*it);
+                    }
+                }
+                m_phone->m_dockApps = newDock;
+            }
+        }
     } catch (const std::exception&) {
         // JSON parsing error, wipe memory to be safe
         onNewGame();
@@ -65,5 +129,8 @@ void PhoneStorage::onGameLoad(int slot) {
 void PhoneStorage::onNewGame() {
     for (auto* app : m_apps) {
         app->onWipe();
+    }
+    if (m_phone) {
+        m_phone->resetDefaultLayout();
     }
 }

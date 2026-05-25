@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
 #include <imgui.h>
 #include "PhoneApp.h"
 #include "PhoneStorage.h"
@@ -15,6 +16,7 @@ enum class PhoneAnimMode {
 
 class Phone {
 public:
+    Phone();
     PhoneStorage& getStorage() { return m_storage; }
 
     // ---- State ----
@@ -85,9 +87,19 @@ public:
     // Call this every frame when isVisible() == true
     void draw();
 
+    void resetDefaultLayout();
+
+    struct AppVisualState {
+        float x = -1.0f;
+        float y = -1.0f;
+        bool isDragging = false;
+    };
 
 private:
+    friend class PhoneStorage;
+
     std::vector<PhoneApp*> m_apps;
+    std::vector<PhoneApp*> m_defaultApps;
     std::vector<PhoneApp*> m_dockApps;
     PhoneApp* m_currentApp = nullptr;
     IClockProvider* m_clockProvider = nullptr;
@@ -97,11 +109,23 @@ private:
     float m_animProgress = 0.0f;
     PhoneStorage m_storage;
 
+    // Drag and drop / edit mode states
+    bool m_editMode = false;
+    bool m_isDragging = false;
+    std::string m_draggedKey = "";
+    ImVec2 m_dragOffset = ImVec2(0, 0);
+    std::string m_pressedKey = "";
+    float m_pressTimer = 0.0f;
+    float m_time = 0.0f;
+    bool m_dragStartedThisClick = false;
+
+    std::unordered_map<std::string, AppVisualState> m_visualStates;
+
     void drawHome(ImDrawList* draw, ImVec2 winPos);
     void drawHomeGrid(ImDrawList* draw, ImVec2 winPos);
     void drawHomeDock(ImDrawList* draw, ImVec2 winPos);
     void drawCurrentApp(ImDrawList* draw, ImVec2 winPos);
     void drawStatusBar();
     bool drawIcon(PhoneApp* app, ImDrawList* draw, ImVec2 winPos,
-                  float curX, float curY, float sz, float rounding, const char* btnId);
+                  float curX, float curY, float sz, float rounding, const char* btnId, const std::string& key);
 };

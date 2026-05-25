@@ -13,6 +13,9 @@
     <Filter Include="source\core\providers">
       <UniqueIdentifier>{E46D9DE7-D021-4054-B404-272A6BF3EBF4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\core\resources">
+      <UniqueIdentifier>{11037F57-5169-42F4-93D6-448C07923AAD}</UniqueIdentifier>
+    </Filter>
     <Filter Include="source\sandbox">
       <UniqueIdentifier>{FC76175B-F7B0-44FB-9FED-F8E18D16DD15}</UniqueIdentifier>
     </Filter>
@@ -50,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="source\core\apps\NotesApp.cpp">
       <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\GarageApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sandbox\providers\SandboxGarageProvider.cpp">
+      <Filter>source\sandbox\providers</Filter>
     </ClCompile>
     <ClCompile Include="source\core\providers\WeatherCommon.cpp">
       <Filter>source\core\providers</Filter>
@@ -101,6 +110,9 @@
     <ClInclude Include="source\sandbox\providers\SandboxScreenProvider.h">
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxStorageProvider.h">
+      <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\Phone.h">
       <Filter>source\core</Filter>
     </ClInclude>
@@ -134,5 +146,24 @@
     <ClInclude Include="source\sandbox\providers\SandboxGarageProvider.h">
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h"><Filter>vendor\fontawesome</Filter></ClInclude></ItemGroup>
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h">
+      <Filter>vendor\fontawesome</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\resources\resource.h">
+      <Filter>source\core\resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\core\resources\resources.rc">
+      <Filter>source\core\resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vendor\fontawesome\fa-solid-900.ttf">
+      <Filter>vendor\fontawesome</Filter>
+    </None>
+    <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf">
+      <Filter>vendor\imgui</Filter>
+    </None>
+  </ItemGroup>
 </Project>

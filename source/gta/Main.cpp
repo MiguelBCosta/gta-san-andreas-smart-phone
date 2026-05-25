@@ -22,6 +22,7 @@
 #include "../core/apps/ClockApp.h"
 #include "providers/GtaScreenProvider.h"
 #include "providers/GtaStorageProvider.h"
+#include "../core/resources/resource.h"
 #include <game_sa/CGenericGameStorage.h>
 #include "providers/GtaGarageProvider.h"
 #include "../core/apps/GarageApp.h"
@@ -60,15 +61,7 @@ static PhoneCallApp  phoneCallApp;
 static SettingsApp   settingsApp;
 static WeatherApp    weatherApp;
 
-#include <fstream>
 #include <string>
-
-void LogDebug(const std::string& msg) {
-    std::ofstream log("sasmartphone_debug.log", std::ios::app);
-    if (log.is_open()) {
-        log << msg << std::endl;
-    }
-}
 
 // ---- Save/Load Hooks ----
 static bool loadedFromSave = false;
@@ -112,24 +105,18 @@ int GetLoadedSlot() {
 }
 
 bool __cdecl hkGenericSave(int slot) {
-    LogDebug("[Hook] hkGenericSave called for slot " + std::to_string(slot));
     bool result = oGenericSave(slot);
-    LogDebug("[Hook] oGenericSave returned " + std::to_string(result));
     if (result) {
-        LogDebug("[Hook] calling phone.getStorage().onGameSave for slot " + std::to_string(slot + 1));
         phone.getStorage().onGameSave(slot + 1);
     }
     return result;
 }
 
 bool __cdecl hkGenericLoad(bool* arg1) {
-    LogDebug("[Hook] hkGenericLoad called");
     bool result = oGenericLoad(arg1);
-    LogDebug("[Hook] oGenericLoad returned " + std::to_string(result));
     if (result) {
         loadedFromSave = true;
         int slot = GetLoadedSlot();
-        LogDebug("[Hook] calling phone.getStorage().onGameLoad for slot " + std::to_string(slot));
         phone.getStorage().onGameLoad(slot);
     }
     return result;
@@ -216,22 +203,31 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
         ImGuiIO& io = ImGui::GetIO();
         io.FontGlobalScale = 1.0f;
         
-        // Dynamic path resolution for the font (finds the ASI location)
+        // Load Roboto from memory (Win32 embedded resource)
         HMODULE hModule = NULL;
         GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)&hkEndScene, &hModule);
-        char modulePath[MAX_PATH];
-        GetModuleFileNameA(hModule, modulePath, MAX_PATH);
-        std::string fullPath = modulePath;
-        std::string basePath = fullPath.substr(0, fullPath.find_last_of("\\/")) + "\\";
 
-        // Load Roboto
-        io.Fonts->AddFontFromFileTTF((basePath + "Roboto-Medium.ttf").c_str(), 15.0f);
+        HRSRC hResRoboto = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_ROBOTO), (LPCSTR)RT_RCDATA);
+        HGLOBAL hDataRoboto = LoadResource(hModule, hResRoboto);
+        void* pRobotoData = LockResource(hDataRoboto);
+        DWORD cbRobotoData = SizeofResource(hModule, hResRoboto);
+
+        ImFontConfig robotoConfig;
+        robotoConfig.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF(pRobotoData, cbRobotoData, 15.0f, &robotoConfig);
+
+        // Merge FontAwesome from memory (Win32 embedded resource)
+        HRSRC hResFA = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_AWESOME), (LPCSTR)RT_RCDATA);
+        HGLOBAL hDataFA = LoadResource(hModule, hResFA);
+        void* pFAData = LockResource(hDataFA);
+        DWORD cbFAData = SizeofResource(hModule, hResFA);
 
         ImFontConfig config;
         config.MergeMode = true;
         config.PixelSnapH = true;
+        config.FontDataOwnedByAtlas = false;
         static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-        io.Fonts->AddFontFromFileTTF((basePath + "fa-solid-900.ttf").c_str(), 0.0f, &config, icon_ranges);
+        io.Fonts->AddFontFromMemoryTTF(pFAData, cbFAData, 15.0f, &config, icon_ranges);
 
         ImGui_ImplWin32_Init(gameWindow);
         ImGui_ImplDX9_Init(pDevice);
@@ -342,7 +338,6 @@ void TryInstallGameHooks() {
 
     MH_STATUS status = MH_Initialize();
     if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
-        LogDebug("[Hook] MH_Initialize failed with status " + std::to_string(status));
         return;
     }
 
@@ -358,7 +353,6 @@ void TryInstallGameHooks() {
     MH_EnableHook((void*)0x53F3C0);
 
     gameHooksInstalled = true;
-    LogDebug("[Hook] Game memory hooks installed successfully.");
 }
 
 // ---- Plugin Entry ----
@@ -389,12 +383,9 @@ public:
         };
 
         Events::reInitGameEvent += []() {
-            LogDebug("[Event] reInitGameEvent triggered. loadedFromSave is " + std::to_string(loadedFromSave));
             if (loadedFromSave) {
-                LogDebug("[Event] skipping clear/wipe because we just loaded a save.");
                 loadedFromSave = false;
             } else {
-                LogDebug("[Event] calling phone.getStorage().onNewGame()");
                 phone.getStorage().onNewGame();
             }
         };

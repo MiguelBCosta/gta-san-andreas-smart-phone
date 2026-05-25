@@ -12,7 +12,7 @@ public:
     CameraApp() {
         id = "camera"; icon = ICON_FA_CAMERA; name = "Camera";
         color = ImVec4(0.30f, 0.30f, 0.35f, 1.0f);
-        dock = true; dockOrder = 1;
+        dock = true; dockOrder = 3;
     }
     void onDraw() override { ImGui::Text("Camera - Em breve"); }
 };
@@ -43,7 +43,6 @@ public:
     MusicApp() {
         id = "music"; icon = ICON_FA_MUSIC; name = "Musica";
         color = ImVec4(0.70f, 0.10f, 0.15f, 1.0f);
-        dock = true; dockOrder = 3;
     }
     void onDraw() override { ImGui::Text("Musica - Em breve"); }
 };
@@ -53,7 +52,7 @@ public:
     PhoneCallApp() {
         id = "phone"; icon = ICON_FA_PHONE; name = "Ligar";
         color = ImVec4(0.18f, 0.72f, 0.30f, 1.0f);
-        dock = true; dockOrder = 4;
+        dock = true; dockOrder = 1;
     }
     void onDraw() override { ImGui::Text("Telefone - Em breve"); }
 };

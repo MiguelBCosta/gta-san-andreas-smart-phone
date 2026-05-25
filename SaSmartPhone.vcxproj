@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release GTA-SA|Win32">
@@ -96,8 +96,6 @@ if defined GTA_SA_DIR (
 taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING" 
 
 xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
-xcopy /Y "$(ProjectDir)vendor\fontawesome\fa-solid-900.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
-xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
 )</Command>
     </PostBuildEvent>
@@ -131,8 +129,6 @@ if defined GTA_SA_DIR (
 taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING" 
 
 xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
-xcopy /Y "$(ProjectDir)vendor\fontawesome\fa-solid-900.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
-xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
 )</Command>
     </PostBuildEvent>
@@ -146,6 +142,8 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClCompile Include="source\core\apps\WeatherApp.cpp" />
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
+    <ClCompile Include="source\core\apps\GarageApp.cpp" />
+    <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -175,10 +173,20 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClInclude Include="source\core\apps\WeatherApp.h" />
     <ClInclude Include="source\core\apps\PlaceholderApps.h" />
     <ClInclude Include="source\core\apps\ClockApp.h" />
+    <ClInclude Include="source\core\apps\CalculatorApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
     <ClInclude Include="source\core\providers\IGarageProvider.h" />
     <ClInclude Include="source\gta\providers\GtaGarageProvider.h" />
-    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" /></ItemGroup>
+    <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
+    <ClInclude Include="source\core\resources\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="source\core\resources\resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vendor\fontawesome\fa-solid-900.ttf" />
+    <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

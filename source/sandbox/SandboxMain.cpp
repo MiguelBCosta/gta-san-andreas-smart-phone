@@ -18,6 +18,7 @@
 #include "providers/SandboxStorageProvider.h"
 #include "providers/SandboxGarageProvider.h"
 #include "../core/apps/GarageApp.h"
+#include "../core/resources/resource.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -124,15 +125,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
 
-    // Load primary font (Roboto)
-    io.Fonts->AddFontFromFileTTF("vendor\\imgui\\misc\\fonts\\Roboto-Medium.ttf", 15.0f);
+    // Load primary font (Roboto) from memory (Win32 embedded resource)
+    HMODULE hModule = GetModuleHandle(NULL);
 
-    // Merge FontAwesome
+    HRSRC hResRoboto = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_ROBOTO), (LPCSTR)RT_RCDATA);
+    HGLOBAL hDataRoboto = LoadResource(hModule, hResRoboto);
+    void* pRobotoData = LockResource(hDataRoboto);
+    DWORD cbRobotoData = SizeofResource(hModule, hResRoboto);
+
+    ImFontConfig robotoConfig;
+    robotoConfig.FontDataOwnedByAtlas = false;
+    io.Fonts->AddFontFromMemoryTTF(pRobotoData, cbRobotoData, 15.0f, &robotoConfig);
+
+    // Merge FontAwesome from memory (Win32 embedded resource)
+    HRSRC hResFA = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_AWESOME), (LPCSTR)RT_RCDATA);
+    HGLOBAL hDataFA = LoadResource(hModule, hResFA);
+    void* pFAData = LockResource(hDataFA);
+    DWORD cbFAData = SizeofResource(hModule, hResFA);
+
     ImFontConfig config;
     config.MergeMode = true;
     config.PixelSnapH = true;
+    config.FontDataOwnedByAtlas = false;
     static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-    io.Fonts->AddFontFromFileTTF("vendor\\fontawesome\\fa-solid-900.ttf", 0.0f, &config, icon_ranges);
+    io.Fonts->AddFontFromMemoryTTF(pFAData, cbFAData, 15.0f, &config, icon_ranges);
 
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX9_Init(g_pd3dDevice);

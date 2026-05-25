@@ -10,7 +10,7 @@
 *.suo
 *.db
 *.sln.docstates
-
+sandbox_saves/
 # ImGui Config
 imgui.ini
 
