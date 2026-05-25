@@ -58,6 +58,7 @@ void Phone::registerApp(PhoneApp* app) {
     } else {
         apps.push_back(app);
     }
+    m_storage.addApp(app);
 }
 
 void Phone::openApp(PhoneApp* app) {

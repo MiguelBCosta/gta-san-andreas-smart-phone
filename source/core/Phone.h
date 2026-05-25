@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include "PhoneApp.h"
+#include "PhoneStorage.h"
 #include "providers/IClockProvider.h"
 #include "providers/IScreenProvider.h"
 
@@ -14,6 +15,8 @@ enum class PhoneAnimMode {
 
 class Phone {
 public:
+    PhoneStorage& getStorage() { return m_storage; }
+
     // ---- State ----
 
     // ---- Layout constants (from MoonPhone.lua) ----
@@ -91,6 +94,7 @@ private:
 
     bool m_isOpen = false;
     float m_animProgress = 0.0f;
+    PhoneStorage m_storage;
 
     void drawHome(ImDrawList* draw, ImVec2 winPos);
     void drawHomeGrid(ImDrawList* draw, ImVec2 winPos);

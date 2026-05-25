@@ -21,6 +21,8 @@
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/ClockApp.h"
 #include "providers/GtaScreenProvider.h"
+#include "providers/GtaStorageProvider.h"
+#include <game_sa/CGenericGameStorage.h>
 
 using namespace plugin;
 
@@ -40,6 +42,7 @@ Phone phone;
 static GtaClockProvider gtaClock;
 static GtaWeatherProvider gtaWeather;
 static GtaScreenProvider gtaScreen;
+static GtaStorageProvider gtaStorage;
 
 // ---- App Instances (static lifetime) ----
 static CalculatorApp calcApp;
@@ -53,6 +56,81 @@ static NotesApp      notesApp;
 static PhoneCallApp  phoneCallApp;
 static SettingsApp   settingsApp;
 static WeatherApp    weatherApp;
+
+#include <fstream>
+#include <string>
+
+void LogDebug(const std::string& msg) {
+    std::ofstream log("sasmartphone_debug.log", std::ios::app);
+    if (log.is_open()) {
+        log << msg << std::endl;
+    }
+}
+
+// ---- Save/Load Hooks ----
+static bool loadedFromSave = false;
+
+typedef bool(__cdecl* GenericSave_t)(int);
+static GenericSave_t oGenericSave = nullptr;
+
+typedef bool(__cdecl* GenericLoad_t)(bool*);
+static GenericLoad_t oGenericLoad = nullptr;
+
+int GetSlotFromFilename(const char* filepath) {
+    if (!filepath) return 0;
+    std::string path(filepath);
+    std::transform(path.begin(), path.end(), path.begin(), ::tolower);
+    size_t pos = path.find("gtasasf");
+    if (pos != std::string::npos && pos + 7 < path.length()) {
+        char numChar = path[pos + 7];
+        if (numChar >= '1' && numChar <= '8') {
+            return numChar - '0';
+        }
+    }
+    return 0;
+}
+
+int GetLoadedSlot() {
+    // 1. Try reading the slot from the Menu Manager (0-indexed, so add 1)
+    int slot = FrontEndMenuManager.m_nSelectedSaveGame + 1;
+    if (slot >= 1 && slot <= 8) return slot;
+
+    // 2. Fallback to parsing filename in case of custom loaders/cheats
+    slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileName);
+    if (slot >= 1 && slot <= 8) return slot;
+
+    slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileNameWithPath);
+    if (slot >= 1 && slot <= 8) return slot;
+
+    slot = GetSlotFromFilename(CGenericGameStorage::ms_ValidSaveName);
+    if (slot >= 1 && slot <= 8) return slot;
+
+    return 1; // Fallback
+}
+
+bool __cdecl hkGenericSave(int slot) {
+    LogDebug("[Hook] hkGenericSave called for slot " + std::to_string(slot));
+    bool result = oGenericSave(slot);
+    LogDebug("[Hook] oGenericSave returned " + std::to_string(result));
+    if (result) {
+        LogDebug("[Hook] calling phone.getStorage().onGameSave for slot " + std::to_string(slot + 1));
+        phone.getStorage().onGameSave(slot + 1);
+    }
+    return result;
+}
+
+bool __cdecl hkGenericLoad(bool* arg1) {
+    LogDebug("[Hook] hkGenericLoad called");
+    bool result = oGenericLoad(arg1);
+    LogDebug("[Hook] oGenericLoad returned " + std::to_string(result));
+    if (result) {
+        loadedFromSave = true;
+        int slot = GetLoadedSlot();
+        LogDebug("[Hook] calling phone.getStorage().onGameLoad for slot " + std::to_string(slot));
+        phone.getStorage().onGameLoad(slot);
+    }
+    return result;
+}
 
 bool CanOpenPhone() {
     // 1. Menu de pausa ou mapa
@@ -182,22 +260,26 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 }
 
 // ---- Hook Installation ----
-static bool hookInstalled = false;
+static bool d3dHooksInstalled = false;
 
-void TryInstallHook() {
-    if (hookInstalled) return;
+void TryInstallD3DHooks() {
+    if (d3dHooksInstalled) return;
 
     IDirect3DDevice9* device = *(IDirect3DDevice9**)0xC97C28;
     if (!device) return;
 
     void** vtable = *(void***)device;
 
-    if (MH_Initialize() != MH_OK) return;
-    if (MH_CreateHook(vtable[42], &hkEndScene, (void**)&oEndScene) != MH_OK) return;
-    MH_CreateHook(vtable[16], &hkReset, (void**)&oReset);
-    MH_EnableHook(MH_ALL_HOOKS);
+    MH_Initialize(); // Ignore if already initialized by game hooks
+    
+    if (MH_CreateHook(vtable[42], &hkEndScene, (void**)&oEndScene) == MH_OK) {
+        MH_EnableHook(vtable[42]);
+    }
+    if (MH_CreateHook(vtable[16], &hkReset, (void**)&oReset) == MH_OK) {
+        MH_EnableHook(vtable[16]);
+    }
 
-    hookInstalled = true;
+    d3dHooksInstalled = true;
 }
 
 // ---- CPad::UpdateMouse Hook ----
@@ -250,14 +332,30 @@ void __cdecl hkUpdateMouse() {
     }
 }
 
-static bool mouseHookInstalled = false;
+static bool gameHooksInstalled = false;
 
-void TryInstallMouseHook() {
-    if (mouseHookInstalled) return;
-    if (MH_CreateHook((void*)0x53F3C0, &hkUpdateMouse, (void**)&oUpdateMouse) == MH_OK) {
-        MH_EnableHook((void*)0x53F3C0);
-        mouseHookInstalled = true;
+void TryInstallGameHooks() {
+    if (gameHooksInstalled) return;
+
+    MH_STATUS status = MH_Initialize();
+    if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
+        LogDebug("[Hook] MH_Initialize failed with status " + std::to_string(status));
+        return;
     }
+
+    // Save/Load Hooks
+    MH_CreateHook((void*)0x5D13E0, &hkGenericSave, (void**)&oGenericSave);
+    MH_CreateHook((void*)0x5D17B0, &hkGenericLoad, (void**)&oGenericLoad);
+
+    // Mouse hook
+    MH_CreateHook((void*)0x53F3C0, &hkUpdateMouse, (void**)&oUpdateMouse);
+
+    MH_EnableHook((void*)0x5D13E0);
+    MH_EnableHook((void*)0x5D17B0);
+    MH_EnableHook((void*)0x53F3C0);
+
+    gameHooksInstalled = true;
+    LogDebug("[Hook] Game memory hooks installed successfully.");
 }
 
 // ---- Plugin Entry ----
@@ -266,6 +364,7 @@ public:
     SaSmartPhone() {
         phone.setClockProvider(&gtaClock);
         phone.setScreenProvider(&gtaScreen);
+        phone.getStorage().setStorageProvider(&gtaStorage);
         weatherApp.SetWeatherProvider(&gtaWeather);
 
         // Register all apps (order = order on home screen)
@@ -281,9 +380,24 @@ public:
         phone.registerApp(&settingsApp);
         phone.registerApp(&weatherApp);
 
+        Events::initGameEvent += []() {
+            TryInstallGameHooks();
+        };
+
+        Events::reInitGameEvent += []() {
+            LogDebug("[Event] reInitGameEvent triggered. loadedFromSave is " + std::to_string(loadedFromSave));
+            if (loadedFromSave) {
+                LogDebug("[Event] skipping clear/wipe because we just loaded a save.");
+                loadedFromSave = false;
+            } else {
+                LogDebug("[Event] calling phone.getStorage().onNewGame()");
+                phone.getStorage().onNewGame();
+            }
+        };
+
         Events::gameProcessEvent += []() {
-            TryInstallHook();
-            TryInstallMouseHook();
+            TryInstallGameHooks();
+            TryInstallD3DHooks();
 
             // 1. Obter o delta time de forma segura usando o CTimer do jogo (ms_fTimeStep / 50.0f)
             float dt = CTimer::ms_fTimeStep / 50.0f;

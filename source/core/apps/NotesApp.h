@@ -26,4 +26,19 @@ public:
         );
         ImGui::PopStyleColor();
     }
+
+    void onSave(nlohmann::json& out) override {
+        out["buffer"] = std::string(buffer);
+    }
+
+    void onLoad(const nlohmann::json& in) override {
+        if (in.contains("buffer") && in["buffer"].is_string()) {
+            std::string text = in["buffer"].get<std::string>();
+            strncpy_s(buffer, sizeof(buffer), text.c_str(), _TRUNCATE);
+        }
+    }
+
+    void onWipe() override {
+        memset(buffer, 0, sizeof(buffer));
+    }
 };

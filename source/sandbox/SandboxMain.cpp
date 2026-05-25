@@ -15,6 +15,7 @@
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/ClockApp.h"
 #include "providers/SandboxScreenProvider.h"
+#include "providers/SandboxStorageProvider.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -84,6 +85,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 Phone phone;
 SandboxClockProvider sandboxClock;
 SandboxScreenProvider sandboxScreen;
+static SandboxStorageProvider sandboxStorage;
 static SandboxWeatherProvider sandboxWeather;
 static CalculatorApp calcApp;
 static CameraApp     cameraApp;
@@ -135,6 +137,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Setup Phone
     phone.setClockProvider(&sandboxClock);
     phone.setScreenProvider(&sandboxScreen);
+    phone.getStorage().setStorageProvider(&sandboxStorage);
     weatherApp.SetWeatherProvider(&sandboxWeather);
     phone.registerApp(&calcApp);
     phone.registerApp(&cameraApp);
@@ -268,6 +271,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Text("Tecla F1: Abre/Fecha o celular");
+        ImGui::End();
+
+        // Control panel for phone storage simulation in sandbox
+        ImGui::SetNextWindowPos(ImVec2(50, 300), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(360, 160), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Controles de Persistencia (Sandbox)", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Simulador de Save/Load/Wipe do Celular");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        static int selectedSlot = 1;
+        ImGui::SliderInt("Slot do Save", &selectedSlot, 1, 8);
+
+        if (ImGui::Button("Salvar Slot", ImVec2(100, 30))) {
+            phone.getStorage().onGameSave(selectedSlot);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Carregar Slot", ImVec2(100, 30))) {
+            phone.getStorage().onGameLoad(selectedSlot);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Wipe", ImVec2(100, 30))) {
+            phone.getStorage().onNewGame();
+        }
+
         ImGui::End();
 
         ImGui::EndFrame();

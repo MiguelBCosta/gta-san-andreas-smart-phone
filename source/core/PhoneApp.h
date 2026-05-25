@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <imgui.h>
+#include <nlohmann/json.hpp>
 
 // Base class for all phone apps.
 // Each app must implement onDraw(). onOpen/onClose are optional.
@@ -24,4 +25,16 @@ public:
     // Called every frame while the app is the active app.
     // Draw your ImGui widgets here.
     virtual void onDraw() = 0;
+
+    // ---- Persistence callbacks (optional) ----
+    
+    // Called when the game/session is saved. Write your data into 'out'.
+    virtual void onSave(nlohmann::json& out) {}
+
+    // Called when a saved game/session is loaded. Read your data from 'in'.
+    virtual void onLoad(const nlohmann::json& in) {}
+
+    // Called when a new game starts or the device is wiped. Reset your app's state.
+    virtual void onWipe() {}
 };
+

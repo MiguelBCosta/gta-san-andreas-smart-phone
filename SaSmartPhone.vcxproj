@@ -66,7 +66,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_NON_CONFORMING_SWPRINTFS;TARGET_NAME=R"($(TargetName))";GTASA;GTAGAME_NAME="San Andreas";GTAGAME_ABBR="SA";GTAGAME_ABBRLOW="sa";GTAGAME_PROTAGONISTNAME="CJ";GTAGAME_CITYNAME="San Andreas";_DX9_SDK_INSTALLED;PLUGIN_SGV_10US;RW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;$(ProjectDir)vendor\json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -107,7 +107,7 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;_CRT_NON_CONFORMING_SWPRINTFS;TARGET_NAME=R"($(TargetName))";GTASA;GTAGAME_NAME="San Andreas";GTAGAME_ABBR="SA";GTAGAME_ABBRLOW="sa";GTAGAME_PROTAGONISTNAME="CJ";GTAGAME_CITYNAME="San Andreas";_DX9_SDK_INSTALLED;PLUGIN_SGV_10US;RW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PLUGIN_SDK_DIR)\Plugin_SA;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\enums;$(PLUGIN_SDK_DIR)\Plugin_SA\game_sa\rw;$(PLUGIN_SDK_DIR)\shared;$(PLUGIN_SDK_DIR)\shared\game;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\imgui\backends;$(ProjectDir)vendor\kiero;$(ProjectDir)vendor\minhook\include;$(ProjectDir)vendor\fontawesome;$(ProjectDir)vendor\json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -140,6 +140,7 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
   <ItemGroup>
     <ClCompile Include="source\gta\Main.cpp" />
     <ClCompile Include="source\core\Phone.cpp" />
+    <ClCompile Include="source\core\PhoneStorage.cpp" />
     <ClCompile Include="source\core\apps\CalculatorApp.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
@@ -157,10 +158,13 @@ xcopy /Y "$(ProjectDir)vendor\imgui\misc\fonts\Roboto-Medium.ttf" "$(GTA_SA_DIR)
     <ClInclude Include="source\core\providers\IClockProvider.h" />
     <ClInclude Include="source\core\providers\IWeatherProvider.h" />
     <ClInclude Include="source\core\providers\IScreenProvider.h" />
+    <ClInclude Include="source\core\providers\IStorageProvider.h" />
     <ClInclude Include="source\gta\providers\GtaClockProvider.h" />
     <ClInclude Include="source\gta\providers\GtaWeatherProvider.h" />
     <ClInclude Include="source\gta\providers\GtaScreenProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaStorageProvider.h" />
     <ClInclude Include="source\core\Phone.h" />
+    <ClInclude Include="source\core\PhoneStorage.h" />
     <ClInclude Include="source\core\PhoneApp.h" />
     <ClInclude Include="source\core\apps\NotesApp.h" />
     <ClInclude Include="source\core\apps\WeatherApp.h" />
