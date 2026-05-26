@@ -310,69 +310,57 @@ void PhoneCallApp::drawIncomingCall() {
     float avatarX = (contentW - avatarRadius * 2.0f) / 2.0f;
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
-    // Place decline and accept buttons at the bottom of the window
+    // Decorative-only buttons at the bottom (non-interactive)
     float btnSize = 64.0f;
     float gap = 52.0f;
     float totalW = btnSize * 2.0f + gap;
     float startX = (contentW - totalW) / 2.0f;
     float buttonsY = contentH - 110.0f;
 
-    // 1. Decline (Desligar)
-    ImGui::SetCursorPosY(buttonsY);
-    ImGui::SetCursorPosX(startX);
-    ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.92f, 0.30f, 0.26f, 1.0f)); // iOS red
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(1.0f, 0.35f, 0.30f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.80f, 0.25f, 0.20f, 1.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImVec2 winPos = ImGui::GetWindowPos();
 
-    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
-    if (ImGui::Button(ICON_FA_PHONE_SLASH "##decline", ImVec2(btnSize, btnSize))) {
-        // Placeholder: UI only - game will end the call on its own
-        m_callState = PhoneCallState::IDLE;
-        m_activeCallerId = "";
-        phone.closeApp();
+    // 1. Decline circle (red)
+    ImVec2 declineCenter = ImVec2(winPos.x + startX + btnSize / 2.0f, winPos.y + buttonsY + btnSize / 2.0f);
+    dl->AddCircleFilled(declineCenter, btnSize / 2.0f, IM_COL32(235, 76, 66, 255));
+    {
+        ImFont* font = ImGui::GetFont();
+        float iconSize = btnSize * 0.45f;
+        const char* icon = ICON_FA_PHONE_SLASH;
+        ImVec2 tsz = font->CalcTextSizeA(iconSize, FLT_MAX, 0.0f, icon);
+        ImVec2 iconPos = ImVec2(declineCenter.x - tsz.x / 2.0f, declineCenter.y - tsz.y / 2.0f);
+        dl->AddText(font, iconSize, iconPos, IM_COL32(255, 255, 255, 255), icon);
     }
-    ImGui::SetWindowFontScale(1.0f);
-    ImGui::PopStyleVar();
-    ImGui::PopStyleColor(3);
 
-    // 2. Accept (Atender)
-    ImGui::SetCursorPosY(buttonsY);
-    ImGui::SetCursorPosX(startX + btnSize + gap);
-    ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.30f, 0.82f, 0.22f, 1.0f)); // iOS green
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(0.35f, 0.90f, 0.25f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.25f, 0.75f, 0.18f, 1.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
-
-    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
-    if (ImGui::Button(ICON_FA_PHONE "##accept", ImVec2(btnSize, btnSize))) {
-        // Placeholder: UI only - game handles the actual call answer natively
-        m_callState = PhoneCallState::TALKING;
-        m_callTimer = 0.0f;
-        // Mark caller as known!
-        for (auto& c : m_contacts) {
-            if (c.id == m_activeCallerId) {
-                c.known = true;
-                break;
-            }
-        }
+    // 2. Accept circle (green)
+    ImVec2 acceptCenter = ImVec2(winPos.x + startX + btnSize + gap + btnSize / 2.0f, winPos.y + buttonsY + btnSize / 2.0f);
+    dl->AddCircleFilled(acceptCenter, btnSize / 2.0f, IM_COL32(76, 209, 55, 255));
+    {
+        ImFont* font = ImGui::GetFont();
+        float iconSize = btnSize * 0.45f;
+        const char* icon = ICON_FA_PHONE;
+        ImVec2 tsz = font->CalcTextSizeA(iconSize, FLT_MAX, 0.0f, icon);
+        ImVec2 iconPos = ImVec2(acceptCenter.x - tsz.x / 2.0f, acceptCenter.y - tsz.y / 2.0f);
+        dl->AddText(font, iconSize, iconPos, IM_COL32(255, 255, 255, 255), icon);
     }
-    ImGui::SetWindowFontScale(1.0f);
-    ImGui::PopStyleVar();
-    ImGui::PopStyleColor(3);
 
-    // Add labels under the buttons
+    // Labels under buttons
     float labelY = contentH - 38.0f;
-    
-    float declSize = ImGui::CalcTextSize("Recusar").x;
+    ImGui::SetWindowFontScale(0.85f);
+
+    std::string labelDecline = "Recusar";
+    float declSize = ImGui::CalcTextSize(labelDecline.c_str()).x;
     ImGui::SetCursorPosY(labelY);
     ImGui::SetCursorPosX(startX + (btnSize - declSize) / 2.0f);
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Recusar");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", labelDecline.c_str());
 
-    float accSize = ImGui::CalcTextSize("Aceitar").x;
+    std::string labelAccept = "Aceitar";
+    float accSize = ImGui::CalcTextSize(labelAccept.c_str()).x;
     ImGui::SetCursorPosY(labelY);
     ImGui::SetCursorPosX(startX + btnSize + gap + (btnSize - accSize) / 2.0f);
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Aceitar");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", labelAccept.c_str());
+
+    ImGui::SetWindowFontScale(1.0f);
 }
 
 void PhoneCallApp::drawActiveCall() {
