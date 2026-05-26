@@ -221,6 +221,7 @@ void PhoneCallApp::drawContactsList() {
 
 void PhoneCallApp::drawIncomingCall() {
     float contentW = ImGui::GetWindowWidth();
+    float contentH = ImGui::GetWindowHeight();
 
     // Resolve display name
     std::string displayName = "Desconhecido";
@@ -235,8 +236,8 @@ void PhoneCallApp::drawIncomingCall() {
         }
     }
 
-    ImGui::Spacing();
-    ImGui::Spacing();
+    // Top texts: Subtitle and Name
+    ImGui::SetCursorPosY(15.0f);
 
     // Subtitle: "Chamada de Voz..."
     std::string subtitle = "Chamada de Voz...";
@@ -255,24 +256,24 @@ void PhoneCallApp::drawIncomingCall() {
     ImGui::SetWindowFontScale(1.0f);
     ImGui::PopStyleColor();
 
-    ImGui::Spacing();
-    ImGui::Spacing();
-
-    // Large Avatar (Radius 45 = 90px diameter)
+    // Center the avatar in the available vertical space
+    float topLimit = 100.0f;
+    float bottomLimit = contentH - 95.0f;
     float avatarRadius = 45.0f;
+    float avatarY = topLimit + (bottomLimit - topLimit - avatarRadius * 2.0f) / 2.0f;
+
+    ImGui::SetCursorPosY(avatarY);
     ImVec2 screenPos = ImGui::GetCursorScreenPos();
     float avatarX = (contentW - avatarRadius * 2.0f) / 2.0f;
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
-    // Make space for the avatar
-    ImGui::Dummy(ImVec2(0, avatarRadius * 2.0f + 40.0f));
-
-    // Action Buttons: Green Accept & Red Decline
+    // Place decline and accept buttons at the bottom of the window
     float btnSize = 58.0f;
     float gap = 40.0f;
     float totalW = btnSize * 2.0f + gap;
     float startX = (contentW - totalW) / 2.0f;
 
+    ImGui::SetCursorPosY(contentH - 85.0f);
     ImGui::SetCursorPosX(startX);
     
     // 1. Decline (Desligar)
@@ -320,6 +321,7 @@ void PhoneCallApp::drawIncomingCall() {
 
 void PhoneCallApp::drawActiveCall() {
     float contentW = ImGui::GetWindowWidth();
+    float contentH = ImGui::GetWindowHeight();
 
     // Resolve display name
     std::string displayName = "Desconhecido";
@@ -332,8 +334,8 @@ void PhoneCallApp::drawActiveCall() {
         }
     }
 
-    ImGui::Spacing();
-    ImGui::Spacing();
+    // Top texts: Timer and Name
+    ImGui::SetCursorPosY(15.0f);
 
     // Subtitle showing timer MM:SS
     int mins = (int)m_callTimer / 60;
@@ -356,20 +358,20 @@ void PhoneCallApp::drawActiveCall() {
     ImGui::SetWindowFontScale(1.0f);
     ImGui::PopStyleColor();
 
-    ImGui::Spacing();
-    ImGui::Spacing();
-
-    // Large Avatar (Radius 45 = 90px diameter)
+    // Center the avatar in the available vertical space
+    float topLimit = 100.0f;
+    float bottomLimit = contentH - 95.0f;
     float avatarRadius = 45.0f;
+    float avatarY = topLimit + (bottomLimit - topLimit - avatarRadius * 2.0f) / 2.0f;
+
+    ImGui::SetCursorPosY(avatarY);
     ImVec2 screenPos = ImGui::GetCursorScreenPos();
     float avatarX = (contentW - avatarRadius * 2.0f) / 2.0f;
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
-    // Make space for the avatar
-    ImGui::Dummy(ImVec2(0, avatarRadius * 2.0f + 40.0f));
-
-    // Single red "Desligar" button at the bottom
+    // Single red "Desligar" button at the bottom of the window
     float btnSize = 58.0f;
+    ImGui::SetCursorPosY(contentH - 85.0f);
     ImGui::SetCursorPosX((contentW - btnSize) / 2.0f);
 
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.92f, 0.30f, 0.26f, 1.0f)); // iOS red
