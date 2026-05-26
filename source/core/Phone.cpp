@@ -27,6 +27,10 @@ void Phone::setAvatarProvider(IAvatarProvider* provider) {
     m_avatarProvider = provider;
 }
 
+void Phone::setCameraProvider(ICameraProvider* provider) {
+    m_cameraProvider = provider;
+}
+
 void Phone::toggle(PhoneAnimMode mode) {
     if (m_isOpen) close(mode);
     else open(mode);
@@ -202,6 +206,28 @@ bool Phone::drawIcon(PhoneApp* app, ImDrawList* draw, ImVec2 winPos,
         draw->AddText(font, fontSize, ImVec2(tx, ty), iconCol, app->icon.c_str(), NULL, 0.0f, nullptr);
     }
 
+    // Draw badge count if > 0
+    if (app->badgeCount > 0 && !state.isDragging) {
+        float badgeRadius = 8.5f;
+        ImVec2 badgeCenter = ImVec2(p2.x - 2.0f, p1.y + 2.0f);
+        
+        // Draw red filled circle (iOS Red: #FF3B30)
+        draw->AddCircleFilled(badgeCenter, badgeRadius, IM_COL32(255, 59, 48, 255));
+        
+        // Draw the badge number text centered
+        std::string badgeText = std::to_string(app->badgeCount);
+        if (app->badgeCount > 9) {
+            badgeText = "9+";
+        }
+        
+        ImFont* font = ImGui::GetFont();
+        float badgeFontSize = badgeRadius * 1.3f;
+        ImVec2 textSz = font->CalcTextSizeA(badgeFontSize, FLT_MAX, 0.0f, badgeText.c_str());
+        ImVec2 textPos = ImVec2(badgeCenter.x - textSz.x / 2.0f, badgeCenter.y - textSz.y / 2.0f);
+        
+        draw->AddText(font, badgeFontSize, textPos, IM_COL32(255, 255, 255, 255), badgeText.c_str());
+    }
+
     // Invisible button for click detection
     ImGui::SetCursorPos(ImVec2(curX + wiggleX, curY + wiggleY));
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0, 0, 0, 0));
@@ -233,7 +259,7 @@ bool Phone::drawIcon(PhoneApp* app, ImDrawList* draw, ImVec2 winPos,
                 }
             } else {
                 m_pressTimer += dt;
-                if (m_pressTimer >= 3.0f) {
+                if (m_pressTimer >= 1.5f) {
                     m_editMode = true;
                     m_isDragging = true;
                     m_draggedKey = key;
@@ -260,6 +286,11 @@ bool Phone::drawIcon(PhoneApp* app, ImDrawList* draw, ImVec2 winPos,
 
 void Phone::drawHome(ImDrawList* draw, ImVec2 winPos) {
     m_time += ImGui::GetIO().DeltaTime;
+
+    if (!ImGui::IsMouseDown(0)) {
+        m_pressedKey = "";
+        m_pressTimer = 0.0f;
+    }
 
     // Handle drag movement and reordering
     if (m_isDragging && !m_draggedKey.empty()) {
@@ -381,8 +412,11 @@ void Phone::drawHome(ImDrawList* draw, ImVec2 winPos) {
         }
     }
 
+    drawHomeGrid(draw, winPos);
+    drawHomeDock(draw, winPos);
+
     if (m_editMode && ImGui::IsMouseClicked(0)) {
-        if (!ImGui::IsAnyItemActive() && !ImGui::IsAnyItemHovered()) {
+        if (m_pressedKey.empty() && !m_isDragging) {
             float mouseX = ImGui::GetIO().MousePos.x - winPos.x;
             float mouseY = ImGui::GetIO().MousePos.y - winPos.y;
             if (mouseX >= BEZEL && mouseX <= PH_W - BEZEL && mouseY >= BEZEL && mouseY <= PH_H - BEZEL) {
@@ -390,9 +424,6 @@ void Phone::drawHome(ImDrawList* draw, ImVec2 winPos) {
             }
         }
     }
-
-    drawHomeGrid(draw, winPos);
-    drawHomeDock(draw, winPos);
 }
 
 void Phone::drawHomeGrid(ImDrawList* draw, ImVec2 winPos) {
@@ -532,7 +563,9 @@ void Phone::drawCurrentApp(ImDrawList* draw, ImVec2 winPos) {
     ImGui::PushStyleColor(ImGuiCol_Text,           ImVec4(0.039f, 0.518f, 1.0f, 1.0f)); // iOS Blue
     
     if (ImGui::Button(ICON_FA_CHEVRON_LEFT " Voltar", ImVec2(HEADER_BTN_W, HEADER_BTN_H))) {
-        closeApp();
+        if (!app->onBack()) {
+            closeApp();
+        }
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar();
         return;
@@ -583,6 +616,33 @@ void Phone::drawCurrentApp(ImDrawList* draw, ImVec2 winPos) {
 void Phone::draw() {
     // Get screen resolution from the ImGui display size
     ImVec2 displaySize = ImGui::GetIO().DisplaySize;
+
+    if (m_currentApp && m_currentApp->hidePhoneChassis()) {
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(displaySize, ImGuiCond_Always);
+        
+        bool visible = true;
+        ImGui::Begin("##fullscreenapp", &visible,
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoScrollWithMouse |
+            ImGuiWindowFlags_NoBackground
+        );
+        
+        m_currentApp->onDraw();
+        
+        ImGui::End();
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor();
+        return;
+    }
+
     float margin = 40.0f;
     ImVec2 targetPos(displaySize.x - PH_W - margin, displaySize.y - PH_H - margin);
     ImVec2 offScreenPos(targetPos.x, displaySize.y + 10.0f);
@@ -624,8 +684,13 @@ void Phone::draw() {
 
     // 2. If app is open, draw dark overlay
     if (m_currentApp) {
-        draw->AddRectFilled(pMin, pMax,
-            ImGui::GetColorU32(ImVec4(0.05f, 0.05f, 0.07f, 0.97f)), SCR_R);
+        if (m_currentApp->hasSolidBackground()) {
+            draw->AddRectFilled(pMin, pMax,
+                ImGui::GetColorU32(ImVec4(0.05f, 0.05f, 0.07f, 0.97f)), SCR_R);
+        } else {
+            draw->AddRectFilled(pMin, pMax,
+                ImGui::GetColorU32(ImVec4(0.05f, 0.05f, 0.07f, 0.20f)), SCR_R);
+        }
     }
 
     // 3. Main content

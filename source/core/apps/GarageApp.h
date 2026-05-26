@@ -27,6 +27,7 @@ public:
     void onOpen() override;
     void onClose() override;
     void update(float dt) override;
+    bool onBack() override;
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;

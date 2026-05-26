@@ -101,22 +101,25 @@ void PhoneCallApp::update(float dt) {
                 }
             }
             
-            // When TAB is pressed (game answers/hangs up call natively), sync UI state
-            if (m_callState == PhoneCallState::RINGING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
-                m_callState = PhoneCallState::TALKING;
-                m_callTimer = 0.0f;
-                // Mark contact as known!
-                for (auto& c : m_contacts) {
-                    if (c.id == m_activeCallerId) {
-                        c.known = true;
-                        break;
+            // Only query keys if ImGui is initialized and phone is visible
+            if (ImGui::GetCurrentContext() != nullptr && phone.isVisible()) {
+                // When TAB is pressed (game answers/hangs up call natively), sync UI state
+                if (m_callState == PhoneCallState::RINGING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
+                    m_callState = PhoneCallState::TALKING;
+                    m_callTimer = 0.0f;
+                    // Mark contact as known!
+                    for (auto& c : m_contacts) {
+                        if (c.id == m_activeCallerId) {
+                            c.known = true;
+                            break;
+                        }
                     }
+                } else if (m_callState == PhoneCallState::TALKING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
+                    m_callState = PhoneCallState::IDLE;
+                    m_activeCallerId = "";
+                    phone.close(PhoneAnimMode::SMOOTH);
+                    phone.closeApp();
                 }
-            } else if (m_callState == PhoneCallState::TALKING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
-                m_callState = PhoneCallState::IDLE;
-                m_activeCallerId = "";
-                phone.close(PhoneAnimMode::SMOOTH);
-                phone.closeApp();
             }
         } else {
             // Call ended from game/provider side

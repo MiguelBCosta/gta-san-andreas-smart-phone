@@ -8,6 +8,7 @@
 #include "PhoneStorage.h"
 #include "providers/IClockProvider.h"
 #include "providers/IScreenProvider.h"
+#include "providers/ICameraProvider.h"
 
 enum class PhoneAnimMode {
     FORCED,
@@ -78,6 +79,8 @@ public:
     IPhoneCallProvider* getCallProvider() const { return m_callProvider; }
     void setAvatarProvider(IAvatarProvider* provider);
     IAvatarProvider* getAvatarProvider() const { return m_avatarProvider; }
+    void setCameraProvider(ICameraProvider* provider);
+    ICameraProvider* getCameraProvider() const { return m_cameraProvider; }
 
     void registerApp(PhoneApp* app);
     void openApp(PhoneApp* app);
@@ -92,6 +95,7 @@ public:
     bool isVisible() const;
     bool shouldCaptureInput() const;
     bool isOpen() const { return m_isOpen; }
+    PhoneApp* getCurrentApp() const { return m_currentApp; }
 
     // Call this every frame when isVisible() == true
     void draw();
@@ -115,6 +119,7 @@ private:
     IScreenProvider* m_screenProvider = nullptr;
     IPhoneCallProvider* m_callProvider = nullptr;
     IAvatarProvider* m_avatarProvider = nullptr;
+    ICameraProvider* m_cameraProvider = nullptr;
 
     bool m_isOpen = false;
     float m_animProgress = 0.0f;

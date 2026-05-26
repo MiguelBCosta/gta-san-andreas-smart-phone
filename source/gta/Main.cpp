@@ -19,6 +19,8 @@
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/WeatherApp.h"
 #include "../core/apps/PlaceholderApps.h"
+#include "../core/apps/CameraApp.h"
+#include "providers/GtaCameraProvider.h"
 #include "../core/apps/ClockApp.h"
 #include "../core/apps/PhoneCallApp.h"
 #include "providers/GtaScreenProvider.h"
@@ -29,6 +31,10 @@
 #include <game_sa/CGenericGameStorage.h>
 #include "providers/GtaGarageProvider.h"
 #include "../core/apps/GarageApp.h"
+#include "../core/apps/MessagesApp.h"
+#include "providers/GtaMessageProvider.h"
+#include "../core/apps/MapsApp.h"
+#include "providers/GtaMapProvider.h"
 
 using namespace plugin;
 
@@ -51,6 +57,8 @@ static GtaScreenProvider gtaScreen;
 static GtaStorageProvider gtaStorage;
 static GtaGarageProvider gtaGarage;
 static GtaPhoneCallProvider gtaCallProvider;
+static GtaMessageProvider gtaMessage;
+static GtaCameraProvider gtaCamera;
 
 // ---- App Instances (static lifetime) ----
 static CalculatorApp calcApp;
@@ -174,8 +182,8 @@ LRESULT CALLBACK hkWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         return 0;
     }
 
-    // When phone is open, let ImGui consume input
-    if (phone.isVisible()) {
+    // When phone is open and ImGui is initialized, let ImGui consume input
+    if (phone.isVisible() && imguiInitialized) {
         if (phone.shouldCaptureInput()) {
             if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
                 return 0;
@@ -242,6 +250,9 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 
         static GtaAvatarProvider gtaAvatarProvider(pDevice);
         phone.setAvatarProvider(&gtaAvatarProvider);
+
+        static GtaMapProvider localGtaMap(pDevice);
+        mapsApp.SetMapProvider(&localGtaMap);
 
         imguiInitialized = true;
     }
@@ -325,6 +336,17 @@ void __cdecl hkUpdateMouse() {
     // This reads the physical mouse (DirectInput) and flushes its buffer.
     oUpdateMouse();
 
+    // If the phone is open and the active app is the camera app,
+    // we force the aiming state (rmb = true) so that the camera weapon aims natively
+    // in first person! We do this here, after oUpdateMouse() has run, so it doesn't overwrite it!
+    if (phone.isVisible() && phone.getCurrentApp() && phone.getCurrentApp()->id == "camera") {
+        ICameraProvider* cam = phone.getCameraProvider();
+        if (cam && cam->IsActive() && !cam->IsSelfieMode()) {
+            CPad* pad = CPad::GetPad(0);
+            pad->NewMouseControllerState.rmb = true;
+        }
+    }
+
     if (wasVisible) {
         // The phone was just closed!
         // oUpdateMouse() just processed all the accumulated mouse movement
@@ -340,6 +362,40 @@ void __cdecl hkUpdateMouse() {
 
         wasVisible = false;
     }
+}
+
+// ---- CHud::DrawCrossHairs Hook ----
+// GTA SA 1.0 US: CHud::DrawCrossHairs is at 0x58E020
+// This is where the game draws targeting crosshairs, including the native green camera HUD.
+typedef void(__cdecl* DrawCrossHairs_t)();
+static DrawCrossHairs_t oDrawCrossHairs = nullptr;
+
+void __cdecl hkDrawCrossHairs() {
+    if (phone.isVisible() && phone.getCurrentApp() && phone.getCurrentApp()->id == "camera") {
+        return; // Skip rendering native camera viewfinder/HUD
+    }
+    oDrawCrossHairs();
+}
+
+// ---- CRadar::RemoveMapSection / RemoveRadarSections Hooks ----
+typedef void(__cdecl* RemoveMapSection_t)(int, int);
+static RemoveMapSection_t oRemoveMapSection = nullptr;
+
+void __cdecl hkRemoveMapSection(int x, int y) {
+    if (MapsApp::bMapAppOpen) {
+        return; // Prevent unloading tiles while map app is open
+    }
+    oRemoveMapSection(x, y);
+}
+
+typedef void(__cdecl* RemoveRadarSections_t)();
+static RemoveRadarSections_t oRemoveRadarSections = nullptr;
+
+void __cdecl hkRemoveRadarSections() {
+    if (MapsApp::bMapAppOpen) {
+        return; // Prevent unloading tiles while map app is open
+    }
+    oRemoveRadarSections();
 }
 
 static bool gameHooksInstalled = false;
@@ -359,12 +415,23 @@ void TryInstallGameHooks() {
     // Mouse hook
     MH_CreateHook((void*)0x53F3C0, &hkUpdateMouse, (void**)&oUpdateMouse);
 
+    // DrawCrossHairs hook
+    MH_CreateHook((void*)0x58E020, &hkDrawCrossHairs, (void**)&oDrawCrossHairs);
+
+    // Radar Unload Hooks (0x584BB0 = RemoveMapSection, 0x584BF0 = RemoveRadarSections)
+    MH_CreateHook((void*)0x584BB0, &hkRemoveMapSection, (void**)&oRemoveMapSection);
+    MH_CreateHook((void*)0x584BF0, &hkRemoveRadarSections, (void**)&oRemoveRadarSections);
+
     MH_EnableHook((void*)0x5D13E0);
     MH_EnableHook((void*)0x5D17B0);
     MH_EnableHook((void*)0x53F3C0);
+    MH_EnableHook((void*)0x58E020);
+    MH_EnableHook((void*)0x584BB0);
+    MH_EnableHook((void*)0x584BF0);
 
     gameHooksInstalled = true;
 }
+
 
 // ---- Plugin Entry ----
 class SaSmartPhone {
@@ -376,7 +443,10 @@ public:
         phone.setCallProvider(&gtaCallProvider);
         weatherApp.SetWeatherProvider(&gtaWeather);
         garageApp.SetGarageProvider(&gtaGarage);
-
+        messagesApp.SetMessageProvider(&gtaMessage);
+        cameraApp.SetCameraProvider(&gtaCamera);
+        phone.setCameraProvider(&gtaCamera);
+        
         // Register all apps (order = order on home screen)
         phone.registerApp(&calcApp);
         phone.registerApp(&cameraApp);

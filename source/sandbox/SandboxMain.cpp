@@ -21,7 +21,13 @@
 #include "providers/SandboxPhoneCallProvider.h"
 #include "providers/SandboxAvatarProvider.h"
 #include "../core/apps/GarageApp.h"
+#include "../core/apps/MessagesApp.h"
+#include "providers/SandboxMessageProvider.h"
 #include "../core/resources/resource.h"
+#include "../core/apps/MapsApp.h"
+#include "providers/SandboxMapProvider.h"
+#include "../core/apps/CameraApp.h"
+#include "providers/SandboxCameraProvider.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -95,6 +101,9 @@ static SandboxStorageProvider sandboxStorage;
 static SandboxWeatherProvider sandboxWeather;
 static SandboxGarageProvider sandboxGarage;
 static SandboxPhoneCallProvider sandboxCallProvider;
+static SandboxMessageProvider sandboxMessage;
+static SandboxMapProvider sandboxMap;
+static SandboxCameraProvider sandboxCamera;
 static CalculatorApp calcApp;
 static CameraApp     cameraApp;
 ClockApp      clockApp;
@@ -168,6 +177,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     weatherApp.SetWeatherProvider(&sandboxWeather);
     garageApp.SetGarageProvider(&sandboxGarage);
+    messagesApp.SetMessageProvider(&sandboxMessage);
+    mapsApp.SetMapProvider(&sandboxMap);
+    cameraApp.SetCameraProvider(&sandboxCamera);
+    phone.setCameraProvider(&sandboxCamera);
     phone.registerApp(&calcApp);
     phone.registerApp(&cameraApp);
     phone.registerApp(&clockApp);
@@ -363,6 +376,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         ImGui::End();
 
+        // Control panel for SMS simulation in sandbox
+        ImGui::SetNextWindowPos(ImVec2(800, 240), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(360, 160), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Controles de SMS (Sandbox)", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Simular Conclusao de Missoes");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        static int selectedMissionIdx = 0;
+        const char* missions[] = {
+            "ryder1 (Ryder)",
+            "ogloc2 (Madd Dogg's Rhymes)",
+            "sweet3 (Cleaning the Hood)",
+            "smoke4 (Just Business)",
+            "sweet8 (Cesar Vialpando)",
+            "ryder4 (Robbing Uncle Sam)",
+            "sweet9 (Doberman)",
+            "crash2 (Gray Imports)",
+            "sweet12 (The Green Sabre)",
+            "cesar2 (King in Exile)",
+            "crash3 (Badlands)",
+            "truth1 (Body Harvest)",
+            "syn2 (Jizzy)",
+            "steal3 (Customs Fast Track)",
+            "steal4 (Puncture Wounds)",
+            "syn7 (Yay Ka-Boom-Boom)",
+            "toreno4 (Learning to Fly)",
+            "rose1 (Intensive Care)",
+            "salv2 (Saint Mark's Bistro)",
+            "heist5 (Breaking the Bank)",
+            "sweet19 (End of the Line)"
+        };
+        const char* missionIds[] = {
+            "ryder1", "ogloc2", "sweet3", "smoke4", "sweet8", "ryder4", "sweet9", "crash2", "sweet12", "cesar2",
+            "crash3", "truth1", "syn2", "steal3", "steal4", "syn7", "toreno4", "rose1", "salv2", "heist5", "sweet19"
+        };
+        ImGui::Combo("Missao", &selectedMissionIdx, missions, IM_ARRAYSIZE(missions));
+
+        if (ImGui::Button("Simular Conclusao", ImVec2(160, 30))) {
+            sandboxMessage.TriggerMissionComplete(missionIds[selectedMissionIdx]);
+        }
+        ImGui::End();
+
         // Control panel for garage simulation in sandbox
         ImGui::SetNextWindowPos(ImVec2(430, 300), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(360, 250), ImGuiCond_FirstUseEver);
@@ -444,6 +500,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
         }
 
+        ImGui::End();
+
+        // Control panel for Map simulation in sandbox
+        ImGui::SetNextWindowPos(ImVec2(430, 50), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Controles do Mapa (Sandbox)", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Simulador de Posicao e Descobertas");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::SliderFloat("Player X", &sandboxMap.m_playerX, -3000.0f, 3000.0f);
+        ImGui::SliderFloat("Player Y", &sandboxMap.m_playerY, -3000.0f, 3000.0f);
+        ImGui::SliderFloat("Direcao", &sandboxMap.m_playerHeading, 0.0f, 360.0f);
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Descoberta de Locais:");
+        for (auto& blip : sandboxMap.m_blips) {
+            ImGui::Checkbox(blip.name.c_str(), &blip.revealed);
+        }
+
+        if (sandboxMap.m_waypointActive) {
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Waypoint Ativo: (%.1f, %.1f)", sandboxMap.m_waypointX, sandboxMap.m_waypointY);
+            if (ImGui::Button("Limpar Waypoint")) {
+                sandboxMap.ClearWaypoint();
+            }
+        }
         ImGui::End();
 
         ImGui::EndFrame();

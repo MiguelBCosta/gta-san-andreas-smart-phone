@@ -143,8 +143,13 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
+    <ClCompile Include="source\core\apps\CameraApp.cpp" />
     <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
+    <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp" />
+    <ClCompile Include="source\gta\providers\GtaCameraProvider.cpp" />
+    <ClCompile Include="source\core\apps\MapsApp.cpp" />
+    <ClCompile Include="source\gta\providers\GtaMapProvider.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -176,13 +181,22 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClInclude Include="source\core\apps\ClockApp.h" />
     <ClInclude Include="source\core\apps\CalculatorApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
+    <ClInclude Include="source\core\apps\CameraApp.h" />
+    <ClInclude Include="source\core\providers\ICameraProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaCameraProvider.h" />
     <ClInclude Include="source\core\apps\PhoneCallApp.h" />
+    <ClInclude Include="source\core\apps\MessagesApp.h" />
+    <ClInclude Include="source\core\providers\IMessageProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaMessageProvider.h" />
     <ClInclude Include="source\core\providers\IGarageProvider.h" />
     <ClInclude Include="source\core\providers\IAvatarProvider.h" />
     <ClInclude Include="source\core\providers\IPhoneCallProvider.h" />
     <ClInclude Include="source\gta\providers\GtaGarageProvider.h" />
     <ClInclude Include="source\gta\providers\GtaPhoneCallProvider.h" />
     <ClInclude Include="source\gta\providers\GtaAvatarProvider.h" />
+    <ClInclude Include="source\core\apps\MapsApp.h" />
+    <ClInclude Include="source\core\providers\IMapProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaMapProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
     <ClInclude Include="source\core\resources\resource.h" />
   </ItemGroup>

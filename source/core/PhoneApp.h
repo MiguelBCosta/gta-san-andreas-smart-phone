@@ -13,14 +13,25 @@ public:
     ImVec4 color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
     bool dock = false;
     int dockOrder = 99;
+    int badgeCount = 0;
 
     virtual ~PhoneApp() = default;
 
     // Whether the app requires mouse interaction
     virtual bool requiresMouse() const { return true; }
 
+    // Whether the app draws a solid background overlay when open
+    virtual bool hasSolidBackground() const { return true; }
+
+    // Whether the phone chassis should be completely hidden when this app is open
+    virtual bool hidePhoneChassis() const { return false; }
+
     // Called when the app is opened
     virtual void onOpen() {}
+
+    // Called when the native back button is clicked.
+    // Returns true if the app handled it internally, false to let the phone close the app.
+    virtual bool onBack() { return false; }
 
     // Called when the app is closed (back button or phone closed)
     virtual void onClose() {}

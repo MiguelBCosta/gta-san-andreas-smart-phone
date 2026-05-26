@@ -57,6 +57,9 @@
     <ClCompile Include="source\core\apps\GarageApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\apps\CameraApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
     <ClCompile Include="source\core\apps\PhoneCallApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
@@ -142,6 +145,15 @@
     </ClInclude>
     <ClInclude Include="source\core\apps\GarageApp.h">
       <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\apps\CameraApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\providers\ICameraProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxCameraProvider.h">
+      <Filter>source\sandbox\providers</Filter>
     </ClInclude>
     <ClInclude Include="source\core\apps\PhoneCallApp.h">
       <Filter>source\core\apps</Filter>

@@ -36,6 +36,15 @@ void GarageApp::update(float dt) {
     }
 }
 
+bool GarageApp::onBack() {
+    if (m_selectedIdx != -1) {
+        m_selectedIdx = -1;
+        m_renamingIdx = -1;
+        return true; // Handled internally
+    }
+    return false; // Let the phone go home
+}
+
 void GarageApp::onSave(nlohmann::json& out) {
     nlohmann::json listJson = nlohmann::json::array();
     for (const auto& v : m_vehicles) {
@@ -219,18 +228,6 @@ namespace {
 
 void GarageApp::DrawDetailsScreen() {
     auto& v = m_vehicles[m_selectedIdx];
-
-    // Back button (chevron left)
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.4f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.1f, 0.1f, 0.6f));
-    if (ImGui::Button(ICON_FA_CHEVRON_LEFT " Voltar", ImVec2(80, 30))) {
-        m_selectedIdx = -1;
-        m_renamingIdx = -1;
-        ImGui::PopStyleColor(3);
-        return;
-    }
-    ImGui::PopStyleColor(3);
 
     ImGui::Spacing();
 
