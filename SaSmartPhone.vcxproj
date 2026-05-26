@@ -143,6 +143,7 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
+    <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
     <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
@@ -175,8 +176,13 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClInclude Include="source\core\apps\ClockApp.h" />
     <ClInclude Include="source\core\apps\CalculatorApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
+    <ClInclude Include="source\core\apps\PhoneCallApp.h" />
     <ClInclude Include="source\core\providers\IGarageProvider.h" />
+    <ClInclude Include="source\core\providers\IAvatarProvider.h" />
+    <ClInclude Include="source\core\providers\IPhoneCallProvider.h" />
     <ClInclude Include="source\gta\providers\GtaGarageProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaPhoneCallProvider.h" />
+    <ClInclude Include="source\gta\providers\GtaAvatarProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
     <ClInclude Include="source\core\resources\resource.h" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 #include "Phone.h"
+#include "providers/IPhoneCallProvider.h"
 #include <cmath>
 #include <IconsFontAwesome5.h>
 
@@ -16,6 +17,14 @@ void Phone::setClockProvider(IClockProvider* provider) {
 
 void Phone::setScreenProvider(IScreenProvider* provider) {
     m_screenProvider = provider;
+}
+
+void Phone::setCallProvider(IPhoneCallProvider* provider) {
+    m_callProvider = provider;
+}
+
+void Phone::setAvatarProvider(IAvatarProvider* provider) {
+    m_avatarProvider = provider;
 }
 
 void Phone::toggle(PhoneAnimMode mode) {
@@ -43,6 +52,22 @@ void Phone::update(float dt) {
     if (m_screenProvider) {
         m_screenProvider->Update(dt);
     }
+    
+    // Auto-open phone and the Phone Call app on active incoming calls
+    if (m_callProvider && m_callProvider->IsIncomingCallActive()) {
+        if (!m_isOpen) {
+            open(PhoneAnimMode::SMOOTH);
+        }
+        if (m_currentApp == nullptr || m_currentApp->id != "phone") {
+            for (auto* app : m_apps) {
+                if (app->id == "phone") {
+                    openApp(app);
+                    break;
+                }
+            }
+        }
+    }
+
     float speed = 5.0f;
     if (m_isOpen) {
         m_animProgress += dt * speed;

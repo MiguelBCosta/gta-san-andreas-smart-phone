@@ -14,9 +14,12 @@
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/ClockApp.h"
+#include "../core/apps/PhoneCallApp.h"
 #include "providers/SandboxScreenProvider.h"
 #include "providers/SandboxStorageProvider.h"
 #include "providers/SandboxGarageProvider.h"
+#include "providers/SandboxPhoneCallProvider.h"
+#include "providers/SandboxAvatarProvider.h"
 #include "../core/apps/GarageApp.h"
 #include "../core/resources/resource.h"
 
@@ -91,6 +94,7 @@ SandboxScreenProvider sandboxScreen;
 static SandboxStorageProvider sandboxStorage;
 static SandboxWeatherProvider sandboxWeather;
 static SandboxGarageProvider sandboxGarage;
+static SandboxPhoneCallProvider sandboxCallProvider;
 static CalculatorApp calcApp;
 static CameraApp     cameraApp;
 ClockApp      clockApp;
@@ -157,6 +161,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     phone.setClockProvider(&sandboxClock);
     phone.setScreenProvider(&sandboxScreen);
     phone.getStorage().setStorageProvider(&sandboxStorage);
+    phone.setCallProvider(&sandboxCallProvider);
+
+    static SandboxAvatarProvider sandboxAvatarProvider(g_pd3dDevice);
+    phone.setAvatarProvider(&sandboxAvatarProvider);
+
     weatherApp.SetWeatherProvider(&sandboxWeather);
     garageApp.SetGarageProvider(&sandboxGarage);
     phone.registerApp(&calcApp);
@@ -323,6 +332,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         bool canSkip = sandboxClock.CanSkipTime();
         if (ImGui::Checkbox("Permitir Descansar", &canSkip)) {
             sandboxClock.SetCanSkipTime(canSkip);
+        }
+
+        ImGui::End();
+
+        // Control panel for phone call simulation
+        ImGui::SetNextWindowPos(ImVec2(800, 50), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(360, 160), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Controles de Ligacoes (Sandbox)", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Simular Recebimento de Chamadas");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        static int selectedCallerIdx = 0;
+        const char* callers[] = { "sweet", "cesar", "catalina", "woozie", "truth", "toreno", "tenpenny", "zero", "unknown" };
+        ImGui::Combo("Remetente", &selectedCallerIdx, callers, IM_ARRAYSIZE(callers));
+
+        if (ImGui::Button("Simular Chamada", ImVec2(160, 30))) {
+            sandboxCallProvider.triggerCall(callers[selectedCallerIdx]);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Encerrar Chamada", ImVec2(160, 30))) {
+            sandboxCallProvider.stopCall();
         }
 
         ImGui::End();

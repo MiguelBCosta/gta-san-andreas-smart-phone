@@ -72,6 +72,9 @@
     <ClCompile Include="source\core\apps\GarageApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\apps\PhoneCallApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
     <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp">
       <Filter>source\gta\providers</Filter>
     </ClCompile>
@@ -164,10 +167,25 @@
     <ClInclude Include="source\core\apps\GarageApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\apps\PhoneCallApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\providers\IGarageProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\providers\IAvatarProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\providers\IPhoneCallProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\gta\providers\GtaGarageProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaPhoneCallProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaAvatarProvider.h">
       <Filter>source\gta\providers</Filter>
     </ClInclude>
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h">

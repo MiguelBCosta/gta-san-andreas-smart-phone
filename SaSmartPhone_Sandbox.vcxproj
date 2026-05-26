@@ -120,6 +120,7 @@
     <ClCompile Include="source\core\apps\WeatherApp.cpp" />
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
+    <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
     <ClCompile Include="source\sandbox\providers\SandboxGarageProvider.cpp" />
     <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
@@ -149,8 +150,13 @@
     <ClInclude Include="source\core\apps\PlaceholderApps.h" />
     <ClInclude Include="source\core\apps\ClockApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
+    <ClInclude Include="source\core\apps\PhoneCallApp.h" />
     <ClInclude Include="source\core\providers\IGarageProvider.h" />
+    <ClInclude Include="source\core\providers\IAvatarProvider.h" />
+    <ClInclude Include="source\core\providers\IPhoneCallProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxGarageProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxPhoneCallProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxAvatarProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
     <ClInclude Include="source\core\resources\resource.h" />
   </ItemGroup>

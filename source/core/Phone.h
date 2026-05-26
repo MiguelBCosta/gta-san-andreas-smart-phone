@@ -14,13 +14,16 @@ enum class PhoneAnimMode {
     SMOOTH
 };
 
+class IPhoneCallProvider;
+class IAvatarProvider;
+
 class Phone {
 public:
     Phone();
     PhoneStorage& getStorage() { return m_storage; }
 
     // ---- State ----
-
+    
     // ---- Layout constants (from MoonPhone.lua) ----
     static constexpr float PH_PADDING_X = 20.0f;
     static constexpr float PH_PADDING_Y = 20.0f;
@@ -71,6 +74,11 @@ public:
     IClockProvider* getClockProvider() const { return m_clockProvider; }
     void setScreenProvider(IScreenProvider* provider);
     IScreenProvider* getScreenProvider() const { return m_screenProvider; }
+    void setCallProvider(IPhoneCallProvider* provider);
+    IPhoneCallProvider* getCallProvider() const { return m_callProvider; }
+    void setAvatarProvider(IAvatarProvider* provider);
+    IAvatarProvider* getAvatarProvider() const { return m_avatarProvider; }
+
     void registerApp(PhoneApp* app);
     void openApp(PhoneApp* app);
     void closeApp();
@@ -104,6 +112,8 @@ private:
     PhoneApp* m_currentApp = nullptr;
     IClockProvider* m_clockProvider = nullptr;
     IScreenProvider* m_screenProvider = nullptr;
+    IPhoneCallProvider* m_callProvider = nullptr;
+    IAvatarProvider* m_avatarProvider = nullptr;
 
     bool m_isOpen = false;
     float m_animProgress = 0.0f;

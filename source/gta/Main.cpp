@@ -20,8 +20,11 @@
 #include "../core/apps/WeatherApp.h"
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/ClockApp.h"
+#include "../core/apps/PhoneCallApp.h"
 #include "providers/GtaScreenProvider.h"
 #include "providers/GtaStorageProvider.h"
+#include "providers/GtaPhoneCallProvider.h"
+#include "providers/GtaAvatarProvider.h"
 #include "../core/resources/resource.h"
 #include <game_sa/CGenericGameStorage.h>
 #include "providers/GtaGarageProvider.h"
@@ -47,6 +50,7 @@ static GtaWeatherProvider gtaWeather;
 static GtaScreenProvider gtaScreen;
 static GtaStorageProvider gtaStorage;
 static GtaGarageProvider gtaGarage;
+static GtaPhoneCallProvider gtaCallProvider;
 
 // ---- App Instances (static lifetime) ----
 static CalculatorApp calcApp;
@@ -232,6 +236,9 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
         ImGui_ImplWin32_Init(gameWindow);
         ImGui_ImplDX9_Init(pDevice);
 
+        static GtaAvatarProvider gtaAvatarProvider(pDevice);
+        phone.setAvatarProvider(&gtaAvatarProvider);
+
         imguiInitialized = true;
     }
 
@@ -362,6 +369,7 @@ public:
         phone.setClockProvider(&gtaClock);
         phone.setScreenProvider(&gtaScreen);
         phone.getStorage().setStorageProvider(&gtaStorage);
+        phone.setCallProvider(&gtaCallProvider);
         weatherApp.SetWeatherProvider(&gtaWeather);
         garageApp.SetGarageProvider(&gtaGarage);
 

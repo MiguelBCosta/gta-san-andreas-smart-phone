@@ -47,15 +47,7 @@ public:
     void onDraw() override { ImGui::Text("Musica - Em breve"); }
 };
 
-class PhoneCallApp : public PhoneApp {
-public:
-    PhoneCallApp() {
-        id = "phone"; icon = ICON_FA_PHONE; name = "Ligar";
-        color = ImVec4(0.18f, 0.72f, 0.30f, 1.0f);
-        dock = true; dockOrder = 1;
-    }
-    void onDraw() override { ImGui::Text("Telefone - Em breve"); }
-};
+
 
 class SettingsApp : public PhoneApp {
 public:
