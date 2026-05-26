@@ -402,8 +402,6 @@ public:
             TryInstallGameHooks();
             TryInstallD3DHooks();
 
-            gtaCallProvider.Update();
-
             // 1. Obter o delta time de forma segura usando o CTimer do jogo (ms_fTimeStep / 50.0f)
             float dt = CTimer::ms_fTimeStep / 50.0f;
 

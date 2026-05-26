@@ -102,9 +102,8 @@ void PhoneCallApp::update(float dt) {
                 }
             }
             
-            // Check Action Key (TAB) press to answer call
+            // When TAB is pressed (game answers the call natively), sync UI state
             if (m_callState == PhoneCallState::RINGING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
-                prov->AnswerCall();
                 m_callState = PhoneCallState::TALKING;
                 m_callTimer = 0.0f;
                 // Mark contact as known!
@@ -328,9 +327,7 @@ void PhoneCallApp::drawIncomingCall() {
 
     ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE_SLASH "##decline", ImVec2(btnSize, btnSize))) {
-        if (auto* prov = phone.getCallProvider()) {
-            prov->HangUpCall();
-        }
+        // Placeholder: UI only - game will end the call on its own
         m_callState = PhoneCallState::IDLE;
         m_activeCallerId = "";
         phone.closeApp();
@@ -349,9 +346,7 @@ void PhoneCallApp::drawIncomingCall() {
 
     ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE "##accept", ImVec2(btnSize, btnSize))) {
-        if (auto* prov = phone.getCallProvider()) {
-            prov->AnswerCall();
-        }
+        // Placeholder: UI only - game handles the actual call answer natively
         m_callState = PhoneCallState::TALKING;
         m_callTimer = 0.0f;
         // Mark caller as known!
@@ -444,11 +439,7 @@ void PhoneCallApp::drawActiveCall() {
 
     ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE_SLASH "##hangup", ImVec2(btnSize, btnSize))) {
-        if (!m_isOutgoingCall) {
-            if (auto* prov = phone.getCallProvider()) {
-                prov->HangUpCall();
-            }
-        }
+        // Placeholder: UI only - game handles call end natively
         m_callState = PhoneCallState::IDLE;
         m_activeCallerId = "";
         m_isOutgoingCall = false;
