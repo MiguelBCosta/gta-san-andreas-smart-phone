@@ -154,9 +154,44 @@ void PhoneCallApp::drawContactsList() {
     }
 
     if (knownContacts.empty()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-        ImGui::TextWrapped("Nenhum contato salvo. Atenda ligacoes no jogo para descobrir novos contatos.");
+        float contentW = ImGui::GetWindowWidth();
+        float contentH = ImGui::GetWindowHeight();
+
+        // Position empty state around 25% down the available window height
+        ImGui::SetCursorPosY(contentH * 0.25f);
+
+        // 1. Icon
+        ImGui::SetWindowFontScale(3.5f);
+        std::string iconStr = ICON_FA_USER_SLASH;
+        float iconW = ImGui::CalcTextSize(iconStr.c_str()).x;
+        ImGui::SetCursorPosX((contentW - iconW) / 2.0f);
+        ImGui::TextColored(ImVec4(0.24f, 0.24f, 0.26f, 1.0f), "%s", iconStr.c_str());
+        ImGui::SetWindowFontScale(1.0f);
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        // 2. Title: "Sem Contatos"
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        ImGui::SetWindowFontScale(1.25f);
+        std::string titleStr = "Sem Contatos";
+        float titleW = ImGui::CalcTextSize(titleStr.c_str()).x;
+        ImGui::SetCursorPosX((contentW - titleW) / 2.0f);
+        ImGui::Text("%s", titleStr.c_str());
+        ImGui::SetWindowFontScale(1.0f);
         ImGui::PopStyleColor();
+
+        ImGui::Spacing();
+
+        // 3. Subtitle
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.57f, 1.0f));
+        float padding = 20.0f;
+        ImGui::SetCursorPosX(padding);
+        ImGui::PushItemWidth(contentW - 2.0f * padding);
+        ImGui::TextWrapped("Atenda chamadas no jogo para descobrir e salvar novos contatos automaticamente.");
+        ImGui::PopItemWidth();
+        ImGui::PopStyleColor();
+
         return;
     }
 
