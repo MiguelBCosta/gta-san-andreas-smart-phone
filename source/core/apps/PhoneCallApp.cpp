@@ -134,17 +134,6 @@ void PhoneCallApp::onWipe() {
 }
 
 void PhoneCallApp::drawContactsList() {
-    // Title
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-    ImGui::SetWindowFontScale(1.35f);
-    ImGui::Text("Contatos");
-    ImGui::SetWindowFontScale(1.0f);
-    ImGui::PopStyleColor();
-
-    ImGui::Spacing();
-    ImGui::Separator();
-    ImGui::Spacing();
-
     // Collect discovered/known contacts
     std::vector<Contact*> knownContacts;
     for (auto& c : m_contacts) {
