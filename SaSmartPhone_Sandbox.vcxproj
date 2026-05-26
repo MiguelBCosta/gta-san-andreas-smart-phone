@@ -120,7 +120,7 @@
     <ClCompile Include="source\core\apps\WeatherApp.cpp" />
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
-    <ClCompile Include="source\core\apps\CameraApp.cpp" />
+    <ClCompile Include="source\core\apps\App.cpp" />
     <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
     <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
@@ -153,9 +153,6 @@
     <ClInclude Include="source\core\apps\PlaceholderApps.h" />
     <ClInclude Include="source\core\apps\ClockApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
-    <ClInclude Include="source\core\apps\CameraApp.h" />
-    <ClInclude Include="source\core\providers\ICameraProvider.h" />
-    <ClInclude Include="source\sandbox\providers\SandboxCameraProvider.h" />
     <ClInclude Include="source\core\apps\PhoneCallApp.h" />
     <ClInclude Include="source\core\apps\MessagesApp.h" />
     <ClInclude Include="source\core\providers\IMessageProvider.h" />

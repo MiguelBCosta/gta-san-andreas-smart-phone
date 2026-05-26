@@ -143,11 +143,9 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\providers\WeatherCommon.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
-    <ClCompile Include="source\core\apps\CameraApp.cpp" />
     <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
     <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\gta\providers\GtaGarageProvider.cpp" />
-    <ClCompile Include="source\gta\providers\GtaCameraProvider.cpp" />
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\gta\providers\GtaMapProvider.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
@@ -181,9 +179,6 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClInclude Include="source\core\apps\ClockApp.h" />
     <ClInclude Include="source\core\apps\CalculatorApp.h" />
     <ClInclude Include="source\core\apps\GarageApp.h" />
-    <ClInclude Include="source\core\apps\CameraApp.h" />
-    <ClInclude Include="source\core\providers\ICameraProvider.h" />
-    <ClInclude Include="source\gta\providers\GtaCameraProvider.h" />
     <ClInclude Include="source\core\apps\PhoneCallApp.h" />
     <ClInclude Include="source\core\apps\MessagesApp.h" />
     <ClInclude Include="source\core\providers\IMessageProvider.h" />
