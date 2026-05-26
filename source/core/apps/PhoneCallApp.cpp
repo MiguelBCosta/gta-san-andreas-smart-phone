@@ -181,17 +181,6 @@ void PhoneCallApp::drawContactsList() {
         ImGui::SetWindowFontScale(1.0f);
         ImGui::PopStyleColor();
 
-        ImGui::Spacing();
-
-        // 3. Subtitle
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.57f, 1.0f));
-        float padding = 20.0f;
-        ImGui::SetCursorPosX(padding);
-        ImGui::PushItemWidth(contentW - 2.0f * padding);
-        ImGui::TextWrapped("Atenda chamadas no jogo para descobrir e salvar novos contatos automaticamente.");
-        ImGui::PopItemWidth();
-        ImGui::PopStyleColor();
-
         return;
     }
 
