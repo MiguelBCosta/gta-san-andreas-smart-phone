@@ -345,7 +345,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::Spacing();
 
         static int selectedCallerIdx = 0;
-        const char* callers[] = { "sweet", "cesar", "catalina", "woozie", "truth", "toreno", "tenpenny", "zero", "unknown" };
+        const char* callers[] = { 
+            "sweet", "cesar", "catalina", "woozie", "truth", "toreno", "tenpenny", "zero", 
+            "denise", "michelle", "helena", "katie", "barbara", "millie", 
+            "kendl", "smoke", "ogloc", "jethro", "kentpaul", "rosenberg", "salvatore",
+            "pulaski", "hernandez", "girlfriend", "unknown" 
+        };
         ImGui::Combo("Remetente", &selectedCallerIdx, callers, IM_ARRAYSIZE(callers));
 
         if (ImGui::Button("Simular Chamada", ImVec2(160, 30))) {

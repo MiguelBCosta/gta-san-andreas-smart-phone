@@ -25,6 +25,21 @@ PhoneCallApp::PhoneCallApp() {
     m_contacts.push_back({"toreno", "Mike Toreno", "555-0105", "MT", ImVec4(0.30f, 0.30f, 0.35f, 1.0f), false});
     m_contacts.push_back({"tenpenny", "Frank Tenpenny", "555-0106", "FT", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
     m_contacts.push_back({"zero", "Zero", "555-0110", "Z", ImVec4(0.60f, 0.20f, 0.80f, 1.0f), false});
+    m_contacts.push_back({"denise", "Denise Robinson", "555-0120", "DR", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"michelle", "Michelle Cannes", "555-0121", "MC", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"helena", "Helena Wankstein", "555-0122", "HW", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"katie", "Katie Zhan", "555-0123", "KZ", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"barbara", "Barbara Schternvart", "555-0124", "BS", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"millie", "Millie Crosthwaite", "555-0125", "MC", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
+    m_contacts.push_back({"kendl", "Kendl Johnson", "555-0130", "KJ", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
+    m_contacts.push_back({"smoke", "Big Smoke", "555-0131", "BS", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
+    m_contacts.push_back({"ogloc", "OG Loc", "555-0132", "OL", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
+    m_contacts.push_back({"jethro", "Jethro", "555-0133", "J", ImVec4(0.50f, 0.50f, 0.55f, 1.0f), false});
+    m_contacts.push_back({"kentpaul", "Kent Paul", "555-0134", "KP", ImVec4(0.75f, 0.25f, 0.60f, 1.0f), false});
+    m_contacts.push_back({"rosenberg", "Ken Rosenberg", "555-0135", "KR", ImVec4(0.20f, 0.50f, 0.80f, 1.0f), false});
+    m_contacts.push_back({"salvatore", "Salvatore Leone", "555-0136", "SL", ImVec4(0.40f, 0.40f, 0.45f, 1.0f), false});
+    m_contacts.push_back({"pulaski", "Eddie Pulaski", "555-0107", "EP", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
+    m_contacts.push_back({"hernandez", "Jimmy Hernandez", "555-0108", "JH", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
 }
 
 void PhoneCallApp::onOpen() {
@@ -69,6 +84,22 @@ void PhoneCallApp::update(float dt) {
                 m_callState = PhoneCallState::RINGING;
                 m_activeCallerId = prov->GetCallerId();
                 m_callTimer = 0.0f;
+            }
+
+            // Refine caller ID if it was unknown/girlfriend and becomes resolved
+            if (m_activeCallerId == "unknown" || m_activeCallerId == "girlfriend") {
+                std::string resolvedId = prov->GetCallerId();
+                if (resolvedId != "unknown" && resolvedId != "girlfriend") {
+                    m_activeCallerId = resolvedId;
+                    if (m_callState == PhoneCallState::TALKING) {
+                        for (auto& c : m_contacts) {
+                            if (c.id == m_activeCallerId) {
+                                c.known = true;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
             
             // Check Action Key (TAB) press to answer call
