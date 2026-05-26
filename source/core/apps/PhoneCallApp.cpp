@@ -237,19 +237,19 @@ void PhoneCallApp::drawIncomingCall() {
     }
 
     // Top texts: Subtitle and Name
-    ImGui::SetCursorPosY(15.0f);
+    ImGui::SetCursorPosY(20.0f);
 
-    // Subtitle: "Chamada de Voz..."
-    std::string subtitle = "Chamada de Voz...";
+    // Subtitle: "CHAMADA DE VOZ"
+    std::string subtitle = "CHAMADA DE VOZ";
     ImVec2 subSize = ImGui::CalcTextSize(subtitle.c_str());
     ImGui::SetCursorPosX((contentW - subSize.x) / 2.0f);
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", subtitle.c_str());
+    ImGui::TextColored(ImVec4(0.55f, 0.55f, 0.57f, 1.0f), "%s", subtitle.c_str());
 
     ImGui::Spacing();
 
     // Big display name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-    ImGui::SetWindowFontScale(1.5f);
+    ImGui::SetWindowFontScale(1.65f);
     ImVec2 nameSize = ImGui::CalcTextSize(displayName.c_str());
     ImGui::SetCursorPosX((contentW - nameSize.x) / 2.0f);
     ImGui::Text("%s", displayName.c_str());
@@ -257,9 +257,9 @@ void PhoneCallApp::drawIncomingCall() {
     ImGui::PopStyleColor();
 
     // Center the avatar in the available vertical space
-    float topLimit = 100.0f;
-    float bottomLimit = contentH - 95.0f;
-    float avatarRadius = 45.0f;
+    float topLimit = 110.0f;
+    float bottomLimit = contentH - 120.0f;
+    float avatarRadius = 55.0f;
     float avatarY = topLimit + (bottomLimit - topLimit - avatarRadius * 2.0f) / 2.0f;
 
     ImGui::SetCursorPosY(avatarY);
@@ -268,20 +268,21 @@ void PhoneCallApp::drawIncomingCall() {
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
     // Place decline and accept buttons at the bottom of the window
-    float btnSize = 58.0f;
-    float gap = 40.0f;
+    float btnSize = 64.0f;
+    float gap = 52.0f;
     float totalW = btnSize * 2.0f + gap;
     float startX = (contentW - totalW) / 2.0f;
+    float buttonsY = contentH - 110.0f;
 
-    ImGui::SetCursorPosY(contentH - 85.0f);
-    ImGui::SetCursorPosX(startX);
-    
     // 1. Decline (Desligar)
+    ImGui::SetCursorPosY(buttonsY);
+    ImGui::SetCursorPosX(startX);
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.92f, 0.30f, 0.26f, 1.0f)); // iOS red
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(1.0f, 0.35f, 0.30f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.80f, 0.25f, 0.20f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
 
+    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE_SLASH "##decline", ImVec2(btnSize, btnSize))) {
         if (auto* prov = phone.getCallProvider()) {
             prov->HangUpCall();
@@ -290,17 +291,19 @@ void PhoneCallApp::drawIncomingCall() {
         m_activeCallerId = "";
         phone.closeApp();
     }
+    ImGui::SetWindowFontScale(1.0f);
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);
 
-    ImGui::SameLine(0, gap);
-
     // 2. Accept (Atender)
+    ImGui::SetCursorPosY(buttonsY);
+    ImGui::SetCursorPosX(startX + btnSize + gap);
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.30f, 0.82f, 0.22f, 1.0f)); // iOS green
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(0.35f, 0.90f, 0.25f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.25f, 0.75f, 0.18f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
 
+    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE "##accept", ImVec2(btnSize, btnSize))) {
         if (auto* prov = phone.getCallProvider()) {
             prov->AnswerCall();
@@ -315,8 +318,22 @@ void PhoneCallApp::drawIncomingCall() {
             }
         }
     }
+    ImGui::SetWindowFontScale(1.0f);
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);
+
+    // Add labels under the buttons
+    float labelY = contentH - 38.0f;
+    
+    float declSize = ImGui::CalcTextSize("Recusar").x;
+    ImGui::SetCursorPosY(labelY);
+    ImGui::SetCursorPosX(startX + (btnSize - declSize) / 2.0f);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Recusar");
+
+    float accSize = ImGui::CalcTextSize("Aceitar").x;
+    ImGui::SetCursorPosY(labelY);
+    ImGui::SetCursorPosX(startX + btnSize + gap + (btnSize - accSize) / 2.0f);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Aceitar");
 }
 
 void PhoneCallApp::drawActiveCall() {
@@ -335,7 +352,7 @@ void PhoneCallApp::drawActiveCall() {
     }
 
     // Top texts: Timer and Name
-    ImGui::SetCursorPosY(15.0f);
+    ImGui::SetCursorPosY(20.0f);
 
     // Subtitle showing timer MM:SS
     int mins = (int)m_callTimer / 60;
@@ -351,7 +368,7 @@ void PhoneCallApp::drawActiveCall() {
 
     // Big display name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-    ImGui::SetWindowFontScale(1.5f);
+    ImGui::SetWindowFontScale(1.65f);
     ImVec2 nameSize = ImGui::CalcTextSize(displayName.c_str());
     ImGui::SetCursorPosX((contentW - nameSize.x) / 2.0f);
     ImGui::Text("%s", displayName.c_str());
@@ -359,9 +376,9 @@ void PhoneCallApp::drawActiveCall() {
     ImGui::PopStyleColor();
 
     // Center the avatar in the available vertical space
-    float topLimit = 100.0f;
-    float bottomLimit = contentH - 95.0f;
-    float avatarRadius = 45.0f;
+    float topLimit = 110.0f;
+    float bottomLimit = contentH - 120.0f;
+    float avatarRadius = 55.0f;
     float avatarY = topLimit + (bottomLimit - topLimit - avatarRadius * 2.0f) / 2.0f;
 
     ImGui::SetCursorPosY(avatarY);
@@ -370,8 +387,10 @@ void PhoneCallApp::drawActiveCall() {
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
     // Single red "Desligar" button at the bottom of the window
-    float btnSize = 58.0f;
-    ImGui::SetCursorPosY(contentH - 85.0f);
+    float btnSize = 64.0f;
+    float buttonsY = contentH - 110.0f;
+
+    ImGui::SetCursorPosY(buttonsY);
     ImGui::SetCursorPosX((contentW - btnSize) / 2.0f);
 
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.92f, 0.30f, 0.26f, 1.0f)); // iOS red
@@ -379,6 +398,7 @@ void PhoneCallApp::drawActiveCall() {
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.80f, 0.25f, 0.20f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
 
+    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
     if (ImGui::Button(ICON_FA_PHONE_SLASH "##hangup", ImVec2(btnSize, btnSize))) {
         if (!m_isOutgoingCall) {
             if (auto* prov = phone.getCallProvider()) {
@@ -390,8 +410,16 @@ void PhoneCallApp::drawActiveCall() {
         m_isOutgoingCall = false;
         phone.closeApp();
     }
+    ImGui::SetWindowFontScale(1.0f);
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);
+
+    // Add label under the button
+    float labelY = contentH - 38.0f;
+    float hangSize = ImGui::CalcTextSize("Desligar").x;
+    ImGui::SetCursorPosY(labelY);
+    ImGui::SetCursorPosX((contentW - hangSize) / 2.0f);
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Desligar");
 }
 
 void PhoneCallApp::drawAvatar(const std::string& contactId, const std::string& name, const ImVec4& color, float radius, ImVec2 pos) {
