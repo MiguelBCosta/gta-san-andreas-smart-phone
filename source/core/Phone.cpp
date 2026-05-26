@@ -88,6 +88,14 @@ bool Phone::isVisible() const {
     return m_animProgress > 0.0f;
 }
 
+bool Phone::shouldCaptureInput() const {
+    if (!isVisible()) return false;
+    if (m_currentApp) {
+        return m_currentApp->requiresMouse();
+    }
+    return true; // Home screen requires input capture
+}
+
 void Phone::registerApp(PhoneApp* app) {
     // Check if app is already registered
     auto it = std::find(m_apps.begin(), m_apps.end(), app);

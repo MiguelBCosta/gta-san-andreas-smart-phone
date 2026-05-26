@@ -31,6 +31,7 @@ public:
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
+    bool requiresMouse() const override;
 
 private:
     PhoneCallState m_callState = PhoneCallState::IDLE;

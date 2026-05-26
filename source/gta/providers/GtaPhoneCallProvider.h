@@ -5,71 +5,144 @@
 #include <windows.h>
 #include <algorithm>
 #include <string>
+#include <fstream>
+#include <sstream>
+
+// $CELLPHONE_CALL_ID → Caller mapping from GTA SA main.scm
+// Source: CLEO phone script community reference
+// Global vars base: 0x00A49960, each var = 4 bytes
+// $PHONE_RINGING_FLAG confirmed at 0x00A4999C (index 15)
+// $CELLPHONE_CALL_ID address determined by debug log below
+
+static std::string CallerFromCallId(int id) {
+    // Catalina
+    if (id >= 0  && id <= 5)  return "catalina";
+    // OG Loc
+    if (id == 6)              return "ogloc";
+    // Cesar
+    if (id == 7  || id == 8  || id == 10) return "cesar";
+    // Kendl
+    if (id == 11)             return "kendl";
+    // C.R.A.S.H. (Tenpenny, Hernandez, Pulaski)
+    if (id == 9  || id == 12 || id == 13) return "crash";
+    // Smoke
+    if (id == 14)             return "smoke";
+    // Truth
+    if (id == 15 || id == 16 || id == 17) return "truth";
+    // Sweet
+    if (id >= 18 && id <= 25) return "sweet";
+    // Zero
+    if (id == 29 || id == 30) return "zero";
+    // Jethro
+    if (id >= 31 && id <= 33) return "jethro";
+    // Woozie
+    if (id == 34 || (id >= 35 && id <= 40)) return "woozie";
+    // Toreno
+    if (id >= 41 && id <= 46) return "toreno";
+    // Kent Paul
+    if (id == 47)             return "kentpaul";
+    // Rosenberg
+    if (id >= 48 && id <= 50) return "rosenberg";
+    // Salvatore
+    if (id == 51 || id == 52) return "salvatore";
+
+    // Girlfriends
+    if (id == 70  || id == 130) return "denise";
+    if (id == 80  || id == 131) return "michelle";
+    if (id == 90  || id == 132) return "helena";
+    if (id == 100 || id == 133) return "barbara";
+    if (id == 110 || id == 134) return "katie";
+    if (id == 53  || id == 120 || id == 135) return "millie";
+
+    return "";
+}
 
 class GtaPhoneCallProvider : public IPhoneCallProvider {
+private:
+    bool m_debugLogged = false;
+
+    // $CELLPHONE_CALL_ID address (global variable $1412)
+    static constexpr uintptr_t RINGING_FLAG_ADDR  = 0x00A4999C;
+    static constexpr uintptr_t CALL_ID_ADDR       = 0x00A4AF70; 
+
+    void LogDebugInfo() {
+        std::ofstream log("phone_call_debug.log", std::ios::app);
+        log << "\n=== PHONE CALL ACTIVE ===\n";
+
+        // Dump 30 global ints around the ringing flag (index -5 to +25)
+        log << "Memory around 0xA4999C (ringing flag = index 0):\n";
+        for (int i = -5; i <= 25; i++) {
+            uintptr_t addr = RINGING_FLAG_ADDR + (uintptr_t)(i * 4);
+            int val = *(int*)addr;
+            log << "  [" << (i >= 0 ? "+" : "") << i << "] 0x"
+                << std::hex << addr << std::dec << " = " << val << "\n";
+        }
+
+        // Dump candidate Call ID variables specifically
+        log << "Special Candidate Addresses:\n";
+        log << "  0x00A49A04 (index +26) = " << *(int*)0x00A49A04 << "\n";
+        log << "  0x00A4AFD0 (index 1436) = " << *(int*)0x00A4AFD0 << "\n";
+
+        // Dump all non-zero global variables from index 0 to 2500
+        log << "Non-zero global variables ($0 to $2500):\n";
+        uintptr_t base_addr = 0x00A49960;
+        for (int i = 0; i <= 2500; i++) {
+            uintptr_t addr = base_addr + (uintptr_t)(i * 4);
+            int val = *(int*)addr;
+            if (val != 0) {
+                log << "  $" << i << " (0x" << std::hex << addr << std::dec << ") = " << val << "\n";
+            }
+        }
+
+        // Dump all active thread names
+        log << "Active script threads:\n";
+        CRunningScript* script = CTheScripts::pActiveScripts;
+        while (script) {
+            char name[9] = { 0 };
+            memcpy(name, script->m_szName, 8);
+            log << "  [" << name << "]\n";
+            script = script->m_pNext;
+        }
+        log << "=========================\n";
+        log.close();
+    }
+
 public:
     bool IsIncomingCallActive() override {
-        // Address 0x00A4999C is 1 if phone is ringing/active, 0 otherwise
-        unsigned char ringing = *(unsigned char*)0x00A4999C;
-        return (ringing == 1);
+        unsigned char ringing = *(unsigned char*)RINGING_FLAG_ADDR;
+        bool active = (ringing == 1);
+
+        if (active && !m_debugLogged) {
+            LogDebugInfo();
+            m_debugLogged = true;
+        }
+        if (!active) m_debugLogged = false;
+
+        return active;
     }
 
     std::string GetCallerId() override {
-        // Scan active script threads to identify the caller by thread name
+        // 1. Try $CELLPHONE_CALL_ID first (most reliable, mapped to all character and girlfriend calls)
+        int callId = *(int*)CALL_ID_ADDR;
+        std::string fromId = CallerFromCallId(callId);
+        if (!fromId.empty()) return fromId;
+
+        // 2. Fallback: only scan for girlfriend thread signature to identify generic girlfriend call
         CRunningScript* script = CTheScripts::pActiveScripts;
         while (script) {
             char name[9] = { 0 };
             memcpy(name, script->m_szName, 8);
             std::string n(name);
             std::transform(n.begin(), n.end(), n.begin(), ::tolower);
-            
-            // Only look at phone/mobile/cell/mob_ related threads
-            bool isMobThread = (n.rfind("mob", 0) == 0 || n.rfind("cell", 0) == 0 || n.rfind("phone", 0) == 0);
-            if (isMobThread) {
-                // --- Grove Street / Families ---
-                if (n.find("swe") != std::string::npos) return "sweet";
-                if (n.find("ces") != std::string::npos || n.find("via") != std::string::npos) return "cesar";
-                if (n.find("knd") != std::string::npos || n.find("ken") != std::string::npos) return "kendl";
-                if (n.find("smo") != std::string::npos) return "smoke";
-                if (n.find("loc") != std::string::npos || n.find("ogl") != std::string::npos) return "ogloc";
-                
-                // --- C.R.A.S.H. ---
-                // "mob_her" or "mob_cra" or any thread with "her" and no "woo"
-                if (n.find("her") != std::string::npos && n.find("woo") == std::string::npos) return "hernandez";
-                if (n.find("pul") != std::string::npos) return "pulaski";
-                // Tenpenny must come after hernandez/pulaski checks
-                if (n.find("ten") != std::string::npos) return "tenpenny";
-                
-                // --- Other story characters ---
-                if (n.find("cat") != std::string::npos) return "catalina";
-                if (n.find("woo") != std::string::npos) return "woozie";
-                if (n.find("tru") != std::string::npos) return "truth";
-                if (n.find("tor") != std::string::npos) return "toreno";
-                if (n.find("ros") != std::string::npos) return "rosenberg";
-                if (n.find("pau") != std::string::npos) return "kentpaul";
-                if (n.find("leo") != std::string::npos) return "salvatore";
-                if (n.find("jet") != std::string::npos) return "jethro";
-                if (n.find("zer") != std::string::npos) return "zero";
-                
-                // --- Girlfriends ---
-                if (n.find("gf") != std::string::npos) return "girlfriend";
-                if (n.find("den") != std::string::npos) return "denise";
-                if (n.find("mic") != std::string::npos) return "michelle";
-                if (n.find("hel") != std::string::npos) return "helena";
-                if (n.find("kat") != std::string::npos) return "katie";
-                if (n.find("bar") != std::string::npos) return "barbara";
-                if (n.find("mil") != std::string::npos) return "millie";
-            }
+
+            if (n.find("gf") != std::string::npos) return "girlfriend";
+
             script = script->m_pNext;
         }
+
         return "unknown";
     }
 
-    void AnswerCall() override {
-        // No-op: buttons are UI-only placeholders; game handles answering natively via TAB
-    }
-
-    void HangUpCall() override {
-        // No-op: buttons are UI-only placeholders; game handles call end natively via TAB
-    }
+    void AnswerCall() override {}
+    void HangUpCall() override {}
 };

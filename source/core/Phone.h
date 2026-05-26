@@ -90,6 +90,7 @@ public:
     void update(float dt);
     void process(float dt);
     bool isVisible() const;
+    bool shouldCaptureInput() const;
     bool isOpen() const { return m_isOpen; }
 
     // Call this every frame when isVisible() == true

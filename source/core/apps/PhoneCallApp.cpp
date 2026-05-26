@@ -17,13 +17,14 @@ PhoneCallApp::PhoneCallApp() {
     dockOrder = 1;
 
     // Built-in game contacts database (initially unknown)
-    m_contacts.push_back({"sweet", "Sweet Johnson", "555-0100", "SJ", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
+    m_contacts.push_back({"sweet", "Sweet Johnson", "555-0100", "SJ", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), true});
+    m_contacts.push_back({"ryder", "Ryder", "555-0109", "R", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), true});
     m_contacts.push_back({"cesar", "Cesar Vialpando", "555-0101", "CV", ImVec4(0.90f, 0.60f, 0.10f, 1.0f), false});
     m_contacts.push_back({"catalina", "Catalina", "555-0102", "C", ImVec4(0.70f, 0.10f, 0.15f, 1.0f), false});
     m_contacts.push_back({"woozie", "Wu Zi Mu", "555-0103", "WZ", ImVec4(0.12f, 0.56f, 1.00f, 1.0f), false});
     m_contacts.push_back({"truth", "The Truth", "555-0104", "T", ImVec4(0.50f, 0.50f, 0.55f, 1.0f), false});
     m_contacts.push_back({"toreno", "Mike Toreno", "555-0105", "MT", ImVec4(0.30f, 0.30f, 0.35f, 1.0f), false});
-    m_contacts.push_back({"tenpenny", "Frank Tenpenny", "555-0106", "FT", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
+    m_contacts.push_back({"crash", "C.R.A.S.H.", "555-0106", "CR", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
     m_contacts.push_back({"zero", "Zero", "555-0110", "Z", ImVec4(0.60f, 0.20f, 0.80f, 1.0f), false});
     m_contacts.push_back({"denise", "Denise Robinson", "555-0120", "DR", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
     m_contacts.push_back({"michelle", "Michelle Cannes", "555-0121", "MC", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
@@ -32,14 +33,12 @@ PhoneCallApp::PhoneCallApp() {
     m_contacts.push_back({"barbara", "Barbara Schternvart", "555-0124", "BS", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
     m_contacts.push_back({"millie", "Millie Crosthwaite", "555-0125", "MC", ImVec4(0.90f, 0.20f, 0.40f, 1.0f), false});
     m_contacts.push_back({"kendl", "Kendl Johnson", "555-0130", "KJ", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
-    m_contacts.push_back({"smoke", "Big Smoke", "555-0131", "BS", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
+    m_contacts.push_back({"smoke", "Big Smoke", "555-0131", "BS", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), true});
     m_contacts.push_back({"ogloc", "OG Loc", "555-0132", "OL", ImVec4(0.18f, 0.72f, 0.30f, 1.0f), false});
     m_contacts.push_back({"jethro", "Jethro", "555-0133", "J", ImVec4(0.50f, 0.50f, 0.55f, 1.0f), false});
     m_contacts.push_back({"kentpaul", "Kent Paul", "555-0134", "KP", ImVec4(0.75f, 0.25f, 0.60f, 1.0f), false});
     m_contacts.push_back({"rosenberg", "Ken Rosenberg", "555-0135", "KR", ImVec4(0.20f, 0.50f, 0.80f, 1.0f), false});
     m_contacts.push_back({"salvatore", "Salvatore Leone", "555-0136", "SL", ImVec4(0.40f, 0.40f, 0.45f, 1.0f), false});
-    m_contacts.push_back({"pulaski", "Eddie Pulaski", "555-0107", "EP", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
-    m_contacts.push_back({"hernandez", "Jimmy Hernandez", "555-0108", "JH", ImVec4(0.80f, 0.20f, 0.20f, 1.0f), false});
 }
 
 void PhoneCallApp::onOpen() {
@@ -102,7 +101,7 @@ void PhoneCallApp::update(float dt) {
                 }
             }
             
-            // When TAB is pressed (game answers the call natively), sync UI state
+            // When TAB is pressed (game answers/hangs up call natively), sync UI state
             if (m_callState == PhoneCallState::RINGING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
                 m_callState = PhoneCallState::TALKING;
                 m_callTimer = 0.0f;
@@ -113,12 +112,18 @@ void PhoneCallApp::update(float dt) {
                         break;
                     }
                 }
+            } else if (m_callState == PhoneCallState::TALKING && ImGui::IsKeyPressed(ImGuiKey_Tab)) {
+                m_callState = PhoneCallState::IDLE;
+                m_activeCallerId = "";
+                phone.close(PhoneAnimMode::SMOOTH);
+                phone.closeApp();
             }
         } else {
             // Call ended from game/provider side
             if (m_callState != PhoneCallState::IDLE) {
                 m_callState = PhoneCallState::IDLE;
                 m_activeCallerId = "";
+                phone.close(PhoneAnimMode::SMOOTH);
                 phone.closeApp();
             }
         }
@@ -136,9 +141,9 @@ void PhoneCallApp::onSave(nlohmann::json& out) {
 }
 
 void PhoneCallApp::onLoad(const nlohmann::json& in) {
-    // Reset all to false first
+    // Reset all to default known states first
     for (auto& contact : m_contacts) {
-        contact.known = false;
+        contact.known = (contact.id == "sweet" || contact.id == "ryder" || contact.id == "smoke");
     }
     if (in.contains("known_contacts") && in["known_contacts"].is_array()) {
         for (const auto& idJson : in["known_contacts"]) {
@@ -155,12 +160,16 @@ void PhoneCallApp::onLoad(const nlohmann::json& in) {
 
 void PhoneCallApp::onWipe() {
     for (auto& contact : m_contacts) {
-        contact.known = false;
+        contact.known = (contact.id == "sweet" || contact.id == "ryder" || contact.id == "smoke");
     }
     m_callState = PhoneCallState::IDLE;
     m_callTimer = 0.0f;
     m_activeCallerId = "";
     m_isOutgoingCall = false;
+}
+
+bool PhoneCallApp::requiresMouse() const {
+    return m_callState != PhoneCallState::RINGING && m_callState != PhoneCallState::TALKING;
 }
 
 void PhoneCallApp::drawContactsList() {
@@ -214,34 +223,30 @@ void PhoneCallApp::drawContactsList() {
         float itemH = 46.0f;
         ImVec2 size = ImVec2(ImGui::GetContentRegionAvail().x, itemH);
 
-        // iOS-style list card
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.14f, 0.14f, 0.16f, 0.6f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.20f, 0.22f, 0.8f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.10f, 0.10f, 0.12f, 0.9f));
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+        // Draw static iOS-style list card background
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        dl->AddRectFilled(
+            pos,
+            ImVec2(pos.x + size.x, pos.y + size.y),
+            IM_COL32(36, 36, 40, 150), // Approx 0.14f, 0.14f, 0.16f, 0.6f
+            12.0f
+        );
 
-        if (ImGui::Button("##item", size)) {
-            m_callState = PhoneCallState::TALKING;
-            m_callTimer = 0.0f;
-            m_activeCallerId = c->id;
-            m_isOutgoingCall = true;
-        }
-
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(3);
+        // Reserve space in ImGui layout
+        ImGui::Dummy(size);
 
         // Draw circular avatar on the left
         float avatarRadius = 16.0f;
         drawAvatar(c->id, c->name, c->color, avatarRadius, ImVec2(pos.x + 8.0f, pos.y + (itemH - avatarRadius * 2.0f) / 2.0f));
 
         // Draw Name & Number
-        ImGui::GetWindowDrawList()->AddText(
+        dl->AddText(
             ImVec2(pos.x + 8.0f + avatarRadius * 2.0f + 10.0f, pos.y + 6.0f),
             IM_COL32(255, 255, 255, 255),
             c->name.c_str()
         );
         
-        ImGui::GetWindowDrawList()->AddText(
+        dl->AddText(
             ImVec2(pos.x + 8.0f + avatarRadius * 2.0f + 10.0f, pos.y + 24.0f),
             IM_COL32(150, 150, 150, 255),
             c->number.c_str()
@@ -249,7 +254,7 @@ void PhoneCallApp::drawContactsList() {
 
         // Phone call icon on the right
         float iconW = ImGui::CalcTextSize(ICON_FA_PHONE).x;
-        ImGui::GetWindowDrawList()->AddText(
+        dl->AddText(
             ImVec2(pos.x + size.x - 16.0f - iconW, pos.y + (itemH - ImGui::GetFontSize()) / 2.0f),
             IM_COL32(76, 209, 55, 255),
             ICON_FA_PHONE
@@ -272,9 +277,7 @@ void PhoneCallApp::drawIncomingCall() {
     for (auto& c : m_contacts) {
         if (c.id == m_activeCallerId) {
             activeContact = &c;
-            if (c.known) {
-                displayName = c.name;
-            }
+            displayName = c.name;
             break;
         }
     }
@@ -413,29 +416,23 @@ void PhoneCallApp::drawActiveCall() {
     float avatarX = (contentW - avatarRadius * 2.0f) / 2.0f;
     drawAvatar(m_activeCallerId, displayName, activeContact ? activeContact->color : ImVec4(0.5f, 0.5f, 0.5f, 1.0f), avatarRadius, ImVec2(screenPos.x + avatarX, screenPos.y));
 
-    // Single red "Desligar" button at the bottom of the window
+    // Decorative-only red "Desligar" button at the bottom of the window
     float btnSize = 64.0f;
     float buttonsY = contentH - 110.0f;
 
-    ImGui::SetCursorPosY(buttonsY);
-    ImGui::SetCursorPosX((contentW - btnSize) / 2.0f);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImVec2 winPos = ImGui::GetWindowPos();
 
-    ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.92f, 0.30f, 0.26f, 1.0f)); // iOS red
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(1.0f, 0.35f, 0.30f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.80f, 0.25f, 0.20f, 1.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btnSize / 2.0f);
-
-    ImGui::SetWindowFontScale(1.8f); // Make icon bigger inside the button
-    if (ImGui::Button(ICON_FA_PHONE_SLASH "##hangup", ImVec2(btnSize, btnSize))) {
-        // Placeholder: UI only - game handles call end natively
-        m_callState = PhoneCallState::IDLE;
-        m_activeCallerId = "";
-        m_isOutgoingCall = false;
-        phone.closeApp();
+    ImVec2 hangupCenter = ImVec2(winPos.x + contentW / 2.0f, winPos.y + buttonsY + btnSize / 2.0f);
+    dl->AddCircleFilled(hangupCenter, btnSize / 2.0f, IM_COL32(235, 76, 66, 255)); // iOS red
+    {
+        ImFont* font = ImGui::GetFont();
+        float iconSize = btnSize * 0.45f;
+        const char* icon = ICON_FA_PHONE_SLASH;
+        ImVec2 tsz = font->CalcTextSizeA(iconSize, FLT_MAX, 0.0f, icon);
+        ImVec2 iconPos = ImVec2(hangupCenter.x - tsz.x / 2.0f, hangupCenter.y - tsz.y / 2.0f);
+        dl->AddText(font, iconSize, iconPos, IM_COL32(255, 255, 255, 255), icon);
     }
-    ImGui::SetWindowFontScale(1.0f);
-    ImGui::PopStyleVar();
-    ImGui::PopStyleColor(3);
 
     // Add label under the button
     float labelY = contentH - 38.0f;
@@ -449,17 +446,7 @@ void PhoneCallApp::drawAvatar(const std::string& contactId, const std::string& n
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     // Check if we should render the actual avatar, or fallback/unknown
-    bool showRealAvatar = true;
-    if (contactId != "unknown") {
-        for (const auto& c : m_contacts) {
-            if (c.id == contactId && !c.known) {
-                showRealAvatar = false;
-                break;
-            }
-        }
-    } else {
-        showRealAvatar = false;
-    }
+    bool showRealAvatar = (contactId != "unknown");
 
     ImTextureID tex = 0;
     auto* avatarProv = phone.getAvatarProvider();

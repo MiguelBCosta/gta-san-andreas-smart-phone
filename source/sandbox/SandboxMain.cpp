@@ -346,10 +346,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         static int selectedCallerIdx = 0;
         const char* callers[] = { 
-            "sweet", "cesar", "catalina", "woozie", "truth", "toreno", "tenpenny", "zero", 
+            "sweet", "ryder", "cesar", "catalina", "woozie", "truth", "toreno", "crash", "zero", 
             "denise", "michelle", "helena", "katie", "barbara", "millie", 
             "kendl", "smoke", "ogloc", "jethro", "kentpaul", "rosenberg", "salvatore",
-            "pulaski", "hernandez", "girlfriend", "unknown" 
+            "girlfriend", "unknown" 
         };
         ImGui::Combo("Remetente", &selectedCallerIdx, callers, IM_ARRAYSIZE(callers));
 

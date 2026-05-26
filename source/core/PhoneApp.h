@@ -16,6 +16,9 @@ public:
 
     virtual ~PhoneApp() = default;
 
+    // Whether the app requires mouse interaction
+    virtual bool requiresMouse() const { return true; }
+
     // Called when the app is opened
     virtual void onOpen() {}
 

@@ -176,8 +176,12 @@ LRESULT CALLBACK hkWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
     // When phone is open, let ImGui consume input
     if (phone.isVisible()) {
-        if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-            return 0;
+        if (phone.shouldCaptureInput()) {
+            if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+                return 0;
+        } else {
+            ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+        }
     }
 
     return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
@@ -245,7 +249,7 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
     // ---- Cursor management (draw only) ----
     if (imguiInitialized) {
         ImGuiIO& io = ImGui::GetIO();
-        io.MouseDrawCursor = phone.isVisible();
+        io.MouseDrawCursor = phone.shouldCaptureInput();
     }
 
     ImGui_ImplDX9_NewFrame();
@@ -299,7 +303,7 @@ static UpdateMouse_t oUpdateMouse = nullptr;
 void __cdecl hkUpdateMouse() {
     static bool wasVisible = false;
 
-    if (phone.isVisible()) {
+    if (phone.shouldCaptureInput()) {
         wasVisible = true;
         
         // We skip the original mouse function so ImGui can use the cursor freely.
