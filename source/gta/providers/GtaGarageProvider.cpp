@@ -233,6 +233,13 @@ void GtaGarageProvider::Update(float dt) {
         }
 
         if (allLoaded) {
+            if (!it->info.plate.empty()) {
+                std::string plateText = it->info.plate;
+                if (plateText.length() > 8) {
+                    plateText = plateText.substr(0, 8);
+                }
+                plugin::Command<COMMAND_CUSTOM_PLATE_FOR_NEXT_CAR>(it->info.model, plateText.c_str());
+            }
             CVehicle* car = nullptr;
             plugin::Command<COMMAND_CREATE_CAR>(it->info.model, it->spawnX, it->spawnY, it->spawnZ, &car);
             

@@ -17,12 +17,15 @@ GarageApp::GarageApp() {
 void GarageApp::onOpen() {
     m_selectedIdx = -1;
     m_renamingIdx = -1;
+    m_editingPlateIdx = -1;
     m_renameBuf[0] = '\0';
+    m_plateBuf[0] = '\0';
 }
 
 void GarageApp::onClose() {
     m_selectedIdx = -1;
     m_renamingIdx = -1;
+    m_editingPlateIdx = -1;
 }
 
 void GarageApp::update(float dt) {
@@ -35,6 +38,7 @@ bool GarageApp::onBack() {
     if (m_selectedIdx != -1) {
         m_selectedIdx = -1;
         m_renamingIdx = -1;
+        m_editingPlateIdx = -1;
         return true; // Handled internally
     }
     return false; // Let the phone go home
@@ -51,6 +55,7 @@ void GarageApp::onSave(nlohmann::json& out) {
         vJson["paintjob"] = v.info.paintjob;
         vJson["mods"] = v.info.mods;
         vJson["hydraulics"] = v.info.hydraulics;
+        vJson["plate"] = v.info.plate;
         listJson.push_back(vJson);
     }
     out["vehicles"] = listJson;
@@ -60,6 +65,7 @@ void GarageApp::onLoad(const nlohmann::json& in) {
     m_vehicles.clear();
     m_selectedIdx = -1;
     m_renamingIdx = -1;
+    m_editingPlateIdx = -1;
     if (in.contains("vehicles") && in["vehicles"].is_array()) {
         for (const auto& vJson : in["vehicles"]) {
             SavedVehicle v;
@@ -70,6 +76,7 @@ void GarageApp::onLoad(const nlohmann::json& in) {
             if (vJson.contains("paintjob")) v.info.paintjob = vJson["paintjob"].get<int>();
             if (vJson.contains("mods")) v.info.mods = vJson["mods"].get<std::vector<int>>();
             if (vJson.contains("hydraulics")) v.info.hydraulics = vJson["hydraulics"].get<bool>();
+            if (vJson.contains("plate")) v.info.plate = vJson["plate"].get<std::string>();
             m_vehicles.push_back(v);
         }
     }
@@ -79,6 +86,7 @@ void GarageApp::onWipe() {
     m_vehicles.clear();
     m_selectedIdx = -1;
     m_renamingIdx = -1;
+    m_editingPlateIdx = -1;
 }
 
 namespace {
@@ -313,6 +321,8 @@ void GarageApp::DrawDetailsScreen() {
 
     int totalMods = (int)v.info.mods.size();
     DrawPropertyRow("Modificacoes", (std::to_string(totalMods) + " itens").c_str());
+
+    DrawPropertyRow("Placa", v.info.plate.empty() ? "Padrao" : v.info.plate.c_str());
     
     ImGui::EndChild();
     ImGui::PopStyleVar();
@@ -326,9 +336,26 @@ void GarageApp::DrawDetailsScreen() {
     unsigned int handle = m_provider->GetSpawnedVehicleHandle(v.deliveryId);
     bool isSameCar = m_provider->IsPlayerInVehicleModel(v.info.model);
     bool isNearSpawned = (handle != 0) && m_provider->IsVehicleNearPlayer(handle);
+    bool isInside = m_provider->IsInside();
+    bool onMission = m_provider->IsOnMission();
+    bool isDeliveryBlocked = isInside || onMission;
 
     // 1. Chamar Button
-    if (isSameCar || isNearSpawned) {
+    if (isDeliveryBlocked) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
+        
+        std::string btnText = ICON_FA_PHONE " Chamar Veiculo";
+        if (isInside) btnText += " (Bloqueado: Interior)";
+        else if (onMission) btnText += " (Bloqueado: Missao)";
+        
+        ImGui::Button(btnText.c_str(), ImVec2(-1, 36));
+        
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
+    } else if (isSameCar || isNearSpawned) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
@@ -410,6 +437,34 @@ void GarageApp::DrawDetailsScreen() {
         }
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
+    } else if (m_editingPlateIdx == m_selectedIdx) {
+        ImGui::Spacing();
+        ImGui::Text("Placa do Veiculo (max 8 caracteres):");
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
+        ImGui::InputText("##plate_val", m_plateBuf, sizeof(m_plateBuf));
+        ImGui::PopStyleVar();
+        ImGui::Spacing();
+        
+        float btnW = (ImGui::GetContentRegionAvail().x - 10.0f) / 2.0f;
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.65f, 0.35f, 1.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
+        if (ImGui::Button("Ok##plate", ImVec2(btnW, 30))) {
+            v.info.plate = m_plateBuf;
+            m_editingPlateIdx = -1;
+        }
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
+        
+        ImGui::SameLine(0, 10.0f);
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.40f, 0.40f, 0.42f, 1.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
+        if (ImGui::Button("Cancelar##plate", ImVec2(btnW, 30))) {
+            m_editingPlateIdx = -1;
+        }
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
     } else {
         ImGui::Spacing();
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.28f, 0.28f, 0.30f, 0.8f));
@@ -419,8 +474,17 @@ void GarageApp::DrawDetailsScreen() {
         
         if (ImGui::Button(ICON_FA_EDIT " Renomear Veiculo", ImVec2(-1, 34))) {
             m_renamingIdx = m_selectedIdx;
+            m_editingPlateIdx = -1;
             strncpy_s(m_renameBuf, sizeof(m_renameBuf), v.info.name.c_str(), _TRUNCATE);
         }
+        
+        ImGui::Spacing();
+        if (ImGui::Button(ICON_FA_EDIT " Customizar Placa", ImVec2(-1, 34))) {
+            m_editingPlateIdx = m_selectedIdx;
+            m_renamingIdx = -1;
+            strncpy_s(m_plateBuf, sizeof(m_plateBuf), v.info.plate.c_str(), _TRUNCATE);
+        }
+        
         ImGui::PopStyleVar();
         ImGui::PopStyleColor(3);
     }
@@ -448,23 +512,43 @@ void GarageApp::DrawListScreen() {
     if (m_provider->IsPlayerInAnyCar()) {
         VehicleInfo currentCar;
         if (m_provider->GetCurrentVehicleInfo(currentCar)) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.65f, 0.35f, 0.85f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.22f, 0.75f, 0.40f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.55f, 0.30f, 1.0f));
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+            bool isInside = m_provider->IsInside();
+            bool onMission = m_provider->IsOnMission();
+            bool isSaveBlocked = isInside || onMission;
 
-            if (ImGui::Button(ICON_FA_PLUS_CIRCLE " Salvar Veiculo Atual", ImVec2(-1, 35))) {
-                if (m_vehicles.size() >= 12) {
-                    // Limit reached
-                } else {
-                    SavedVehicle sv;
-                    sv.info = currentCar;
-                    m_vehicles.push_back(sv);
+            if (isSaveBlocked) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+
+                std::string btnText = ICON_FA_PLUS_CIRCLE " Salvar Veiculo";
+                if (isInside) btnText += " (Bloqueado: Interior)";
+                else if (onMission) btnText += " (Bloqueado: Missao)";
+
+                ImGui::Button(btnText.c_str(), ImVec2(-1, 35));
+
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor(3);
+            } else {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.65f, 0.35f, 0.85f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.22f, 0.75f, 0.40f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.55f, 0.30f, 1.0f));
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+
+                if (ImGui::Button(ICON_FA_PLUS_CIRCLE " Salvar Veiculo Atual", ImVec2(-1, 35))) {
+                    if (m_vehicles.size() >= 12) {
+                        // Limit reached
+                    } else {
+                        SavedVehicle sv;
+                        sv.info = currentCar;
+                        m_vehicles.push_back(sv);
+                    }
                 }
-            }
 
-            ImGui::PopStyleVar();
-            ImGui::PopStyleColor(3);
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor(3);
+            }
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Spacing();
@@ -524,16 +608,6 @@ void GarageApp::DrawListScreen() {
 void GarageApp::onDraw() {
     if (!m_provider) {
         ImGui::Text("Servico indisponivel.");
-        return;
-    }
-
-    // Restrictions: Interior or Active Mission block deliveries
-    bool isInside = m_provider->IsInside();
-    bool onMission = m_provider->IsOnMission();
-    if (isInside || onMission) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
-        ImGui::TextWrapped("Servico indisponivel no momento. O Garagem nao faz entregas durante missoes ou dentro de interiores.");
-        ImGui::PopStyleColor();
         return;
     }
 

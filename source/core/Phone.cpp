@@ -1,5 +1,6 @@
 #include "Phone.h"
 #include "providers/IPhoneCallProvider.h"
+#include "apps/SettingsApp.h"
 #include <IconsFontAwesome5.h>
 #include <cmath>
 
@@ -700,9 +701,21 @@ void Phone::draw() {
   ImVec2 pMin(winPos.x + BEZEL, winPos.y + BEZEL);
   ImVec2 pMax(winPos.x + PH_W - BEZEL, winPos.y + PH_H - BEZEL);
 
-  // 1. Wallpaper — fallback gradient (purple/blue like original Lua)
-  draw->AddRectFilled(pMin, pMax, IM_COL32(0x4B, 0x1A, 0x7A, 0xFF),
-                      SCR_R); // base
+  // 1. Wallpaper (Render using SettingsApp if registered)
+  SettingsApp* settings = nullptr;
+  for (auto* app : m_apps) {
+      if (app->id == "settings") {
+          settings = static_cast<SettingsApp*>(app);
+          break;
+      }
+  }
+
+  if (settings) {
+      settings->DrawWallpaper(draw, pMin, pMax, SCR_R);
+  } else {
+      // Fallback base color (Grove Street Green)
+      draw->AddRectFilled(pMin, pMax, IM_COL32(20, 90, 44, 255), SCR_R);
+  }
 
   // 2. If app is open, draw dark overlay
   if (m_currentApp) {

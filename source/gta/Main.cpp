@@ -23,7 +23,10 @@
 #include "../core/apps/PhoneCallApp.h"
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/WeatherApp.h"
+#include "../core/apps/SettingsApp.h"
+#include "../core/apps/ProfileApp.h"
 #include "../core/resources/resource.h"
+#include "providers/GtaStatsProvider.h"
 #include "providers/GtaAvatarProvider.h"
 #include "providers/GtaClockProvider.h"
 #include "providers/GtaGarageProvider.h"
@@ -33,6 +36,7 @@
 #include "providers/GtaScreenProvider.h"
 #include "providers/GtaStorageProvider.h"
 #include "providers/GtaWeatherProvider.h"
+#include "providers/GtaWallpaperProvider.h"
 #include <game_sa/CGenericGameStorage.h>
 
 using namespace plugin;
@@ -59,6 +63,8 @@ static GtaStorageProvider gtaStorage;
 static GtaGarageProvider gtaGarage;
 static GtaPhoneCallProvider gtaCallProvider;
 static GtaMessageProvider gtaMessage;
+static GtaStatsProvider gtaStats;
+static ProfileApp profileApp;
 
 // ---- App Instances (static lifetime) ----
 static CalculatorApp calcApp;
@@ -71,6 +77,28 @@ static NotesApp notesApp;
 static PhoneCallApp phoneCallApp;
 static SettingsApp settingsApp;
 static WeatherApp weatherApp;
+
+void RegisterGtaBaseServices() {
+    ServiceContainer::registerService<IClockProvider>(&gtaClock);
+    ServiceContainer::registerService<IScreenProvider>(&gtaScreen);
+    ServiceContainer::registerService<IStorageProvider>(&gtaStorage);
+    ServiceContainer::registerService<IPhoneCallProvider>(&gtaCallProvider);
+    ServiceContainer::registerService<IWeatherProvider>(&gtaWeather);
+    ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
+    ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
+    ServiceContainer::registerService<IStatsProvider>(&gtaStats);
+}
+
+void RegisterGtaGraphicsServices(IDirect3DDevice9* pDevice) {
+    static GtaAvatarProvider gtaAvatarProvider(pDevice);
+    ServiceContainer::registerService<IAvatarProvider>(&gtaAvatarProvider);
+
+    static GtaMapProvider localGtaMap(pDevice);
+    ServiceContainer::registerService<IMapProvider>(&localGtaMap);
+
+    static GtaWallpaperProvider gtaWallpaper(pDevice);
+    ServiceContainer::registerService<IWallpaperProvider>(&gtaWallpaper);
+}
 
 #include <string>
 
@@ -260,11 +288,8 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9 *pDevice) {
     ImGui_ImplWin32_Init(gameWindow);
     ImGui_ImplDX9_Init(pDevice);
 
-    static GtaAvatarProvider gtaAvatarProvider(pDevice);
-    ServiceContainer::registerService<IAvatarProvider>(&gtaAvatarProvider);
-
-    static GtaMapProvider localGtaMap(pDevice);
-    ServiceContainer::registerService<IMapProvider>(&localGtaMap);
+    // Register D3D9 graphics services using extracted helper
+    RegisterGtaGraphicsServices(pDevice);
 
     imguiInitialized = true;
   }
@@ -439,13 +464,8 @@ void TryInstallGameHooks() {
 class SaSmartPhone {
 public:
   SaSmartPhone() {
-    ServiceContainer::registerService<IClockProvider>(&gtaClock);
-    ServiceContainer::registerService<IScreenProvider>(&gtaScreen);
-    ServiceContainer::registerService<IStorageProvider>(&gtaStorage);
-    ServiceContainer::registerService<IPhoneCallProvider>(&gtaCallProvider);
-    ServiceContainer::registerService<IWeatherProvider>(&gtaWeather);
-    ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
-    ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
+    // Register base services using extracted helper
+    RegisterGtaBaseServices();
 
     // Register all apps (order = order on home screen)
     phone.registerApp(&calcApp);
@@ -458,6 +478,7 @@ public:
     phone.registerApp(&phoneCallApp);
     phone.registerApp(&settingsApp);
     phone.registerApp(&weatherApp);
+    phone.registerApp(&profileApp);
 
     Events::initGameEvent += []() { TryInstallGameHooks(); };
 

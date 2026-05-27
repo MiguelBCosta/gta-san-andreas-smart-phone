@@ -4,11 +4,32 @@
 #include <d3dx9.h>
 #include <unordered_map>
 #include <string>
+#include <filesystem>
+#include <windows.h>
 
 class GtaAvatarProvider : public IAvatarProvider {
 private:
     IDirect3DDevice9* m_device = nullptr;
     std::unordered_map<std::string, ImTextureID> m_textures;
+
+    static void getAnchorAddress() {}
+
+    // Dynamically retrieve the absolute path of the directory containing the DLL
+    std::string GetModDirectory() {
+        char path[MAX_PATH];
+        HMODULE hm = NULL;
+        if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | 
+                               GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               (LPCSTR)&getAnchorAddress, &hm)) {
+            GetModuleFileNameA(hm, path, sizeof(path));
+            std::string sPath(path);
+            size_t pos = sPath.find_last_of("\\/");
+            if (pos != std::string::npos) {
+                return sPath.substr(0, pos + 1);
+            }
+        }
+        return "";
+    }
 
 public:
     GtaAvatarProvider(IDirect3DDevice9* device) : m_device(device) {}
@@ -30,15 +51,17 @@ public:
         if (it != m_textures.end()) return it->second;
 
         IDirect3DTexture9* texture = nullptr;
-        // Search path: modloader/sasmartphone/avatars/<id>.png
-        std::string path = "modloader/sasmartphone/avatars/" + contactId + ".png";
+        
+        // Retrieve dynamic path relative to the ASI DLL location
+        std::string modDir = GetModDirectory();
+        std::string path = modDir + "avatars/" + contactId + ".png";
         HRESULT hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {
             m_textures[contactId] = (ImTextureID)texture;
             return (ImTextureID)texture;
         }
 
-        // Try fallback path relative to execution
+        // Try local fallback path
         path = "avatars/" + contactId + ".png";
         hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {

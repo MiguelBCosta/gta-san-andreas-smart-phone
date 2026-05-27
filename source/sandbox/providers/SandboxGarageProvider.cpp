@@ -10,6 +10,7 @@ SandboxGarageProvider::SandboxGarageProvider() {
     m_mockCurrentVehicle.paintjob = -1;
     m_mockCurrentVehicle.hydraulics = true;
     m_mockCurrentVehicle.mods = { 1087, 1010 }; // Hydraulics, Nitro
+    m_mockCurrentVehicle.plate = "SANDBOX";
 }
 
 void SandboxGarageProvider::SetInside(bool val) {
@@ -78,7 +79,7 @@ int SandboxGarageProvider::TriggerDelivery(const VehicleInfo& info) {
     del.delivered = false;
     m_deliveries.push_back(del);
 
-    ShowMessage("[Sim] O veiculo " + info.name + " esta a caminho!", 3000);
+    ShowMessage("[Sim] O veiculo " + info.name + " (Placa: " + (info.plate.empty() ? "Padrao" : info.plate) + ") esta a caminho!", 3000);
     return del.id;
 }
 

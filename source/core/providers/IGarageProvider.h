@@ -10,6 +10,7 @@ struct VehicleInfo {
     int paintjob = -1;
     std::vector<int> mods;
     bool hydraulics = false;
+    std::string plate = "";
 };
 
 class IGarageProvider {

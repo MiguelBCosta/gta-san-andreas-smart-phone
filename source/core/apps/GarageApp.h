@@ -16,7 +16,9 @@ private:
     std::vector<SavedVehicle> m_vehicles;
     int m_selectedIdx = -1;
     int m_renamingIdx = -1;
+    int m_editingPlateIdx = -1;
     char m_renameBuf[256] = "";
+    char m_plateBuf[16] = "";
 
     void DrawDetailsScreen();
     void DrawListScreen();

@@ -51,6 +51,9 @@
     <ClCompile Include="source\core\Phone.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\stb_image.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
     <ClCompile Include="source\core\PhoneStorage.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="source\core\providers\WeatherCommon.cpp">
       <Filter>source\core\providers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\SettingsApp.cpp">
+      <Filter>source\core\apps</Filter>
     </ClCompile>
     <ClCompile Include="source\core\apps\GarageApp.cpp">
       <Filter>source\core\apps</Filter>
@@ -158,6 +164,9 @@
     <ClInclude Include="source\core\apps\WeatherApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\apps\SettingsApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\apps\CalculatorApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
@@ -179,6 +188,9 @@
     <ClInclude Include="source\core\providers\IAvatarProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\providers\IWallpaperProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\providers\IPhoneCallProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
@@ -189,6 +201,9 @@
       <Filter>source\gta\providers</Filter>
     </ClInclude>
     <ClInclude Include="source\gta\providers\GtaAvatarProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaWallpaperProvider.h">
       <Filter>source\gta\providers</Filter>
     </ClInclude>
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h">

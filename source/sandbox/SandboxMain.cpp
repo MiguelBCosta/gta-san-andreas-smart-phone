@@ -17,10 +17,14 @@
 #include "../core/apps/PhoneCallApp.h"
 #include "../core/apps/PlaceholderApps.h"
 #include "../core/apps/WeatherApp.h"
+#include "../core/apps/SettingsApp.h"
+#include "../core/apps/ProfileApp.h"
 #include "../core/resources/resource.h"
+#include "providers/SandboxStatsProvider.h"
 #include "providers/SandboxAvatarProvider.h"
 #include "providers/SandboxClockProvider.h"
 #include "providers/SandboxGarageProvider.h"
+#include "providers/SandboxWallpaperProvider.h"
 #include "providers/SandboxMapProvider.h"
 #include "providers/SandboxMessageProvider.h"
 #include "providers/SandboxPhoneCallProvider.h"
@@ -123,6 +127,26 @@ static NotesApp notesApp;
 static PhoneCallApp phoneCallApp;
 static SettingsApp settingsApp;
 static WeatherApp weatherApp;
+static ProfileApp profileApp;
+static SandboxStatsProvider sandboxStats;
+
+void RegisterSandboxServices(IDirect3DDevice9* device) {
+    ServiceContainer::registerService<IClockProvider>(&sandboxClock);
+    ServiceContainer::registerService<IScreenProvider>(&sandboxScreen);
+    ServiceContainer::registerService<IStorageProvider>(&sandboxStorage);
+    ServiceContainer::registerService<IPhoneCallProvider>(&sandboxCallProvider);
+    ServiceContainer::registerService<IWeatherProvider>(&sandboxWeather);
+    ServiceContainer::registerService<IGarageProvider>(&sandboxGarage);
+    ServiceContainer::registerService<IMessageProvider>(&sandboxMessage);
+    ServiceContainer::registerService<IMapProvider>(&sandboxMap);
+    ServiceContainer::registerService<IStatsProvider>(&sandboxStats);
+
+    static SandboxAvatarProvider sandboxAvatarProvider(device);
+    ServiceContainer::registerService<IAvatarProvider>(&sandboxAvatarProvider);
+
+    static SandboxWallpaperProvider sandboxWallpaper(device);
+    ServiceContainer::registerService<IWallpaperProvider>(&sandboxWallpaper);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nShowCmd) {
@@ -185,19 +209,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ImGui_ImplWin32_Init(hwnd);
   ImGui_ImplDX9_Init(g_pd3dDevice);
 
-  // Setup Phone
-  ServiceContainer::registerService<IClockProvider>(&sandboxClock);
-  ServiceContainer::registerService<IScreenProvider>(&sandboxScreen);
-  ServiceContainer::registerService<IStorageProvider>(&sandboxStorage);
-  ServiceContainer::registerService<IPhoneCallProvider>(&sandboxCallProvider);
-
-  static SandboxAvatarProvider sandboxAvatarProvider(g_pd3dDevice);
-  ServiceContainer::registerService<IAvatarProvider>(&sandboxAvatarProvider);
-
-  ServiceContainer::registerService<IWeatherProvider>(&sandboxWeather);
-  ServiceContainer::registerService<IGarageProvider>(&sandboxGarage);
-  ServiceContainer::registerService<IMessageProvider>(&sandboxMessage);
-  ServiceContainer::registerService<IMapProvider>(&sandboxMap);
+  // Setup Phone services using extracted helper
+  RegisterSandboxServices(g_pd3dDevice);
   phone.registerApp(&calcApp);
   phone.registerApp(&clockApp);
   phone.registerApp(&garageApp);
@@ -208,6 +221,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   phone.registerApp(&phoneCallApp);
   phone.registerApp(&settingsApp);
   phone.registerApp(&weatherApp);
+  phone.registerApp(&profileApp);
   phone.open(PhoneAnimMode::FORCED); // Always visible in sandbox
 
   // Main loop
@@ -438,6 +452,80 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (ImGui::Button("Simular Conclusao", ImVec2(160, 30))) {
       sandboxMessage.TriggerMissionComplete(missionIds[selectedMissionIdx]);
     }
+    ImGui::End();
+
+    // Control panel for Profile app stats simulation in sandbox
+    ImGui::SetNextWindowPos(ImVec2(800, 420), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(400, 320), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Controles do Perfil (Sandbox)", nullptr, ImGuiWindowFlags_None);
+    ImGui::Text("Simular Estatisticas do CJ");
+    ImGui::Separator();
+    
+    if (ImGui::BeginTabBar("##profile_stats_tabs")) {
+        if (ImGui::BeginTabItem("Jogador")) {
+            ImGui::InputInt("Dinheiro", &sandboxStats.playerStats.money);
+            ImGui::SliderFloat("Vida", &sandboxStats.playerStats.health, 0.0f, sandboxStats.playerStats.maxHealth);
+            ImGui::SliderFloat("Vida Max", &sandboxStats.playerStats.maxHealth, 100.0f, 1000.0f);
+            ImGui::SliderFloat("Colete", &sandboxStats.playerStats.armor, 0.0f, 100.0f);
+            ImGui::SliderFloat("Gordura %", &sandboxStats.playerStats.fat, 0.0f, 100.0f);
+            ImGui::SliderFloat("Musculo %", &sandboxStats.playerStats.muscle, 0.0f, 100.0f);
+            ImGui::InputInt("Tempo Jogo (s)", &sandboxStats.playerStats.totalPlayTimeSeconds);
+            ImGui::InputInt("Refeicoes", &sandboxStats.playerStats.mealsEaten);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Habilidades")) {
+            ImGui::SliderFloat("Carro %", &sandboxStats.skillStats.drivingSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Moto %", &sandboxStats.skillStats.bikeSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Bicicleta %", &sandboxStats.skillStats.cyclingSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Aviao %", &sandboxStats.skillStats.flyingSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Pistola %", &sandboxStats.skillStats.pistolSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Escopeta %", &sandboxStats.skillStats.shotgunSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("SMG %", &sandboxStats.skillStats.smgSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fuzil %", &sandboxStats.skillStats.assaultRifleSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Sniper %", &sandboxStats.skillStats.sniperSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Folego %", &sandboxStats.skillStats.lungCapacity, 0.0f, 100.0f);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Gang")) {
+            ImGui::SliderFloat("Respeito %", &sandboxStats.gangStats.respect, 0.0f, 100.0f);
+            ImGui::SliderFloat("GSF Territorio %", &sandboxStats.gangStats.territoryControlledPercentage, 0.0f, 100.0f);
+            
+            char gangBuf[128];
+            strncpy_s(gangBuf, sizeof(gangBuf), sandboxStats.gangStats.strongestGangName.c_str(), _TRUNCATE);
+            if (ImGui::InputText("Maior Gang", gangBuf, sizeof(gangBuf))) {
+                sandboxStats.gangStats.strongestGangName = gangBuf;
+            }
+            
+            ImGui::InputInt("Territorios", &sandboxStats.gangStats.territoriesHeld);
+            ImGui::SliderInt("Recrutados", &sandboxStats.gangStats.recruitedMembersCount, 0, 7);
+            ImGui::SliderInt("Capacidade Max", &sandboxStats.gangStats.maxRecruitsCount, 0, 7);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Crimes")) {
+            ImGui::InputInt("Pessoas Mortas", &sandboxStats.crimeStats.peopleKilled);
+            ImGui::InputInt("Carros Roubados", &sandboxStats.crimeStats.carsStolen);
+            ImGui::InputInt("Veiculos Destruidos", &sandboxStats.crimeStats.vehiclesDestroyed);
+            ImGui::InputInt("Prisoes", &sandboxStats.crimeStats.bustedCount);
+            ImGui::InputInt("Mortes", &sandboxStats.crimeStats.wastedCount);
+            ImGui::InputInt("Fugas Policia", &sandboxStats.crimeStats.starsEvaded);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Progresso")) {
+            ImGui::SliderFloat("Conclusao %", &sandboxStats.progressStats.completionPercentage, 0.0f, 100.0f);
+            ImGui::InputInt("Missoes OK", &sandboxStats.progressStats.storyMissionsCompleted);
+            ImGui::InputInt("Missoes Tot", &sandboxStats.progressStats.storyMissionsTotal);
+            ImGui::InputInt("Falhas", &sandboxStats.progressStats.missionsFailed);
+            ImGui::InputInt("Cheats Usados", &sandboxStats.progressStats.cheatsUsedCount);
+            ImGui::InputInt("Fotos", &sandboxStats.progressStats.photosTaken);
+            ImGui::SliderInt("Ostras", &sandboxStats.progressStats.oystersCollected, 0, sandboxStats.progressStats.oystersTotal);
+            ImGui::SliderInt("Ferros Cavalo", &sandboxStats.progressStats.horseshoesCollected, 0, sandboxStats.progressStats.horseshoesTotal);
+            ImGui::SliderInt("Tags Pixadas", &sandboxStats.progressStats.tagsSprayed, 0, sandboxStats.progressStats.tagsTotal);
+            ImGui::SliderInt("Snapshots", &sandboxStats.progressStats.snapshotsTaken, 0, sandboxStats.progressStats.snapshotsTotal);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+    
     ImGui::End();
 
     // Control panel for garage simulation in sandbox

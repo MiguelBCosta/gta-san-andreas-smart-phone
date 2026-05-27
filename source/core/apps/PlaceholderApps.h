@@ -24,12 +24,4 @@ public:
 
 
 
-class SettingsApp : public PhoneApp {
-public:
-    SettingsApp() {
-        id = "settings"; icon = ICON_FA_COG; name = "Config";
-        color = ImVec4(0.45f, 0.45f, 0.50f, 1.0f);
-    }
-    void onDraw() override { ImGui::Text("Configuracoes - Em breve"); }
-};
 

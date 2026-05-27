@@ -39,6 +39,9 @@
     <ClCompile Include="source\core\Phone.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\stb_image.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
     <ClCompile Include="source\core\PhoneStorage.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
@@ -52,6 +55,9 @@
       <Filter>source\core\apps</Filter>
     </ClCompile>
     <ClCompile Include="source\core\apps\NotesApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\SettingsApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
     <ClCompile Include="source\core\apps\GarageApp.cpp">
@@ -131,6 +137,9 @@
     <ClInclude Include="source\core\apps\NotesApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\apps\SettingsApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\apps\WeatherApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
@@ -155,6 +164,9 @@
     <ClInclude Include="source\core\providers\IAvatarProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\providers\IWallpaperProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\providers\IPhoneCallProvider.h">
       <Filter>source\core\providers</Filter>
     </ClInclude>
@@ -165,6 +177,9 @@
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
     <ClInclude Include="source\sandbox\providers\SandboxAvatarProvider.h">
+      <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxWallpaperProvider.h">
       <Filter>source\sandbox\providers</Filter>
     </ClInclude>
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h">
