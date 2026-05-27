@@ -3,10 +3,6 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 
-void PhoneStorage::setStorageProvider(IStorageProvider* provider) {
-    m_provider = provider;
-}
-
 void PhoneStorage::setPhone(Phone* phone) {
     m_phone = phone;
 }

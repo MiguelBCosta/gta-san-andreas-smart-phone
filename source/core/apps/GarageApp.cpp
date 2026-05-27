@@ -14,11 +14,6 @@ GarageApp::GarageApp() {
     dock = true;
     dockOrder = 4;
 }
-
-void GarageApp::SetGarageProvider(IGarageProvider* provider) {
-    m_provider = provider;
-}
-
 void GarageApp::onOpen() {
     m_selectedIdx = -1;
     m_renamingIdx = -1;

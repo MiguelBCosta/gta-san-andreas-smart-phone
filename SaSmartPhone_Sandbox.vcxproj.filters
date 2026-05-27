@@ -119,6 +119,9 @@
     <ClInclude Include="source\core\Phone.h">
       <Filter>source\core</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\ServiceContainer.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\PhoneStorage.h">
       <Filter>source\core</Filter>
     </ClInclude>

@@ -120,7 +120,6 @@
     <ClCompile Include="source\core\apps\WeatherApp.cpp" />
     <ClCompile Include="source\core\apps\NotesApp.cpp" />
     <ClCompile Include="source\core\apps\GarageApp.cpp" />
-    <ClCompile Include="source\core\apps\App.cpp" />
     <ClCompile Include="source\core\apps\PhoneCallApp.cpp" />
     <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
@@ -145,6 +144,7 @@
     <ClInclude Include="source\sandbox\providers\SandboxScreenProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxStorageProvider.h" />
     <ClInclude Include="source\core\Phone.h" />
+    <ClInclude Include="source\core\ServiceContainer.h" />
     <ClInclude Include="source\core\PhoneStorage.h" />
     <ClInclude Include="source\core\PhoneApp.h" />
     <ClInclude Include="source\core\apps\NotesApp.h" />

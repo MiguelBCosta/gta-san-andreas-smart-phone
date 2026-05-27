@@ -2,6 +2,7 @@
 #include <vector>
 #include "PhoneApp.h"
 #include "providers/IStorageProvider.h"
+#include "ServiceContainer.h"
 
 class Phone;
 
@@ -10,7 +11,6 @@ public:
     PhoneStorage() = default;
     ~PhoneStorage() = default;
 
-    void setStorageProvider(IStorageProvider* provider);
     void setPhone(Phone* phone);
     void addApp(PhoneApp* app);
 
@@ -20,7 +20,7 @@ public:
     void onNewGame();
 
 private:
-    IStorageProvider* m_provider = nullptr;
+    Inject<IStorageProvider> m_provider;
     Phone* m_phone = nullptr;
     std::vector<PhoneApp*> m_apps;
 };

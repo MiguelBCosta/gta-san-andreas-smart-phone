@@ -13,6 +13,7 @@
 #include <plugin.h>
 
 #include "../core/Phone.h"
+#include "../core/ServiceContainer.h"
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/ClockApp.h"
 #include "../core/apps/GarageApp.h"
@@ -260,10 +261,10 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9 *pDevice) {
     ImGui_ImplDX9_Init(pDevice);
 
     static GtaAvatarProvider gtaAvatarProvider(pDevice);
-    phone.setAvatarProvider(&gtaAvatarProvider);
+    ServiceContainer::registerService<IAvatarProvider>(&gtaAvatarProvider);
 
     static GtaMapProvider localGtaMap(pDevice);
-    mapsApp.SetMapProvider(&localGtaMap);
+    ServiceContainer::registerService<IMapProvider>(&localGtaMap);
 
     imguiInitialized = true;
   }
@@ -438,13 +439,13 @@ void TryInstallGameHooks() {
 class SaSmartPhone {
 public:
   SaSmartPhone() {
-    phone.setClockProvider(&gtaClock);
-    phone.setScreenProvider(&gtaScreen);
-    phone.getStorage().setStorageProvider(&gtaStorage);
-    phone.setCallProvider(&gtaCallProvider);
-    weatherApp.SetWeatherProvider(&gtaWeather);
-    garageApp.SetGarageProvider(&gtaGarage);
-    messagesApp.SetMessageProvider(&gtaMessage);
+    ServiceContainer::registerService<IClockProvider>(&gtaClock);
+    ServiceContainer::registerService<IScreenProvider>(&gtaScreen);
+    ServiceContainer::registerService<IStorageProvider>(&gtaStorage);
+    ServiceContainer::registerService<IPhoneCallProvider>(&gtaCallProvider);
+    ServiceContainer::registerService<IWeatherProvider>(&gtaWeather);
+    ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
+    ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
 
     // Register all apps (order = order on home screen)
     phone.registerApp(&calcApp);
@@ -483,7 +484,11 @@ public:
         phone.closeApp();
       }
 
-      phone.process(dt);
+    phone.process(dt);
     };
+  }
+
+  ~SaSmartPhone() {
+    ServiceContainer::clear();
   }
 } gSmartPhone;

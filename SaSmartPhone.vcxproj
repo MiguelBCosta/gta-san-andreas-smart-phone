@@ -171,6 +171,7 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
     <ClInclude Include="source\gta\providers\GtaScreenProvider.h" />
     <ClInclude Include="source\gta\providers\GtaStorageProvider.h" />
     <ClInclude Include="source\core\Phone.h" />
+    <ClInclude Include="source\core\ServiceContainer.h" />
     <ClInclude Include="source\core\PhoneStorage.h" />
     <ClInclude Include="source\core\PhoneApp.h" />
     <ClInclude Include="source\core\apps\NotesApp.h" />

@@ -55,3 +55,5 @@ public:
     virtual void onWipe() {}
 };
 
+// Force rebuild to resolve ABI mismatch caused by adding badgeCount
+

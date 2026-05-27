@@ -3,6 +3,9 @@
 #include "PhoneStorage.h"
 #include "providers/IClockProvider.h"
 #include "providers/IScreenProvider.h"
+#include "providers/IPhoneCallProvider.h"
+#include "providers/IAvatarProvider.h"
+#include "ServiceContainer.h"
 #include <algorithm>
 #include <imgui.h>
 #include <string>
@@ -68,13 +71,9 @@ public:
   static constexpr float STATUS_BAR_Y = BEZEL + 7.0f;
 
   // ---- Public API ----
-  void setClockProvider(IClockProvider *provider);
   IClockProvider *getClockProvider() const { return m_clockProvider; }
-  void setScreenProvider(IScreenProvider *provider);
   IScreenProvider *getScreenProvider() const { return m_screenProvider; }
-  void setCallProvider(IPhoneCallProvider *provider);
   IPhoneCallProvider *getCallProvider() const { return m_callProvider; }
-  void setAvatarProvider(IAvatarProvider *provider);
   IAvatarProvider *getAvatarProvider() const { return m_avatarProvider; }
 
   void registerApp(PhoneApp *app);
@@ -110,10 +109,10 @@ private:
   std::vector<PhoneApp *> m_defaultApps;
   std::vector<PhoneApp *> m_dockApps;
   PhoneApp *m_currentApp = nullptr;
-  IClockProvider *m_clockProvider = nullptr;
-  IScreenProvider *m_screenProvider = nullptr;
-  IPhoneCallProvider *m_callProvider = nullptr;
-  IAvatarProvider *m_avatarProvider = nullptr;
+  Inject<IClockProvider> m_clockProvider;
+  Inject<IScreenProvider> m_screenProvider;
+  Inject<IPhoneCallProvider> m_callProvider;
+  Inject<IAvatarProvider> m_avatarProvider;
 
   bool m_isOpen = false;
   float m_animProgress = 0.0f;

@@ -7,6 +7,7 @@
 #include <windows.h>
 
 #include "../core/Phone.h"
+#include "../core/ServiceContainer.h"
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/ClockApp.h"
 #include "../core/apps/GarageApp.h"
@@ -185,18 +186,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ImGui_ImplDX9_Init(g_pd3dDevice);
 
   // Setup Phone
-  phone.setClockProvider(&sandboxClock);
-  phone.setScreenProvider(&sandboxScreen);
-  phone.getStorage().setStorageProvider(&sandboxStorage);
-  phone.setCallProvider(&sandboxCallProvider);
+  ServiceContainer::registerService<IClockProvider>(&sandboxClock);
+  ServiceContainer::registerService<IScreenProvider>(&sandboxScreen);
+  ServiceContainer::registerService<IStorageProvider>(&sandboxStorage);
+  ServiceContainer::registerService<IPhoneCallProvider>(&sandboxCallProvider);
 
   static SandboxAvatarProvider sandboxAvatarProvider(g_pd3dDevice);
-  phone.setAvatarProvider(&sandboxAvatarProvider);
+  ServiceContainer::registerService<IAvatarProvider>(&sandboxAvatarProvider);
 
-  weatherApp.SetWeatherProvider(&sandboxWeather);
-  garageApp.SetGarageProvider(&sandboxGarage);
-  messagesApp.SetMessageProvider(&sandboxMessage);
-  mapsApp.SetMapProvider(&sandboxMap);
+  ServiceContainer::registerService<IWeatherProvider>(&sandboxWeather);
+  ServiceContainer::registerService<IGarageProvider>(&sandboxGarage);
+  ServiceContainer::registerService<IMessageProvider>(&sandboxMessage);
+  ServiceContainer::registerService<IMapProvider>(&sandboxMap);
   phone.registerApp(&calcApp);
   phone.registerApp(&clockApp);
   phone.registerApp(&garageApp);
@@ -580,5 +581,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ::DestroyWindow(hwnd);
   ::UnregisterClass(wc.lpszClassName, wc.hInstance);
 
+  ServiceContainer::clear();
   return 0;
 }

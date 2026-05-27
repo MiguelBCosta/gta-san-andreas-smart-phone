@@ -1,6 +1,7 @@
 #pragma once
 #include "../PhoneApp.h"
 #include "../providers/IGarageProvider.h"
+#include "../ServiceContainer.h"
 #include <vector>
 #include <string>
 
@@ -11,7 +12,7 @@ private:
         int deliveryId = -1; // runtime only
     };
 
-    IGarageProvider* m_provider = nullptr;
+    Inject<IGarageProvider> m_provider;
     std::vector<SavedVehicle> m_vehicles;
     int m_selectedIdx = -1;
     int m_renamingIdx = -1;
@@ -23,7 +24,6 @@ private:
 public:
     GarageApp();
 
-    void SetGarageProvider(IGarageProvider* provider);
     void onOpen() override;
     void onClose() override;
     void update(float dt) override;

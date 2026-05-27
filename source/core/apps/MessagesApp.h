@@ -1,5 +1,6 @@
 #pragma once
 #include "../PhoneApp.h"
+#include "../ServiceContainer.h"
 #include <vector>
 #include <string>
 #include <imgui.h>
@@ -32,8 +33,6 @@ public:
     MessagesApp();
     virtual ~MessagesApp() = default;
 
-    void SetMessageProvider(IMessageProvider* provider) { m_provider = provider; }
-
     void onOpen() override;
     void onClose() override;
     void onDraw() override;
@@ -45,7 +44,7 @@ public:
     void onWipe() override;
 
 private:
-    IMessageProvider* m_provider = nullptr;
+    Inject<IMessageProvider> m_provider;
     std::vector<ChatThread> m_threads;
     std::vector<Contact> m_contacts;
     std::string m_activeThreadContactId = "";

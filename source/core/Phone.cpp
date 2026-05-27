@@ -9,22 +9,6 @@
 
 Phone::Phone() { m_storage.setPhone(this); }
 
-void Phone::setClockProvider(IClockProvider *provider) {
-  m_clockProvider = provider;
-}
-
-void Phone::setScreenProvider(IScreenProvider *provider) {
-  m_screenProvider = provider;
-}
-
-void Phone::setCallProvider(IPhoneCallProvider *provider) {
-  m_callProvider = provider;
-}
-
-void Phone::setAvatarProvider(IAvatarProvider *provider) {
-  m_avatarProvider = provider;
-}
-
 void Phone::toggle(PhoneAnimMode mode) {
   if (m_isOpen)
     close(mode);

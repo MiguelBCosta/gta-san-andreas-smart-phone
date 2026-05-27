@@ -11,11 +11,6 @@ WeatherApp::WeatherApp() {
     name = "Clima";
     color = ImVec4(0.25f, 0.60f, 0.90f, 1.0f);
 }
-
-void WeatherApp::SetWeatherProvider(IWeatherProvider* provider) {
-    m_weatherProvider = provider;
-}
-
 void WeatherApp::getThemeColors(WeatherTheme theme, ImColor& topColor, ImColor& bottomColor) {
     switch (theme) {
         case WeatherTheme::SUNNY:

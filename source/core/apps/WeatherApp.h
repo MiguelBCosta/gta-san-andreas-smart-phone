@@ -1,12 +1,13 @@
 #pragma once
 #include "../PhoneApp.h"
+#include "../ServiceContainer.h"
 
 class IWeatherProvider;
 enum class WeatherTheme;
 
 class WeatherApp : public PhoneApp {
 private:
-    IWeatherProvider* m_weatherProvider = nullptr;
+    Inject<IWeatherProvider> m_weatherProvider;
 
     void getThemeColors(WeatherTheme theme, ImColor& topColor, ImColor& bottomColor);
     int getSimulatedTemp(WeatherTheme theme, float rain);
@@ -14,6 +15,5 @@ private:
 public:
     WeatherApp();
 
-    void SetWeatherProvider(IWeatherProvider* provider);
     void onDraw() override;
 };
