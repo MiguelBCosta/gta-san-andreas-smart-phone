@@ -43,6 +43,15 @@
     <Filter Include="vendor\fontawesome">
       <UniqueIdentifier>{AB4C6E9F-F9F6-4C51-8446-1B99648AC008}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assets">
+      <UniqueIdentifier>{f2c7a6de-9fa2-4f3e-93d4-69f32a3ece85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\wallpaper">
+      <UniqueIdentifier>{674a27b6-2ca9-4d47-be61-5fd64ce6322d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\avatars">
+      <UniqueIdentifier>{73ea07cb-38b9-4d60-94d6-794804ba3a48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\gta\Main.cpp">
@@ -116,6 +125,12 @@
     </ClCompile>
     <ClCompile Include="vendor\minhook\src\hde\hde32.c">
       <Filter>vendor\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\apps\MessagesApp.cpp" />
+    <ClCompile Include="source\core\apps\MapsApp.cpp" />
+    <ClCompile Include="source\core\apps\ProfileApp.cpp" />
+    <ClCompile Include="source\gta\providers\GtaMapProvider.cpp">
+      <Filter>source\gta\providers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,6 +227,21 @@
     <ClInclude Include="source\core\resources\resource.h">
       <Filter>source\core\resources</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\apps\MessagesApp.h" />
+    <ClInclude Include="source\core\providers\IMessageProvider.h" />
+    <ClInclude Include="source\core\apps\MapsApp.h" />
+    <ClInclude Include="source\core\providers\IMapProvider.h" />
+    <ClInclude Include="source\core\providers\IStatsProvider.h" />
+    <ClInclude Include="source\core\apps\ProfileApp.h" />
+    <ClInclude Include="source\gta\providers\GtaMapProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaMessageProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gta\providers\GtaStatsProvider.h">
+      <Filter>source\gta\providers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="source\core\resources\resources.rc">
@@ -224,6 +254,24 @@
     </None>
     <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf">
       <Filter>vendor\imgui</Filter>
+    </None>
+    <None Include="assets\avatar\profile.png">
+      <Filter>assets\avatars</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cesar.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cj.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cover.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_do-job.jpeg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_grove_member.jpg">
+      <Filter>assets\wallpaper</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

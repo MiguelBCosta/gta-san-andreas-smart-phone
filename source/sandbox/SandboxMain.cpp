@@ -483,7 +483,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             ImGui::SliderFloat("SMG %", &sandboxStats.skillStats.smgSkill, 0.0f, 100.0f);
             ImGui::SliderFloat("Fuzil %", &sandboxStats.skillStats.assaultRifleSkill, 0.0f, 100.0f);
             ImGui::SliderFloat("Sniper %", &sandboxStats.skillStats.sniperSkill, 0.0f, 100.0f);
-            ImGui::SliderFloat("Folego %", &sandboxStats.skillStats.lungCapacity, 0.0f, 100.0f);
+            ImGui::SliderFloat("Folego %", &sandboxStats.playerStats.lungCapacity, 0.0f, 100.0f);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Gang")) {

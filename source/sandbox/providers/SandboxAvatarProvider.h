@@ -31,7 +31,7 @@ public:
 
         IDirect3DTexture9* texture = nullptr;
         // Search path: avatars/<id>.png (relative to the .exe)
-        std::string path = "avatars/" + contactId + ".png";
+        std::string path = "avatar/" + contactId + ".png";
         HRESULT hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {
             m_textures[contactId] = (ImTextureID)texture;
@@ -39,7 +39,7 @@ public:
         }
 
         // Try source directory for running directly from visual studio
-        path = "source/core/resources/avatars/" + contactId + ".png";
+        path = "source/core/resources/avatar/" + contactId + ".png";
         hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {
             m_textures[contactId] = (ImTextureID)texture;

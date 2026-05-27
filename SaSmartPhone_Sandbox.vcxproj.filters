@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="source">
@@ -31,7 +31,19 @@
     <Filter Include="vendor\imgui\backends">
       <UniqueIdentifier>{2D826707-977D-4DFD-B1FC-E46987F51E20}</UniqueIdentifier>
     </Filter>
-  <Filter Include="vendor\fontawesome"><UniqueIdentifier>{0CE21B54-3A3A-4728-AE9E-91775BEA680A}</UniqueIdentifier></Filter></ItemGroup>
+    <Filter Include="vendor\fontawesome">
+      <UniqueIdentifier>{0CE21B54-3A3A-4728-AE9E-91775BEA680A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets">
+      <UniqueIdentifier>{24e53048-e6f4-4ee2-ac92-894ea176f5cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\avatar">
+      <UniqueIdentifier>{f913e505-48da-40cb-960e-9bbb0072d27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\wallpaper">
+      <UniqueIdentifier>{0cd6efa1-2801-47bd-9d88-2253087d7e8c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\sandbox\SandboxMain.cpp">
       <Filter>source\sandbox</Filter>
@@ -93,6 +105,9 @@
     <ClCompile Include="vendor\imgui\backends\imgui_impl_win32.cpp">
       <Filter>vendor\imgui\backends</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\apps\MessagesApp.cpp" />
+    <ClCompile Include="source\core\apps\MapsApp.cpp" />
+    <ClCompile Include="source\core\apps\ProfileApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\core\providers\IClockProvider.h">
@@ -188,6 +203,15 @@
     <ClInclude Include="source\core\resources\resource.h">
       <Filter>source\core\resources</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\apps\MessagesApp.h" />
+    <ClInclude Include="source\core\providers\IMessageProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxMessageProvider.h" />
+    <ClInclude Include="source\core\apps\MapsApp.h" />
+    <ClInclude Include="source\core\providers\IMapProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxMapProvider.h" />
+    <ClInclude Include="source\core\providers\IStatsProvider.h" />
+    <ClInclude Include="source\sandbox\providers\SandboxStatsProvider.h" />
+    <ClInclude Include="source\core\apps\ProfileApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="source\core\resources\resources.rc">
@@ -200,6 +224,24 @@
     </None>
     <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf">
       <Filter>vendor\imgui</Filter>
+    </None>
+    <None Include="assets\avatar\profile.png">
+      <Filter>assets\avatar</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cesar.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cj.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_cover.jpg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_do-job.jpeg">
+      <Filter>assets\wallpaper</Filter>
+    </None>
+    <None Include="assets\wallpaper\wallpaper_grove_member.jpg">
+      <Filter>assets\wallpaper</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -54,7 +54,7 @@ public:
         
         // Retrieve dynamic path relative to the ASI DLL location
         std::string modDir = GetModDirectory();
-        std::string path = modDir + "avatars/" + contactId + ".png";
+        std::string path = modDir + "avatar/" + contactId + ".png";
         HRESULT hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {
             m_textures[contactId] = (ImTextureID)texture;
@@ -62,7 +62,7 @@ public:
         }
 
         // Try local fallback path
-        path = "avatars/" + contactId + ".png";
+        path = "avatar/" + contactId + ".png";
         hr = D3DXCreateTextureFromFileA(m_device, path.c_str(), &texture);
         if (SUCCEEDED(hr)) {
             m_textures[contactId] = (ImTextureID)texture;

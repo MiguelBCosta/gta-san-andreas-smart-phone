@@ -132,7 +132,8 @@ taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING"
 
 xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
-xcopy /Y /S /I "$(ProjectDir)wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
+xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
+xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartphone\avatar\" 
 
 )</Command>
     </PostBuildEvent>
@@ -215,11 +216,12 @@ xcopy /Y /S /I "$(ProjectDir)wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\
   <ItemGroup>
     <None Include="vendor\fontawesome\fa-solid-900.ttf" />
     <None Include="vendor\imgui\misc\fonts\Roboto-Medium.ttf" />
-    <None Include="wallpaper\wallpaper_cesar.jpg" />
-    <None Include="wallpaper\wallpaper_cj.jpg" />
-    <None Include="wallpaper\wallpaper_cover.jpg" />
-    <None Include="wallpaper\wallpaper_do-job.jpeg" />
-    <None Include="wallpaper\wallpaper_grove_member.jpg" />
+    <None Include="assets\avatar\profile.png" />
+    <None Include="assets\wallpaper\wallpaper_cesar.jpg" />
+    <None Include="assets\wallpaper\wallpaper_cj.jpg" />
+    <None Include="assets\wallpaper\wallpaper_cover.jpg" />
+    <None Include="assets\wallpaper\wallpaper_do-job.jpeg" />
+    <None Include="assets\wallpaper\wallpaper_grove_member.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
