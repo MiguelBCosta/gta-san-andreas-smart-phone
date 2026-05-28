@@ -13,9 +13,11 @@ public:
     ImVec4 color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
     bool dock = false;
     int dockOrder = 99;
-    int badgeCount = 0;
 
     virtual ~PhoneApp() = default;
+
+    // Get current notification badge count (default 0, overridden by apps like MessagesApp)
+    virtual int getBadgeCount() const { return 0; }
 
     // Whether the app requires mouse interaction
     virtual bool requiresMouse() const { return true; }

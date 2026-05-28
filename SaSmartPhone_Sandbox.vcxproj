@@ -89,7 +89,8 @@
       <AdditionalLibraryDirectories>$(PLUGIN_SDK_DIR)\output\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /S /I "$(ProjectDir)wallpaper\*" "$(OutDir)wallpaper\"</Command>
+      <Command>xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(OutDir)wallpaper\"
+xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(OutDir)avatar\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug GTA-SA|Win32'">
@@ -114,7 +115,8 @@
       <AdditionalLibraryDirectories>$(PLUGIN_SDK_DIR)\output\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /S /I "$(ProjectDir)wallpaper\*" "$(OutDir)wallpaper\"</Command>
+      <Command>xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(OutDir)wallpaper\"
+xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(OutDir)avatar\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

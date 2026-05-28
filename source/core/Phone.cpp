@@ -199,7 +199,8 @@ bool Phone::drawIcon(PhoneApp *app, ImDrawList *draw, ImVec2 winPos, float curX,
   }
 
   // Draw badge count if > 0
-  if (app->badgeCount > 0 && !state.isDragging) {
+  int badgeCount = app->getBadgeCount();
+  if (badgeCount > 0 && !state.isDragging) {
     float badgeRadius = 8.5f;
     ImVec2 badgeCenter = ImVec2(p2.x - 2.0f, p1.y + 2.0f);
 
@@ -207,8 +208,8 @@ bool Phone::drawIcon(PhoneApp *app, ImDrawList *draw, ImVec2 winPos, float curX,
     draw->AddCircleFilled(badgeCenter, badgeRadius, IM_COL32(255, 59, 48, 255));
 
     // Draw the badge number text centered
-    std::string badgeText = std::to_string(app->badgeCount);
-    if (app->badgeCount > 9) {
+    std::string badgeText = std::to_string(badgeCount);
+    if (badgeCount > 9) {
       badgeText = "9+";
     }
 

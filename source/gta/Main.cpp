@@ -42,14 +42,14 @@
 using namespace plugin;
 
 // ---- D3D9 Hook Types ----
-typedef HRESULT(__stdcall *EndScene_t)(IDirect3DDevice9 *);
-typedef HRESULT(__stdcall *Reset_t)(IDirect3DDevice9 *,
-                                    D3DPRESENT_PARAMETERS *);
+typedef HRESULT(__stdcall* EndScene_t)(IDirect3DDevice9*);
+typedef HRESULT(__stdcall* Reset_t)(IDirect3DDevice9*,
+	D3DPRESENT_PARAMETERS*);
 static EndScene_t oEndScene = nullptr;
 static Reset_t oReset = nullptr;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg,
-                                              WPARAM wParam, LPARAM lParam);
+	WPARAM wParam, LPARAM lParam);
 static WNDPROC oWndProc = nullptr;
 static HWND gameWindow = nullptr;
 static bool imguiInitialized = false;
@@ -79,25 +79,25 @@ static SettingsApp settingsApp;
 static WeatherApp weatherApp;
 
 void RegisterGtaBaseServices() {
-    ServiceContainer::registerService<IClockProvider>(&gtaClock);
-    ServiceContainer::registerService<IScreenProvider>(&gtaScreen);
-    ServiceContainer::registerService<IStorageProvider>(&gtaStorage);
-    ServiceContainer::registerService<IPhoneCallProvider>(&gtaCallProvider);
-    ServiceContainer::registerService<IWeatherProvider>(&gtaWeather);
-    ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
-    ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
-    ServiceContainer::registerService<IStatsProvider>(&gtaStats);
+	ServiceContainer::registerService<IClockProvider>(&gtaClock);
+	ServiceContainer::registerService<IScreenProvider>(&gtaScreen);
+	ServiceContainer::registerService<IStorageProvider>(&gtaStorage);
+	ServiceContainer::registerService<IPhoneCallProvider>(&gtaCallProvider);
+	ServiceContainer::registerService<IWeatherProvider>(&gtaWeather);
+	ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
+	ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
+	ServiceContainer::registerService<IStatsProvider>(&gtaStats);
 }
 
 void RegisterGtaGraphicsServices(IDirect3DDevice9* pDevice) {
-    static GtaAvatarProvider gtaAvatarProvider(pDevice);
-    ServiceContainer::registerService<IAvatarProvider>(&gtaAvatarProvider);
+	static GtaAvatarProvider gtaAvatarProvider(pDevice);
+	ServiceContainer::registerService<IAvatarProvider>(&gtaAvatarProvider);
 
-    static GtaMapProvider localGtaMap(pDevice);
-    ServiceContainer::registerService<IMapProvider>(&localGtaMap);
+	static GtaMapProvider localGtaMap(pDevice);
+	ServiceContainer::registerService<IMapProvider>(&localGtaMap);
 
-    static GtaWallpaperProvider gtaWallpaper(pDevice);
-    ServiceContainer::registerService<IWallpaperProvider>(&gtaWallpaper);
+	static GtaWallpaperProvider gtaWallpaper(pDevice);
+	ServiceContainer::registerService<IWallpaperProvider>(&gtaWallpaper);
 }
 
 #include <string>
@@ -105,241 +105,251 @@ void RegisterGtaGraphicsServices(IDirect3DDevice9* pDevice) {
 // ---- Save/Load Hooks ----
 static bool loadedFromSave = false;
 
-typedef bool(__cdecl *GenericSave_t)(int);
+typedef bool(__cdecl* GenericSave_t)(int);
 static GenericSave_t oGenericSave = nullptr;
 
-typedef bool(__cdecl *GenericLoad_t)(bool *);
+typedef bool(__cdecl* GenericLoad_t)(bool*);
 static GenericLoad_t oGenericLoad = nullptr;
 
-int GetSlotFromFilename(const char *filepath) {
-  if (!filepath)
-    return 0;
-  std::string path(filepath);
-  std::transform(path.begin(), path.end(), path.begin(), ::tolower);
-  size_t pos = path.find("gtasasf");
-  if (pos != std::string::npos && pos + 7 < path.length()) {
-    char numChar = path[pos + 7];
-    if (numChar >= '1' && numChar <= '8') {
-      return numChar - '0';
-    }
-  }
-  return 0;
+int GetSlotFromFilename(const char* filepath) {
+	if (!filepath)
+		return 0;
+	std::string path(filepath);
+	std::transform(path.begin(), path.end(), path.begin(), ::tolower);
+	size_t pos = path.find("gtasasf");
+	if (pos != std::string::npos && pos + 7 < path.length()) {
+		char numChar = path[pos + 7];
+		if (numChar >= '1' && numChar <= '8') {
+			return numChar - '0';
+		}
+	}
+	return 0;
 }
 
 int GetLoadedSlot() {
-  // 1. Try reading the slot from the Menu Manager (0-indexed, so add 1)
-  int slot = FrontEndMenuManager.m_nSelectedSaveGame + 1;
-  if (slot >= 1 && slot <= 8)
-    return slot;
+	// 1. Try reading the slot from the Menu Manager (0-indexed, so add 1)
+	int slot = FrontEndMenuManager.m_nSelectedSaveGame + 1;
+	if (slot >= 1 && slot <= 8)
+		return slot;
 
-  // 2. Fallback to parsing filename in case of custom loaders/cheats
-  slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileName);
-  if (slot >= 1 && slot <= 8)
-    return slot;
+	// 2. Fallback to parsing filename in case of custom loaders/cheats
+	slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileName);
+	if (slot >= 1 && slot <= 8)
+		return slot;
 
-  slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileNameWithPath);
-  if (slot >= 1 && slot <= 8)
-    return slot;
+	slot = GetSlotFromFilename(CGenericGameStorage::ms_LoadFileNameWithPath);
+	if (slot >= 1 && slot <= 8)
+		return slot;
 
-  slot = GetSlotFromFilename(CGenericGameStorage::ms_ValidSaveName);
-  if (slot >= 1 && slot <= 8)
-    return slot;
+	slot = GetSlotFromFilename(CGenericGameStorage::ms_ValidSaveName);
+	if (slot >= 1 && slot <= 8)
+		return slot;
 
-  return 1; // Fallback
+	return 1; // Fallback
 }
 
-bool __cdecl hkGenericSave(int slot) {
-  bool result = oGenericSave(slot);
-  if (result) {
-    phone.getStorage().onGameSave(slot + 1);
-  }
-  return result;
+bool __cdecl hkGenericSave(int unused) {
+	bool result = oGenericSave(unused);
+	if (result) {
+		int slot = GetSlotFromFilename(CGenericGameStorage::ms_SaveFileNameJustSaved);
+		if (slot < 1 || slot > 8) {
+			slot = FrontEndMenuManager.m_nSelectedSaveGame + 1;
+		}
+		if (slot < 1 || slot > 8) {
+			slot = 1; // Fallback
+		}
+
+		phone.getStorage().onGameSave(slot);
+	}
+	return result;
 }
 
-bool __cdecl hkGenericLoad(bool *arg1) {
-  bool result = oGenericLoad(arg1);
-  if (result) {
-    loadedFromSave = true;
-    int slot = GetLoadedSlot();
-    phone.getStorage().onGameLoad(slot);
-  }
-  return result;
+bool __cdecl hkGenericLoad(bool* arg1) {
+	bool result = oGenericLoad(arg1);
+	if (result) {
+		loadedFromSave = true;
+		int slot = GetLoadedSlot();
+		phone.getStorage().onGameLoad(slot);
+	}
+	return result;
 }
 
 bool CanOpenPhone() {
-  // 1. Menu de pausa ou mapa
-  if (FrontEndMenuManager.m_bMenuActive) {
-    return false;
-  }
+	// 1. Menu de pausa ou mapa
+	if (FrontEndMenuManager.m_bMenuActive) {
+		return false;
+	}
 
-  // 2. Cutscene ativa
-  if (CCutsceneMgr::ms_running) {
-    return false;
-  }
+	// 2. Cutscene ativa
+	if (CCutsceneMgr::ms_running) {
+		return false;
+	}
 
-  // 3. Jogador controlando o personagem (deve existir e estar vivo)
-  CPlayerPed *player = FindPlayerPed(-1);
-  if (!player || !player->IsAlive()) {
-    return false;
-  }
+	// 3. Jogador controlando o personagem (deve existir e estar vivo)
+	CPlayerPed* player = FindPlayerPed(-1);
+	if (!player || !player->IsAlive()) {
+		return false;
+	}
 
-  // 4. Controles desabilitados por script/jogo
-  CPad *pad = CPad::GetPad(0);
-  if (pad && pad->DisablePlayerControls) {
-    return false;
-  }
+	// 4. Controles desabilitados por script/jogo
+	CPad* pad = CPad::GetPad(0);
+	if (pad && pad->DisablePlayerControls) {
+		return false;
+	}
 
-  return true;
+	return true;
 }
 
 // ---- WndProc Hook ----
 LRESULT CALLBACK hkWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-  // F1 toggles phone visibility (ignore auto-repeat)
-  if (msg == WM_KEYDOWN && wParam == VK_F1 && !(lParam & 0x40000000)) {
-    if (phone.isOpen()) {
-      phone.close(PhoneAnimMode::SMOOTH);
-      phone.closeApp();
-    } else if (CanOpenPhone()) {
-      phone.open(PhoneAnimMode::SMOOTH);
+	// F1 toggles phone visibility (ignore auto-repeat)
+	if (msg == WM_KEYDOWN && wParam == VK_F1 && !(lParam & 0x40000000)) {
+		if (phone.isOpen()) {
+			phone.close(PhoneAnimMode::SMOOTH);
+			phone.closeApp();
+		}
+		else if (CanOpenPhone()) {
+			phone.open(PhoneAnimMode::SMOOTH);
 
-      // Centraliza o cursor do mouse
-      if (gameWindow) {
-        RECT rect;
-        GetClientRect(gameWindow, &rect);
-        POINT center = {rect.right / 2, rect.bottom / 2};
-        ClientToScreen(gameWindow, &center);
-        SetCursorPos(center.x, center.y);
-      }
-    }
-    return 0;
-  }
+			// Centraliza o cursor do mouse
+			if (gameWindow) {
+				RECT rect;
+				GetClientRect(gameWindow, &rect);
+				POINT center = { rect.right / 2, rect.bottom / 2 };
+				ClientToScreen(gameWindow, &center);
+				SetCursorPos(center.x, center.y);
+			}
+		}
+		return 0;
+	}
 
-  // When phone is open and ImGui is initialized, let ImGui consume input
-  if (phone.isVisible() && imguiInitialized) {
-    if (phone.shouldCaptureInput()) {
-      if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-        return 0;
-    } else {
-      ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-    }
-  }
+	// When phone is open and ImGui is initialized, let ImGui consume input
+	if (phone.isVisible() && imguiInitialized) {
+		if (phone.shouldCaptureInput()) {
+			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+				return 0;
+		}
+		else {
+			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+		}
+	}
 
-  return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
+	return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
 }
 
 // ---- Reset Hook ----
-HRESULT __stdcall hkReset(IDirect3DDevice9 *pDevice,
-                          D3DPRESENT_PARAMETERS *pParams) {
-  if (imguiInitialized) {
-    ImGui_ImplDX9_InvalidateDeviceObjects();
-  }
-  return oReset(pDevice, pParams);
+HRESULT __stdcall hkReset(IDirect3DDevice9* pDevice,
+	D3DPRESENT_PARAMETERS* pParams) {
+	if (imguiInitialized) {
+		ImGui_ImplDX9_InvalidateDeviceObjects();
+	}
+	return oReset(pDevice, pParams);
 }
 
 // ---- EndScene Hook ----
-HRESULT __stdcall hkEndScene(IDirect3DDevice9 *pDevice) {
-  if (!imguiInitialized) {
-    D3DDEVICE_CREATION_PARAMETERS params;
-    pDevice->GetCreationParameters(&params);
-    gameWindow = params.hFocusWindow;
+HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
+	if (!imguiInitialized) {
+		D3DDEVICE_CREATION_PARAMETERS params;
+		pDevice->GetCreationParameters(&params);
+		gameWindow = params.hFocusWindow;
 
-    oWndProc =
-        (WNDPROC)SetWindowLongPtr(gameWindow, GWL_WNDPROC, (LONG_PTR)hkWndProc);
+		oWndProc =
+			(WNDPROC)SetWindowLongPtr(gameWindow, GWL_WNDPROC, (LONG_PTR)hkWndProc);
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
 
-    // Use a clean default font (slightly larger for phone readability)
-    ImGuiIO &io = ImGui::GetIO();
-    io.FontGlobalScale = 1.0f;
+		// Use a clean default font (slightly larger for phone readability)
+		ImGuiIO& io = ImGui::GetIO();
+		io.FontGlobalScale = 1.0f;
 
-    // Load Roboto from memory (Win32 embedded resource)
-    HMODULE hModule = NULL;
-    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                           GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                       (LPCSTR)&hkEndScene, &hModule);
+		// Load Roboto from memory (Win32 embedded resource)
+		HMODULE hModule = NULL;
+		GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+			GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+			(LPCSTR)&hkEndScene, &hModule);
 
-    HRSRC hResRoboto = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_ROBOTO),
-                                     (LPCSTR)RT_RCDATA);
-    HGLOBAL hDataRoboto = LoadResource(hModule, hResRoboto);
-    void *pRobotoData = LockResource(hDataRoboto);
-    DWORD cbRobotoData = SizeofResource(hModule, hResRoboto);
+		HRSRC hResRoboto = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_ROBOTO),
+			(LPCSTR)RT_RCDATA);
+		HGLOBAL hDataRoboto = LoadResource(hModule, hResRoboto);
+		void* pRobotoData = LockResource(hDataRoboto);
+		DWORD cbRobotoData = SizeofResource(hModule, hResRoboto);
 
-    ImFontConfig robotoConfig;
-    robotoConfig.FontDataOwnedByAtlas = false;
-    io.Fonts->AddFontFromMemoryTTF(pRobotoData, cbRobotoData, 15.0f,
-                                   &robotoConfig);
+		ImFontConfig robotoConfig;
+		robotoConfig.FontDataOwnedByAtlas = false;
+		io.Fonts->AddFontFromMemoryTTF(pRobotoData, cbRobotoData, 15.0f,
+			&robotoConfig);
 
-    // Merge FontAwesome from memory (Win32 embedded resource)
-    HRSRC hResFA = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_AWESOME),
-                                 (LPCSTR)RT_RCDATA);
-    HGLOBAL hDataFA = LoadResource(hModule, hResFA);
-    void *pFAData = LockResource(hDataFA);
-    DWORD cbFAData = SizeofResource(hModule, hResFA);
+		// Merge FontAwesome from memory (Win32 embedded resource)
+		HRSRC hResFA = FindResourceA(hModule, MAKEINTRESOURCEA(IDR_FONT_AWESOME),
+			(LPCSTR)RT_RCDATA);
+		HGLOBAL hDataFA = LoadResource(hModule, hResFA);
+		void* pFAData = LockResource(hDataFA);
+		DWORD cbFAData = SizeofResource(hModule, hResFA);
 
-    ImFontConfig config;
-    config.MergeMode = true;
-    config.PixelSnapH = true;
-    config.FontDataOwnedByAtlas = false;
-    static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-    io.Fonts->AddFontFromMemoryTTF(pFAData, cbFAData, 15.0f, &config,
-                                   icon_ranges);
+		ImFontConfig config;
+		config.MergeMode = true;
+		config.PixelSnapH = true;
+		config.FontDataOwnedByAtlas = false;
+		static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+		io.Fonts->AddFontFromMemoryTTF(pFAData, cbFAData, 15.0f, &config,
+			icon_ranges);
 
-    ImGui_ImplWin32_Init(gameWindow);
-    ImGui_ImplDX9_Init(pDevice);
+		ImGui_ImplWin32_Init(gameWindow);
+		ImGui_ImplDX9_Init(pDevice);
 
-    // Register D3D9 graphics services using extracted helper
-    RegisterGtaGraphicsServices(pDevice);
+		// Register D3D9 graphics services using extracted helper
+		RegisterGtaGraphicsServices(pDevice);
 
-    imguiInitialized = true;
-  }
+		imguiInitialized = true;
+	}
 
-  // ---- Cursor management (draw only) ----
-  if (imguiInitialized) {
-    ImGuiIO &io = ImGui::GetIO();
-    io.MouseDrawCursor = phone.shouldCaptureInput();
-  }
+	// ---- Cursor management (draw only) ----
+	if (imguiInitialized) {
+		ImGuiIO& io = ImGui::GetIO();
+		io.MouseDrawCursor = phone.shouldCaptureInput();
+	}
 
-  ImGui_ImplDX9_NewFrame();
-  ImGui_ImplWin32_NewFrame();
-  ImGui::NewFrame();
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 
-  // Update and draw the phone
-  phone.update(ImGui::GetIO().DeltaTime);
-  if (phone.isVisible()) {
-    phone.draw();
-  }
+	// Update and draw the phone
+	phone.update(ImGui::GetIO().DeltaTime);
+	if (phone.isVisible()) {
+		phone.draw();
+	}
 
-  ImGui::EndFrame();
-  ImGui::Render();
-  ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
-  return oEndScene(pDevice);
+	return oEndScene(pDevice);
 }
 
 // ---- Hook Installation ----
 static bool d3dHooksInstalled = false;
 
 void TryInstallD3DHooks() {
-  if (d3dHooksInstalled)
-    return;
+	if (d3dHooksInstalled)
+		return;
 
-  IDirect3DDevice9 *device = *(IDirect3DDevice9 **)0xC97C28;
-  if (!device)
-    return;
+	IDirect3DDevice9* device = *(IDirect3DDevice9**)0xC97C28;
+	if (!device)
+		return;
 
-  void **vtable = *(void ***)device;
+	void** vtable = *(void***)device;
 
-  MH_Initialize(); // Ignore if already initialized by game hooks
+	MH_Initialize(); // Ignore if already initialized by game hooks
 
-  if (MH_CreateHook(vtable[42], &hkEndScene, (void **)&oEndScene) == MH_OK) {
-    MH_EnableHook(vtable[42]);
-  }
-  if (MH_CreateHook(vtable[16], &hkReset, (void **)&oReset) == MH_OK) {
-    MH_EnableHook(vtable[16]);
-  }
+	if (MH_CreateHook(vtable[42], &hkEndScene, (void**)&oEndScene) == MH_OK) {
+		MH_EnableHook(vtable[42]);
+	}
+	if (MH_CreateHook(vtable[16], &hkReset, (void**)&oReset) == MH_OK) {
+		MH_EnableHook(vtable[16]);
+	}
 
-  d3dHooksInstalled = true;
+	d3dHooksInstalled = true;
 }
 
 // ---- CPad::UpdateMouse Hook ----
@@ -347,169 +357,170 @@ void TryInstallD3DHooks() {
 // This is where the game reads GetCursorPos for camera rotation.
 // By skipping it when the phone is open, the camera stays locked
 // but WASD still works because keyboard input goes through a different path.
-typedef void(__cdecl *UpdateMouse_t)();
+typedef void(__cdecl* UpdateMouse_t)();
 static UpdateMouse_t oUpdateMouse = nullptr;
 
 void __cdecl hkUpdateMouse() {
-  static bool wasVisible = false;
+	static bool wasVisible = false;
 
-  if (phone.shouldCaptureInput()) {
-    wasVisible = true;
+	if (phone.shouldCaptureInput()) {
+		wasVisible = true;
 
-    // We skip the original mouse function so ImGui can use the cursor freely.
-    // HOWEVER, the game's mouse struct still holds the "last known" delta from
-    // right before the phone was opened. If we don't zero it out every frame,
-    // the camera will read that stale delta forever and spin infinitely!
-    CPad *pad = CPad::GetPad(0);
-    pad->NewMouseControllerState.x = 0.0f;
-    pad->NewMouseControllerState.y = 0.0f;
-    pad->PCTempMouseControllerState.x = 0.0f;
-    pad->PCTempMouseControllerState.y = 0.0f;
-    *(float *)0xB73404 = 0.0f;
-    *(float *)0xB73408 = 0.0f;
+		// We skip the original mouse function so ImGui can use the cursor freely.
+		// HOWEVER, the game's mouse struct still holds the "last known" delta from
+		// right before the phone was opened. If we don't zero it out every frame,
+		// the camera will read that stale delta forever and spin infinitely!
+		CPad* pad = CPad::GetPad(0);
+		pad->NewMouseControllerState.x = 0.0f;
+		pad->NewMouseControllerState.y = 0.0f;
+		pad->PCTempMouseControllerState.x = 0.0f;
+		pad->PCTempMouseControllerState.y = 0.0f;
+		*(float*)0xB73404 = 0.0f;
+		*(float*)0xB73408 = 0.0f;
 
-    return;
-  }
+		return;
+	}
 
-  // Run the original game function.
-  // This reads the physical mouse (DirectInput) and flushes its buffer.
-  oUpdateMouse();
+	// Run the original game function.
+	// This reads the physical mouse (DirectInput) and flushes its buffer.
+	oUpdateMouse();
 
-  if (wasVisible) {
-    // The phone was just closed!
-    // oUpdateMouse() just processed all the accumulated mouse movement
-    // from the time the phone was open. We must ZERO the result this frame
-    // before the camera reads it, swallowing the jump.
-    CPad *pad = CPad::GetPad(0);
-    pad->NewMouseControllerState.x = 0.0f;
-    pad->NewMouseControllerState.y = 0.0f;
-    pad->PCTempMouseControllerState.x = 0.0f;
-    pad->PCTempMouseControllerState.y = 0.0f;
-    *(float *)0xB73404 = 0.0f;
-    *(float *)0xB73408 = 0.0f;
+	if (wasVisible) {
+		// The phone was just closed!
+		// oUpdateMouse() just processed all the accumulated mouse movement
+		// from the time the phone was open. We must ZERO the result this frame
+		// before the camera reads it, swallowing the jump.
+		CPad* pad = CPad::GetPad(0);
+		pad->NewMouseControllerState.x = 0.0f;
+		pad->NewMouseControllerState.y = 0.0f;
+		pad->PCTempMouseControllerState.x = 0.0f;
+		pad->PCTempMouseControllerState.y = 0.0f;
+		*(float*)0xB73404 = 0.0f;
+		*(float*)0xB73408 = 0.0f;
 
-    wasVisible = false;
-  }
+		wasVisible = false;
+	}
 }
 
 // ---- CHud::DrawCrossHairs Hook ----
 // GTA SA 1.0 US: CHud::DrawCrossHairs is at 0x58E020
 // This is where the game draws targeting crosshairs, including the native green
 // camera HUD.
-typedef void(__cdecl *DrawCrossHairs_t)();
+typedef void(__cdecl* DrawCrossHairs_t)();
 static DrawCrossHairs_t oDrawCrossHairs = nullptr;
 
 void __cdecl hkDrawCrossHairs() { oDrawCrossHairs(); }
 
 // ---- CRadar::RemoveMapSection / RemoveRadarSections Hooks ----
-typedef void(__cdecl *RemoveMapSection_t)(int, int);
+typedef void(__cdecl* RemoveMapSection_t)(int, int);
 static RemoveMapSection_t oRemoveMapSection = nullptr;
 
 void __cdecl hkRemoveMapSection(int x, int y) {
-  if (MapsApp::bMapAppOpen) {
-    return; // Prevent unloading tiles while map app is open
-  }
-  oRemoveMapSection(x, y);
+	if (MapsApp::bMapAppOpen) {
+		return; // Prevent unloading tiles while map app is open
+	}
+	oRemoveMapSection(x, y);
 }
 
-typedef void(__cdecl *RemoveRadarSections_t)();
+typedef void(__cdecl* RemoveRadarSections_t)();
 static RemoveRadarSections_t oRemoveRadarSections = nullptr;
 
 void __cdecl hkRemoveRadarSections() {
-  if (MapsApp::bMapAppOpen) {
-    return; // Prevent unloading tiles while map app is open
-  }
-  oRemoveRadarSections();
+	if (MapsApp::bMapAppOpen) {
+		return; // Prevent unloading tiles while map app is open
+	}
+	oRemoveRadarSections();
 }
 
 static bool gameHooksInstalled = false;
 
 void TryInstallGameHooks() {
-  if (gameHooksInstalled)
-    return;
+	if (gameHooksInstalled)
+		return;
 
-  MH_STATUS status = MH_Initialize();
-  if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
-    return;
-  }
+	MH_STATUS status = MH_Initialize();
+	if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
+		return;
+	}
 
-  // Save/Load Hooks
-  MH_CreateHook((void *)0x5D13E0, &hkGenericSave, (void **)&oGenericSave);
-  MH_CreateHook((void *)0x5D17B0, &hkGenericLoad, (void **)&oGenericLoad);
+	// Save/Load Hooks
+	MH_CreateHook((void*)0x5D13E0, &hkGenericSave, (void**)&oGenericSave);
+	MH_CreateHook((void*)0x5D17B0, &hkGenericLoad, (void**)&oGenericLoad);
 
-  // Mouse hook
-  MH_CreateHook((void *)0x53F3C0, &hkUpdateMouse, (void **)&oUpdateMouse);
+	// Mouse hook
+	MH_CreateHook((void*)0x53F3C0, &hkUpdateMouse, (void**)&oUpdateMouse);
 
-  // DrawCrossHairs hook
-  MH_CreateHook((void *)0x58E020, &hkDrawCrossHairs, (void **)&oDrawCrossHairs);
+	// DrawCrossHairs hook
+	MH_CreateHook((void*)0x58E020, &hkDrawCrossHairs, (void**)&oDrawCrossHairs);
 
-  // Radar Unload Hooks (0x584BB0 = RemoveMapSection, 0x584BF0 =
-  // RemoveRadarSections)
-  MH_CreateHook((void *)0x584BB0, &hkRemoveMapSection,
-                (void **)&oRemoveMapSection);
-  MH_CreateHook((void *)0x584BF0, &hkRemoveRadarSections,
-                (void **)&oRemoveRadarSections);
+	// Radar Unload Hooks (0x584BB0 = RemoveMapSection, 0x584BF0 =
+	// RemoveRadarSections)
+	MH_CreateHook((void*)0x584BB0, &hkRemoveMapSection,
+		(void**)&oRemoveMapSection);
+	MH_CreateHook((void*)0x584BF0, &hkRemoveRadarSections,
+		(void**)&oRemoveRadarSections);
 
-  MH_EnableHook((void *)0x5D13E0);
-  MH_EnableHook((void *)0x5D17B0);
-  MH_EnableHook((void *)0x53F3C0);
-  MH_EnableHook((void *)0x58E020);
-  MH_EnableHook((void *)0x584BB0);
-  MH_EnableHook((void *)0x584BF0);
+	MH_EnableHook((void*)0x5D13E0);
+	MH_EnableHook((void*)0x5D17B0);
+	MH_EnableHook((void*)0x53F3C0);
+	MH_EnableHook((void*)0x58E020);
+	MH_EnableHook((void*)0x584BB0);
+	MH_EnableHook((void*)0x584BF0);
 
-  gameHooksInstalled = true;
+	gameHooksInstalled = true;
 }
 
 // ---- Plugin Entry ----
 class SaSmartPhone {
 public:
-  SaSmartPhone() {
-    // Register base services using extracted helper
-    RegisterGtaBaseServices();
+	SaSmartPhone() {
+		// Register base services using extracted helper
+		RegisterGtaBaseServices();
 
-    // Register all apps (order = order on home screen)
-    phone.registerApp(&calcApp);
-    phone.registerApp(&clockApp);
-    phone.registerApp(&garageApp);
-    phone.registerApp(&mapsApp);
-    phone.registerApp(&messagesApp);
-    phone.registerApp(&musicApp);
-    phone.registerApp(&notesApp);
-    phone.registerApp(&phoneCallApp);
-    phone.registerApp(&settingsApp);
-    phone.registerApp(&weatherApp);
-    phone.registerApp(&profileApp);
+		// Register all apps (order = order on home screen)
+		phone.registerApp(&calcApp);
+		phone.registerApp(&clockApp);
+		phone.registerApp(&garageApp);
+		phone.registerApp(&mapsApp);
+		phone.registerApp(&messagesApp);
+		phone.registerApp(&musicApp);
+		phone.registerApp(&notesApp);
+		phone.registerApp(&phoneCallApp);
+		phone.registerApp(&settingsApp);
+		phone.registerApp(&weatherApp);
+		phone.registerApp(&profileApp);
 
-    Events::initGameEvent += []() { TryInstallGameHooks(); };
+		Events::initGameEvent += []() { TryInstallGameHooks(); };
 
-    Events::reInitGameEvent += []() {
-      if (loadedFromSave) {
-        loadedFromSave = false;
-      } else {
-        phone.getStorage().onNewGame();
-      }
-    };
+		Events::reInitGameEvent += []() {
+			if (loadedFromSave) {
+				loadedFromSave = false;
+			}
+			else {
+				phone.getStorage().onNewGame();
+			}
+			};
 
-    Events::gameProcessEvent += []() {
-      TryInstallGameHooks();
-      TryInstallD3DHooks();
+		Events::gameProcessEvent += []() {
+			TryInstallGameHooks();
+			TryInstallD3DHooks();
 
-      // 1. Obter o delta time de forma segura usando o CTimer do jogo
-      // (ms_fTimeStep / 50.0f)
-      float dt = CTimer::ms_fTimeStep / 50.0f;
+			// 1. Obter o delta time de forma segura usando o CTimer do jogo
+			// (ms_fTimeStep / 50.0f)
+			float dt = CTimer::ms_fTimeStep / 50.0f;
 
-      // 2. Fechar o celular de forma forçada se ele estiver visível mas as
-      // condições de abertura não forem mais válidas
-      if (phone.isVisible() && !CanOpenPhone()) {
-        phone.close(PhoneAnimMode::FORCED);
-        phone.closeApp();
-      }
+			// 2. Fechar o celular de forma forçada se ele estiver visível mas as
+			// condições de abertura não forem mais válidas
+			if (phone.isVisible() && !CanOpenPhone()) {
+				phone.close(PhoneAnimMode::FORCED);
+				phone.closeApp();
+			}
 
-    phone.process(dt);
-    };
-  }
+			phone.process(dt);
+			};
+	}
 
-  ~SaSmartPhone() {
-    ServiceContainer::clear();
-  }
+	~SaSmartPhone() {
+		ServiceContainer::clear();
+	}
 } gSmartPhone;

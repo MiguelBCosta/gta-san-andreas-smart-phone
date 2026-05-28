@@ -42,6 +42,7 @@ public:
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
+    int getBadgeCount() const override { return m_badgeCount; }
 
 private:
     Inject<IMessageProvider> m_provider;
@@ -57,4 +58,5 @@ private:
     void drawAvatar(const std::string& contactId, const std::string& name, const ImVec4& color, float radius, ImVec2 pos);
     void addIncomingMessage(const std::string& contactId, const std::string& text);
     void updateBadgeCount();
+    int m_badgeCount = 0;
 };

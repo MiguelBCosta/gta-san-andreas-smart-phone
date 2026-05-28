@@ -97,7 +97,8 @@ taskkill /IM gta_sa.exe /F /FI "STATUS eq RUNNING"
 
 xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\" 
 
-xcopy /Y /S /I "$(ProjectDir)wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
+xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
+xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartphone\avatar\" 
 
 )</Command>
     </PostBuildEvent>

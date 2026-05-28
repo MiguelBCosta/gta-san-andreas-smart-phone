@@ -225,7 +225,7 @@ void MessagesApp::updateBadgeCount() {
             }
         }
     }
-    badgeCount = unread;
+    m_badgeCount = unread;
 }
 
 void MessagesApp::drawThreadsList() {
@@ -636,5 +636,5 @@ void MessagesApp::onLoad(const nlohmann::json& in) {
 void MessagesApp::onWipe() {
     m_threads.clear();
     m_activeThreadContactId = "";
-    badgeCount = 0;
+    m_badgeCount = 0;
 }
