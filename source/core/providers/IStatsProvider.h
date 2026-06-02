@@ -24,16 +24,25 @@ struct SkillStats {
 
   // Weapons (0% to 100%)
   float pistolSkill = 0.0f;
+  float silencedPistolSkill = 0.0f;
+  float desertEagleSkill = 0.0f;
   float shotgunSkill = 0.0f;
+  float sawnoffShotgunSkill = 0.0f;
+  float combatShotgunSkill = 0.0f;
+  float machinePistolSkill = 0.0f;
   float smgSkill = 0.0f;
-  float assaultRifleSkill = 0.0f;
+  float ak47Skill = 0.0f;
+  float m4Skill = 0.0f;
   float sniperSkill = 0.0f;
+  float assaultRifleSkill = 0.0f; // Keep for compatibility
 };
 
 struct GangStats {
   float respect = 0.0f;                       // 0% to 100%
   float territoryControlledPercentage = 0.0f; // 0% to 100%
   std::string strongestGangName = "Grove Street Families";
+  std::string secondStrongestGangName = "Ballas";
+  std::string thirdStrongestGangName = "Los Santos Vagos";
   int territoriesHeld = 0;
   int recruitedMembersCount = 0;
   int maxRecruitsCount = 0;
@@ -76,4 +85,6 @@ public:
   virtual GangStats GetGangStats() = 0;
   virtual CrimeStats GetCrimeStats() = 0;
   virtual ProgressStats GetProgressStats() = 0;
+  virtual void AddPlayerMoney(int amount) = 0;
 };
+

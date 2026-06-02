@@ -19,8 +19,11 @@
 #include "../core/apps/WeatherApp.h"
 #include "../core/apps/SettingsApp.h"
 #include "../core/apps/ProfileApp.h"
+#include "../core/apps/EmpresasApp.h"
 #include "../core/resources/resource.h"
 #include "providers/SandboxStatsProvider.h"
+#include "providers/SandboxBusinessProvider.h"
+
 #include "providers/SandboxAvatarProvider.h"
 #include "providers/SandboxClockProvider.h"
 #include "providers/SandboxGarageProvider.h"
@@ -128,7 +131,10 @@ static PhoneCallApp phoneCallApp;
 static SettingsApp settingsApp;
 static WeatherApp weatherApp;
 static ProfileApp profileApp;
+static EmpresasApp empresasApp;
 static SandboxStatsProvider sandboxStats;
+static SandboxBusinessProvider sandboxBusiness;
+
 
 void RegisterSandboxServices(IDirect3DDevice9* device) {
     ServiceContainer::registerService<IClockProvider>(&sandboxClock);
@@ -140,6 +146,8 @@ void RegisterSandboxServices(IDirect3DDevice9* device) {
     ServiceContainer::registerService<IMessageProvider>(&sandboxMessage);
     ServiceContainer::registerService<IMapProvider>(&sandboxMap);
     ServiceContainer::registerService<IStatsProvider>(&sandboxStats);
+    ServiceContainer::registerService<IBusinessProvider>(&sandboxBusiness);
+
 
     static SandboxAvatarProvider sandboxAvatarProvider(device);
     ServiceContainer::registerService<IAvatarProvider>(&sandboxAvatarProvider);
@@ -222,7 +230,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   phone.registerApp(&settingsApp);
   phone.registerApp(&weatherApp);
   phone.registerApp(&profileApp);
+  phone.registerApp(&empresasApp);
   phone.open(PhoneAnimMode::FORCED); // Always visible in sandbox
+
 
   // Main loop
   bool done = false;
@@ -456,7 +466,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     // Control panel for Profile app stats simulation in sandbox
     ImGui::SetNextWindowPos(ImVec2(800, 420), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(400, 320), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(400, 450), ImGuiCond_FirstUseEver);
     ImGui::Begin("Controles do Perfil (Sandbox)", nullptr, ImGuiWindowFlags_None);
     ImGui::Text("Simular Estatisticas do CJ");
     ImGui::Separator();
@@ -478,11 +488,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             ImGui::SliderFloat("Moto %", &sandboxStats.skillStats.bikeSkill, 0.0f, 100.0f);
             ImGui::SliderFloat("Bicicleta %", &sandboxStats.skillStats.cyclingSkill, 0.0f, 100.0f);
             ImGui::SliderFloat("Aviao %", &sandboxStats.skillStats.flyingSkill, 0.0f, 100.0f);
+            ImGui::Separator();
+            ImGui::Text("Armas:");
             ImGui::SliderFloat("Pistola %", &sandboxStats.skillStats.pistolSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Pistola Silenciada %", &sandboxStats.skillStats.silencedPistolSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Desert Eagle %", &sandboxStats.skillStats.desertEagleSkill, 0.0f, 100.0f);
             ImGui::SliderFloat("Escopeta %", &sandboxStats.skillStats.shotgunSkill, 0.0f, 100.0f);
-            ImGui::SliderFloat("SMG %", &sandboxStats.skillStats.smgSkill, 0.0f, 100.0f);
-            ImGui::SliderFloat("Fuzil %", &sandboxStats.skillStats.assaultRifleSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Escopeta Cano Curto %", &sandboxStats.skillStats.sawnoffShotgunSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("Escopeta Combate %", &sandboxStats.skillStats.combatShotgunSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("SMG Leve (Tec9/Uzi) %", &sandboxStats.skillStats.machinePistolSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("SMG (MP5) %", &sandboxStats.skillStats.smgSkill, 0.0f, 100.0f);
+            ImGui::SliderFloat("AK-47 %", &sandboxStats.skillStats.ak47Skill, 0.0f, 100.0f);
+            ImGui::SliderFloat("M4 %", &sandboxStats.skillStats.m4Skill, 0.0f, 100.0f);
             ImGui::SliderFloat("Sniper %", &sandboxStats.skillStats.sniperSkill, 0.0f, 100.0f);
+            ImGui::Separator();
             ImGui::SliderFloat("Folego %", &sandboxStats.playerStats.lungCapacity, 0.0f, 100.0f);
             ImGui::EndTabItem();
         }
@@ -490,10 +509,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             ImGui::SliderFloat("Respeito %", &sandboxStats.gangStats.respect, 0.0f, 100.0f);
             ImGui::SliderFloat("GSF Territorio %", &sandboxStats.gangStats.territoryControlledPercentage, 0.0f, 100.0f);
             
-            char gangBuf[128];
-            strncpy_s(gangBuf, sizeof(gangBuf), sandboxStats.gangStats.strongestGangName.c_str(), _TRUNCATE);
-            if (ImGui::InputText("Maior Gang", gangBuf, sizeof(gangBuf))) {
-                sandboxStats.gangStats.strongestGangName = gangBuf;
+            char gangBuf1[128];
+            strncpy_s(gangBuf1, sizeof(gangBuf1), sandboxStats.gangStats.strongestGangName.c_str(), _TRUNCATE);
+            if (ImGui::InputText("1ª Maior Gangue", gangBuf1, sizeof(gangBuf1))) {
+                sandboxStats.gangStats.strongestGangName = gangBuf1;
+            }
+
+            char gangBuf2[128];
+            strncpy_s(gangBuf2, sizeof(gangBuf2), sandboxStats.gangStats.secondStrongestGangName.c_str(), _TRUNCATE);
+            if (ImGui::InputText("2ª Maior Gangue", gangBuf2, sizeof(gangBuf2))) {
+                sandboxStats.gangStats.secondStrongestGangName = gangBuf2;
+            }
+
+            char gangBuf3[128];
+            strncpy_s(gangBuf3, sizeof(gangBuf3), sandboxStats.gangStats.thirdStrongestGangName.c_str(), _TRUNCATE);
+            if (ImGui::InputText("3ª Maior Gangue", gangBuf3, sizeof(gangBuf3))) {
+                sandboxStats.gangStats.thirdStrongestGangName = gangBuf3;
             }
             
             ImGui::InputInt("Territorios", &sandboxStats.gangStats.territoriesHeld);

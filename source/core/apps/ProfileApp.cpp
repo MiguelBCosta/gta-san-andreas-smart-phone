@@ -367,16 +367,28 @@ void ProfileApp::drawHabilidadesMenu() {
   // Group 2: Armas
   ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "ARMAS");
   ImGui::BeginChild("##armas_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 230.0f), true,
+                    ImVec2(ImGui::GetContentRegionAvail().x, 490.0f), true,
                     ImGuiWindowFlags_NoScrollbar);
-  drawStatProgressBar("Pistola", stats.pistolSkill, ICON_FA_CROSSHAIRS,
+  drawStatProgressBar("Pistola (9mm)", stats.pistolSkill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("Pistola Silenciada", stats.silencedPistolSkill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("Desert Eagle", stats.desertEagleSkill, ICON_FA_CROSSHAIRS,
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   drawStatProgressBar("Escopeta", stats.shotgunSkill, ICON_FA_CROSSHAIRS,
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("Escopeta Cano Curto", stats.sawnoffShotgunSkill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("Escopeta de Combate", stats.combatShotgunSkill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("Submetralhadora Leve", stats.machinePistolSkill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   drawStatProgressBar("Submetralhadora (SMG)", stats.smgSkill,
                       ICON_FA_CROSSHAIRS, ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
-  drawStatProgressBar("Fuzil de Assalto", stats.assaultRifleSkill,
-                      ICON_FA_CROSSHAIRS, ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("AK-47", stats.ak47Skill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  drawStatProgressBar("M4", stats.m4Skill, ICON_FA_CROSSHAIRS,
+                      ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   drawStatProgressBar("Rifle / Sniper", stats.sniperSkill, ICON_FA_CROSSHAIRS,
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   ImGui::EndChild();
@@ -397,7 +409,7 @@ void ProfileApp::drawGangMenu() {
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
   ImGui::BeginChild("##gang_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 260.0f), true,
+                    ImVec2(ImGui::GetContentRegionAvail().x, 330.0f), true,
                     ImGuiWindowFlags_NoScrollbar);
 
   // Respeito
@@ -409,9 +421,17 @@ void ProfileApp::drawGangMenu() {
                       ICON_FA_MAP_MARKED_ALT,
                       ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
 
-  // Strongest Gang
-  drawStatRow("Maior Gang", stats.strongestGangName.c_str(), ICON_FA_CROWN,
-              ImVec4(0.95f, 0.60f, 0.10f, 1.0f));
+  // Strongest Gang (1st)
+  drawStatRow("1ª Maior Gangue", stats.strongestGangName.c_str(), ICON_FA_CROWN,
+              ImVec4(1.0f, 0.843f, 0.0f, 1.0f)); // Gold
+
+  // 2nd Strongest Gang
+  drawStatRow("2ª Maior Gangue", stats.secondStrongestGangName.c_str(), ICON_FA_CROWN,
+              ImVec4(0.75f, 0.75f, 0.75f, 1.0f)); // Silver
+
+  // 3rd Strongest Gang
+  drawStatRow("3ª Maior Gangue", stats.thirdStrongestGangName.c_str(), ICON_FA_CROWN,
+              ImVec4(0.80f, 0.50f, 0.20f, 1.0f)); // Bronze
 
   // Territories Held
   char terrBuf[16];

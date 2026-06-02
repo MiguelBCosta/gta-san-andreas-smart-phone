@@ -108,7 +108,11 @@
     <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\core\apps\ProfileApp.cpp" />
+    <ClCompile Include="source\core\apps\EmpresasApp.cpp">
+      <Filter>source\core\apps</Filter>
+    </ClCompile>
   </ItemGroup>
+
   <ItemGroup>
     <ClInclude Include="source\core\providers\IClockProvider.h">
       <Filter>source\core\providers</Filter>
@@ -212,7 +216,17 @@
     <ClInclude Include="source\core\providers\IStatsProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxStatsProvider.h" />
     <ClInclude Include="source\core\apps\ProfileApp.h" />
+    <ClInclude Include="source\core\apps\EmpresasApp.h">
+      <Filter>source\core\apps</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\providers\IBusinessProvider.h">
+      <Filter>source\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sandbox\providers\SandboxBusinessProvider.h">
+      <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
   </ItemGroup>
+
   <ItemGroup>
     <ResourceCompile Include="source\core\resources\resources.rc">
       <Filter>source\core\resources</Filter>

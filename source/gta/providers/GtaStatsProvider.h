@@ -1,6 +1,7 @@
 #pragma once
 #include "../../core/providers/IStatsProvider.h"
 #include <algorithm>
+#include <game_sa/CGangWars.h>
 #include <game_sa/CPedGroups.h>
 #include <game_sa/CPedIntelligence.h>
 #include <game_sa/CPlayerData.h>
@@ -58,15 +59,21 @@ public:
 
     // Weapon skills are 0-1000. Convert to 0-100%
     stats.pistolSkill = CStats::GetStatValue(STAT_PISTOL_SKILL) / 10.0f;
+    stats.silencedPistolSkill = CStats::GetStatValue(STAT_SILENCED_PISTOL_SKILL) / 10.0f;
+    stats.desertEagleSkill = CStats::GetStatValue(STAT_DESERT_EAGLE_SKILL) / 10.0f;
     stats.shotgunSkill = CStats::GetStatValue(STAT_SHOTGUN_SKILL) / 10.0f;
+    stats.sawnoffShotgunSkill = CStats::GetStatValue(STAT_SAWN_OFF_SHOTGUN_SKILL) / 10.0f;
+    stats.combatShotgunSkill = CStats::GetStatValue(STAT_COMBAT_SHOTGUN_SKILL) / 10.0f;
+    stats.machinePistolSkill = CStats::GetStatValue(STAT_MACHINE_PISTOL_SKILL) / 10.0f;
     stats.smgSkill = CStats::GetStatValue(STAT_SMG_SKILL) / 10.0f;
+    stats.ak47Skill = CStats::GetStatValue(STAT_AK_47_SKILL) / 10.0f;
+    stats.m4Skill = CStats::GetStatValue(STAT_M4_SKILL) / 10.0f;
+    stats.sniperSkill = CStats::GetStatValue(STAT_RIFLE_SKILL) / 10.0f;
 
     // Assault rifle skill: average of AK47 and M4
     float ak = CStats::GetStatValue(STAT_AK_47_SKILL);
     float m4 = CStats::GetStatValue(STAT_M4_SKILL);
     stats.assaultRifleSkill = ((ak + m4) / 2.0f) / 10.0f;
-
-    stats.sniperSkill = CStats::GetStatValue(STAT_RIFLE_SKILL) / 10.0f;
 
     // Clamp values to 0-100%
     stats.drivingSkill = std::clamp(stats.drivingSkill, 0.0f, 100.0f);
@@ -74,10 +81,17 @@ public:
     stats.cyclingSkill = std::clamp(stats.cyclingSkill, 0.0f, 100.0f);
     stats.flyingSkill = std::clamp(stats.flyingSkill, 0.0f, 100.0f);
     stats.pistolSkill = std::clamp(stats.pistolSkill, 0.0f, 100.0f);
+    stats.silencedPistolSkill = std::clamp(stats.silencedPistolSkill, 0.0f, 100.0f);
+    stats.desertEagleSkill = std::clamp(stats.desertEagleSkill, 0.0f, 100.0f);
     stats.shotgunSkill = std::clamp(stats.shotgunSkill, 0.0f, 100.0f);
+    stats.sawnoffShotgunSkill = std::clamp(stats.sawnoffShotgunSkill, 0.0f, 100.0f);
+    stats.combatShotgunSkill = std::clamp(stats.combatShotgunSkill, 0.0f, 100.0f);
+    stats.machinePistolSkill = std::clamp(stats.machinePistolSkill, 0.0f, 100.0f);
     stats.smgSkill = std::clamp(stats.smgSkill, 0.0f, 100.0f);
-    stats.assaultRifleSkill = std::clamp(stats.assaultRifleSkill, 0.0f, 100.0f);
+    stats.ak47Skill = std::clamp(stats.ak47Skill, 0.0f, 100.0f);
+    stats.m4Skill = std::clamp(stats.m4Skill, 0.0f, 100.0f);
     stats.sniperSkill = std::clamp(stats.sniperSkill, 0.0f, 100.0f);
+    stats.assaultRifleSkill = std::clamp(stats.assaultRifleSkill, 0.0f, 100.0f);
 
     return stats;
   }
@@ -96,21 +110,9 @@ public:
     stats.territoryControlledPercentage =
         std::clamp(stats.territoryControlledPercentage, 0.0f, 100.0f);
 
-    float strongest = CStats::GetStatValue(STAT_STRONGEST_GANG);
-    if (strongest == 0.0f)
-      stats.strongestGangName = "Ballas";
-    else if (strongest == 1.0f)
-      stats.strongestGangName = "Grove Street Families";
-    else if (strongest == 2.0f)
-      stats.strongestGangName = "Los Santos Vagos";
-    else if (strongest == 3.0f)
-      stats.strongestGangName = "San Fierro Rifa";
-    else if (strongest == 4.0f)
-      stats.strongestGangName = "Da Nang Boys";
-    else if (strongest == 5.0f)
-      stats.strongestGangName = "Mafia / Triads";
-    else
-      stats.strongestGangName = "Grove Street Families";
+    stats.strongestGangName = GetGangName(static_cast<float>(CGangWars::GangRatings[0]));
+    stats.secondStrongestGangName = GetGangName(static_cast<float>(CGangWars::GangRatings[1]));
+    stats.thirdStrongestGangName = GetGangName(static_cast<float>(CGangWars::GangRatings[2]));
 
     // Query player recruited gang members
     stats.recruitedMembersCount = 0;
@@ -222,4 +224,28 @@ public:
 
     return stats;
   }
+
+  void AddPlayerMoney(int amount) override {
+    CPlayerPed *player = FindPlayerPed();
+    if (player) {
+      CWorld::Players[0].m_nMoney += amount;
+    }
+  }
+
+private:
+  std::string GetGangName(float gangId) {
+    int id = static_cast<int>(gangId);
+    switch (id) {
+      case 0: return "Ballas";
+      case 1: return "Grove Street Families";
+      case 2: return "Los Santos Vagos";
+      case 3: return "San Fierro Rifa";
+      case 4: return "Da Nang Boys";
+      case 5: return "Italian Mafia";
+      case 6: return "Triads";
+      case 7: return "Varrio Los Aztecas";
+      default: return "Grove Street Families";
+    }
+  }
 };
+

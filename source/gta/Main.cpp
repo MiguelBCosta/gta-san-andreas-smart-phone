@@ -25,8 +25,11 @@
 #include "../core/apps/WeatherApp.h"
 #include "../core/apps/SettingsApp.h"
 #include "../core/apps/ProfileApp.h"
+#include "../core/apps/EmpresasApp.h"
 #include "../core/resources/resource.h"
 #include "providers/GtaStatsProvider.h"
+#include "providers/GtaBusinessProvider.h"
+
 #include "providers/GtaAvatarProvider.h"
 #include "providers/GtaClockProvider.h"
 #include "providers/GtaGarageProvider.h"
@@ -64,6 +67,7 @@ static GtaGarageProvider gtaGarage;
 static GtaPhoneCallProvider gtaCallProvider;
 static GtaMessageProvider gtaMessage;
 static GtaStatsProvider gtaStats;
+static GtaBusinessProvider gtaBusiness;
 static ProfileApp profileApp;
 
 // ---- App Instances (static lifetime) ----
@@ -77,6 +81,8 @@ static NotesApp notesApp;
 static PhoneCallApp phoneCallApp;
 static SettingsApp settingsApp;
 static WeatherApp weatherApp;
+static EmpresasApp empresasApp;
+
 
 void RegisterGtaBaseServices() {
 	ServiceContainer::registerService<IClockProvider>(&gtaClock);
@@ -87,7 +93,9 @@ void RegisterGtaBaseServices() {
 	ServiceContainer::registerService<IGarageProvider>(&gtaGarage);
 	ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
 	ServiceContainer::registerService<IStatsProvider>(&gtaStats);
+	ServiceContainer::registerService<IBusinessProvider>(&gtaBusiness);
 }
+
 
 void RegisterGtaGraphicsServices(IDirect3DDevice9* pDevice) {
 	static GtaAvatarProvider gtaAvatarProvider(pDevice);
@@ -489,6 +497,8 @@ public:
 		phone.registerApp(&settingsApp);
 		phone.registerApp(&weatherApp);
 		phone.registerApp(&profileApp);
+		phone.registerApp(&empresasApp);
+
 
 		Events::initGameEvent += []() { TryInstallGameHooks(); };
 

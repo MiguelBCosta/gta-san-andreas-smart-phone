@@ -26,14 +26,23 @@ public:
     skillStats.cyclingSkill = 85.0f;
     skillStats.flyingSkill = 40.0f;
     skillStats.pistolSkill = 80.0f;
+    skillStats.silencedPistolSkill = 45.0f;
+    skillStats.desertEagleSkill = 60.0f;
     skillStats.shotgunSkill = 50.0f;
+    skillStats.sawnoffShotgunSkill = 35.0f;
+    skillStats.combatShotgunSkill = 75.0f;
+    skillStats.machinePistolSkill = 80.0f;
     skillStats.smgSkill = 90.0f;
-    skillStats.assaultRifleSkill = 70.0f;
+    skillStats.ak47Skill = 70.0f;
+    skillStats.m4Skill = 65.0f;
     skillStats.sniperSkill = 30.0f;
+    skillStats.assaultRifleSkill = 67.5f;
 
     gangStats.respect = 72.0f;
     gangStats.territoryControlledPercentage = 42.0f;
     gangStats.strongestGangName = "Grove Street Families";
+    gangStats.secondStrongestGangName = "Ballas";
+    gangStats.thirdStrongestGangName = "Los Santos Vagos";
     gangStats.territoriesHeld = 24;
     gangStats.recruitedMembersCount = 3;
     gangStats.maxRecruitsCount = 5;
@@ -68,4 +77,9 @@ public:
   GangStats GetGangStats() override { return gangStats; }
   CrimeStats GetCrimeStats() override { return crimeStats; }
   ProgressStats GetProgressStats() override { return progressStats; }
+
+  void AddPlayerMoney(int amount) override {
+    playerStats.money += amount;
+  }
 };
+
