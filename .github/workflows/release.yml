@@ -27,7 +27,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Install Premake5
-        uses: Jarod42/install-premake5@v2
+        uses: Jarod42/install-premake5@v7
 
       - name: Clone Plugin-SDK
         run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git
