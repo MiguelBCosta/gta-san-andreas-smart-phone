@@ -52,6 +52,16 @@ jobs:
           cd plugin-sdk
           ..\premake5 --file=tools/premake/premake5.lua vs2022
 
+      - name: Print Solution Configurations
+        if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          if (Test-Path plugin-sdk/plugin.sln) {
+              Get-Content plugin-sdk/plugin.sln | Select-String -Pattern "SolutionConfigurationPlatforms" -Context 0, 15
+          } else {
+              Write-Output "plugin.sln not found!"
+          }
+
       - name: Build Plugin-SDK library (GTA-SA)
         if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
         run: |
