@@ -56,7 +56,7 @@ jobs:
         if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
         run: |
           cd plugin-sdk
-          msbuild plugin.sln /p:Configuration=Release /p:Platform=Win32 /t:plugin_sa
+          msbuild plugin.sln /p:Configuration=Release /p:Platform=x86 /t:plugin_sa
 
       - name: Build SaSmartPhone ASI Plugin
         run: |
