@@ -14,6 +14,8 @@ jobs:
   build:
     name: Build and Package
     runs-on: windows-2022
+    permissions:
+      contents: write
     env:
       PLUGIN_SDK_DIR: ${{ github.workspace }}/plugin-sdk
 
