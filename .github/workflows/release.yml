@@ -10,11 +10,12 @@ on:
     branches:
       - master
   workflow_dispatch:
-
 jobs:
   build:
     name: Build and Package
     runs-on: windows-2022
+    env:
+      PLUGIN_SDK_DIR: ${{ github.workspace }}/plugin-sdk
 
     steps:
       - name: Checkout repository
@@ -34,7 +35,7 @@ jobs:
       - name: Generate Plugin-SDK project files
         run: |
           cd plugin-sdk
-          premake5 vs2022
+          premake5 --file=tools/premake/premake5.lua vs2022
 
       - name: Build Plugin-SDK library (GTA-SA)
         run: |
@@ -42,8 +43,6 @@ jobs:
           msbuild plugin.sln /p:Configuration=Release /p:Platform=Win32 /t:plugin_sa
 
       - name: Build SaSmartPhone ASI Plugin
-        env:
-          PLUGIN_SDK_DIR: ${{ github.workspace }}/plugin-sdk
         run: |
           msbuild SaSmartPhone.sln /p:Configuration="Release GTA-SA" /p:Platform=Win32
 
