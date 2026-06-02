@@ -362,12 +362,10 @@ void GtaGarageProvider::Update(float dt) {
                 plugin::Command<COMMAND_REMOVE_BLIP>(it->blip);
             }
             if (IsVehicleValid(it->car)) {
-                CVehicle* carPtr = it->car;
-                plugin::Command<COMMAND_MARK_CAR_AS_NO_LONGER_NEEDED>(&carPtr);
+                plugin::Command<COMMAND_MARK_CAR_AS_NO_LONGER_NEEDED>(it->car);
             }
             if (IsPedValid(it->driver)) {
-                CPed* driverPtr = it->driver;
-                plugin::Command<COMMAND_MARK_CHAR_AS_NO_LONGER_NEEDED>(&driverPtr);
+                plugin::Command<COMMAND_MARK_CHAR_AS_NO_LONGER_NEEDED>(it->driver);
             }
             it = m_activeDeliveries.erase(it);
         } else {
