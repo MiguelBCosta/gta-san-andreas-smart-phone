@@ -30,9 +30,8 @@ public:
     stats.fat = CStats::GetStatValue(STAT_FAT) / 10.0f;
     stats.muscle = CStats::GetStatValue(STAT_MUSCLE) / 10.0f;
 
-    // Playtime in milliseconds converted to seconds
-    stats.totalPlayTimeSeconds =
-        static_cast<int>(CStats::GetStatValue(STAT_PLAYING_TIME) / 1000.0f);
+    // Playtime in milliseconds retrieved from memory address 0xA8ECF0 and converted to seconds
+    stats.totalPlayTimeSeconds = (*(unsigned int*)0xA8ECF0) / 1000;
     stats.mealsEaten =
         static_cast<int>(CStats::GetStatValue(STAT_NUMBER_OF_MEALS_EATEN));
 
