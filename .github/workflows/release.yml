@@ -1,0 +1,86 @@
+name: Release & Deploy SaSmartPhone
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install Premake5
+        uses: Jarod42/install-premake5@v2
+
+      - name: Clone Plugin-SDK
+        run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git
+
+      - name: Generate Plugin-SDK project files
+        run: |
+          cd plugin-sdk
+          premake5 vs2022
+
+      - name: Build Plugin-SDK library (GTA-SA)
+        run: |
+          cd plugin-sdk
+          msbuild plugin.sln /p:Configuration=Release /p:Platform=Win32 /t:plugin_sa
+
+      - name: Build SaSmartPhone ASI Plugin
+        env:
+          PLUGIN_SDK_DIR: ${{ github.workspace }}/plugin-sdk
+        run: |
+          msbuild SaSmartPhone.sln /p:Configuration="Release GTA-SA" /p:Platform=Win32
+
+      - name: Prepare Package Structure
+        shell: powershell
+        run: |
+          # Create staging directory
+          New-Item -ItemType Directory -Force -Path sasmartphone
+          
+          # Copy ASI plugin
+          Copy-Item -Path bin/GTA-SA/Release/SaSmartPhone.SA.asi -Destination sasmartphone/SaSmartPhone.SA.asi -Force
+          
+          # Copy wallpapers folder
+          if (Test-Path assets/wallpaper) {
+              Copy-Item -Path assets/wallpaper -Destination sasmartphone/ -Recurse -Force
+          }
+          
+          # Copy avatars folder
+          if (Test-Path assets/avatar) {
+              Copy-Item -Path assets/avatar -Destination sasmartphone/ -Recurse -Force
+          }
+
+      - name: Create Zip Archive
+        shell: powershell
+        run: |
+          Compress-Archive -Path sasmartphone -DestinationPath SaSmartPhone.zip -Force
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaSmartPhone-Build
+          path: SaSmartPhone.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SaSmartPhone.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
