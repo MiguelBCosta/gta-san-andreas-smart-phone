@@ -60,7 +60,7 @@ jobs:
 
       - name: Build SaSmartPhone ASI Plugin
         run: |
-          msbuild SaSmartPhone.sln /p:Configuration=Release /p:Platform=GTA-SA
+          msbuild SaSmartPhone.sln /p:Configuration=Release /p:Platform=GTA-SA /t:SaSmartPhone
 
       - name: Prepare Package Structure
         shell: powershell
