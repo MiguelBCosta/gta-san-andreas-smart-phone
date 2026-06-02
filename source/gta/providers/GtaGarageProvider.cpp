@@ -7,6 +7,7 @@
 #include <game_sa/CWorld.h>
 #include <game_sa/CVehicle.h>
 #include <game_sa/CPed.h>
+#include <game_sa/CPlayerPed.h>
 #include <game_sa/CPools.h>
 #include <game_sa/common.h>
 #include <game_sa/CGeneral.h>
