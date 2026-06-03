@@ -521,7 +521,7 @@ void Phone::drawHome(ImDrawList *draw, ImVec2 winPos) {
   drawHomeDock(draw, winPos);
 
   if (m_editMode && ImGui::IsMouseClicked(0)) {
-    if (m_pressedKey.empty() && !m_isDragging) {
+    if (m_pressedKey.empty() && !m_isDragging && !m_popupState.active) {
       float mouseX = ImGui::GetIO().MousePos.x - winPos.x;
       float mouseY = ImGui::GetIO().MousePos.y - winPos.y;
       if (mouseX >= BEZEL && mouseX <= PH_W - BEZEL && mouseY >= BEZEL &&
@@ -569,7 +569,7 @@ void Phone::drawHomeGrid(ImDrawList *draw, ImVec2 winPos) {
 
     bool clicked = drawIcon(app, draw, winPos, state.x, state.y, ICON_SZ,
                             ICON_R, "##icon", key);
-    if (clicked && !m_dragStartedThisClick && !m_editMode) {
+    if (clicked && !m_dragStartedThisClick && !m_editMode && !m_popupState.active) {
       openApp(app);
     }
 
@@ -646,7 +646,7 @@ void Phone::drawHomeDock(ImDrawList *draw, ImVec2 winPos) {
 
       bool clicked = drawIcon(app, draw, winPos, state.x, state.y, DOCK_ICON_SZ,
                               DOCK_ICON_R, "##icon", key);
-      if (clicked && !m_dragStartedThisClick && !m_editMode) {
+      if (clicked && !m_dragStartedThisClick && !m_editMode && !m_popupState.active) {
         openApp(app);
       }
 
@@ -978,7 +978,7 @@ void Phone::drawAlertPopup(ImDrawList* draw, ImVec2 winPos) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
   ImGui::SetCursorScreenPos(ImVec2(ax + 16.0f, ay + titlePadding + titleSize.y + msgPadding));
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-  ImGui::PushTextWrapPos(ax + alertW - 16.0f);
+  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + maxTextW);
   ImGui::TextUnformatted(m_popupState.message.c_str());
   ImGui::PopTextWrapPos();
   ImGui::PopStyleVar();
