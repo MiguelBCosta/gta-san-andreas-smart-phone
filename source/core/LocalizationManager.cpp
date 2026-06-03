@@ -19,8 +19,13 @@ void LocalizationManager::Init(const std::string& basePath) {
     m_basePath = basePath;
     ScanLanguages();
 
-    // Idioma padrão: inglês. LoadLanguage faz fallback gracioso se não existir.
-    LoadLanguage(m_currentLang);
+    // Pre-load all available languages into memory
+    for (const auto& lang : m_availableLanguages) {
+        LoadLanguage(lang.code);
+    }
+
+    // Set default language
+    SetLanguage(m_currentLang);
 }
 
 // ---------------------------------------------------------------------------
@@ -69,7 +74,13 @@ void LocalizationManager::ScanLanguages() {
 // ---------------------------------------------------------------------------
 void LocalizationManager::SetLanguage(const std::string& langCode) {
     m_currentLang = langCode;
-    LoadLanguage(langCode);
+    
+    auto it = m_allLanguages.find(langCode);
+    if (it != m_allLanguages.end()) {
+        m_currentStrings = &it->second;
+    } else {
+        m_currentStrings = nullptr;
+    }
 
     for (const auto& cb : m_callbacks) {
         if (cb) {
@@ -96,7 +107,8 @@ const std::vector<LanguageInfo>& LocalizationManager::GetAvailableLanguages() co
 // LoadLanguage — carrega o JSON de um idioma e preenche m_strings
 // ---------------------------------------------------------------------------
 void LocalizationManager::LoadLanguage(const std::string& langCode) {
-    m_strings.clear();
+    auto& langStrings = m_allLanguages[langCode];
+    langStrings.clear();
 
     std::string filePath = m_basePath + "lang/" + langCode + ".json";
     std::ifstream file(filePath);
@@ -109,7 +121,7 @@ void LocalizationManager::LoadLanguage(const std::string& langCode) {
         // Percorre todas as chaves e armazena os valores como strings
         for (auto it = j.begin(); it != j.end(); ++it) {
             if (it.value().is_string()) {
-                m_strings[it.key()] = it.value().get<std::string>();
+                langStrings[it.key()] = it.value().get<std::string>();
             }
         }
     } catch (...) {}
@@ -119,9 +131,23 @@ void LocalizationManager::LoadLanguage(const std::string& langCode) {
 // Translate — retorna a string traduzida ou a própria chave como fallback
 // ---------------------------------------------------------------------------
 const char* LocalizationManager::Translate(const char* key) const {
-    auto it = m_strings.find(key);
-    if (it != m_strings.end()) {
-        return it->second.c_str();
+    if (m_currentStrings) {
+        auto it = m_currentStrings->find(key);
+        if (it != m_currentStrings->end()) {
+            return it->second.c_str();
+        }
     }
+
+    // Fallback translation: Try English if not already English
+    if (m_currentLang != "en") {
+        auto itEng = m_allLanguages.find("en");
+        if (itEng != m_allLanguages.end()) {
+            auto itKey = itEng->second.find(key);
+            if (itKey != itEng->second.end()) {
+                return itKey->second.c_str();
+            }
+        }
+    }
+
     return key; // fallback: exibir a chave bruta
 }

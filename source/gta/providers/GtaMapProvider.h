@@ -9,6 +9,11 @@ private:
 
     IDirect3DTexture9* GetD3DTexture(RwRaster* raster);
 
+    // Time-based and language-based cache for performance
+    std::vector<MapBlip> m_cachedBlips;
+    unsigned int m_lastCacheTime = 0;
+    std::string m_cachedLang = "";
+
 public:
     GtaMapProvider(IDirect3DDevice9* device) : m_device(device) {}
 

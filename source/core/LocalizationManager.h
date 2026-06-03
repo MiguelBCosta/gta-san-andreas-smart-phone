@@ -59,7 +59,8 @@ private:
 
     std::string m_basePath;
     std::string m_currentLang = "en";
-    std::unordered_map<std::string, std::string> m_strings;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_allLanguages;
+    const std::unordered_map<std::string, std::string>* m_currentStrings = nullptr;
     std::vector<LanguageInfo> m_availableLanguages;
     std::vector<std::function<void()>> m_callbacks;
 };

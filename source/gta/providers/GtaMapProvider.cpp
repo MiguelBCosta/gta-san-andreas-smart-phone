@@ -143,167 +143,174 @@ ImTextureID GtaMapProvider::GetBlipTexture(int spriteId) {
 }
 
 std::vector<MapBlip> GtaMapProvider::GetActiveBlips() {
-  std::vector<MapBlip> active;
+  unsigned int now = GetTickCount();
+  const std::string& currentLang = LocalizationManager::Get().GetCurrentLanguage();
 
-  for (int i = 0; i < 175; ++i) { // MAX_RADAR_TRACES = 175
-    tRadarTrace &trace = CRadar::ms_RadarTrace[i];
-    if (!trace.m_bInUse)
-      continue;
+  if (m_cachedBlips.empty() || (now - m_lastCacheTime > 1000) || (m_cachedLang != currentLang)) {
+    m_cachedBlips.clear();
+    m_lastCacheTime = now;
+    m_cachedLang = currentLang;
 
-    int sprite = trace.m_nRadarSprite;
+    for (int i = 0; i < 175; ++i) { // MAX_RADAR_TRACES = 175
+      tRadarTrace &trace = CRadar::ms_RadarTrace[i];
+      if (!trace.m_bInUse)
+        continue;
 
-    // Filter relevant blip sprites (commercial, utility, and social
-    // establishments)
-    bool relevant =
-        (sprite == 5) ||  // Airport (RADAR_SPRITE_AIRYARD)
-        (sprite == 6) ||  // Ammu-Nation (RADAR_SPRITE_AMMUGUN)
-        (sprite == 7) ||  // Barber (RADAR_SPRITE_BARBERS)
-        (sprite == 9) ||  // Boatyard (RADAR_SPRITE_BOATYARD)
-        (sprite == 10) || // Burger Shot (RADAR_SPRITE_BURGERSHOT)
-        (sprite == 14) || // Cluckin' Bell (RADAR_SPRITE_CHICKEN)
-        (sprite == 17) || // Diner (RADAR_SPRITE_DINER)
-        (sprite == 21) || // Girlfriend (RADAR_SPRITE_GIRLFRIEND)
-        (sprite == 22) || // Hospital (RADAR_SPRITE_HOSTPITAL)
-        (sprite == 25) || // Caligula's Casino (RADAR_SPRITE_MAFIACASINO)
-        (sprite == 27) || // Mod Garage (RADAR_SPRITE_MODGARAGE)
-        (sprite == 29) || // Pizza (RADAR_SPRITE_PIZZA)
-        (sprite == 30) || // Police (RADAR_SPRITE_POLICE)
-        (sprite == 31) || // Property Purchased (RADAR_SPRITE_PROPERTYG)
-        (sprite == 32) || // Property For Sale (RADAR_SPRITE_PROPERTYR)
-        (sprite == 33) || // Race (RADAR_SPRITE_RACE)
-        (sprite == 35) || // Safehouse (RADAR_SPRITE_SAVEGAME)
-        (sprite == 36) || // Driving School (RADAR_SPRITE_SCHOOL)
-        (sprite == 39) || // Tattoo (RADAR_SPRITE_TATTOO)
-        (sprite == 44) || // Four Dragons Casino (RADAR_SPRITE_TRIADSCASINO)
-        (sprite == 45) || // Clothes (RADAR_SPRITE_TSHIRT)
-        (sprite == 47) || // Zero's RC Shop (RADAR_SPRITE_ZERO)
-        (sprite == 48) || // Dance Club (RADAR_SPRITE_DATEDISCO)
-        (sprite == 49) || // Bar (RADAR_SPRITE_DATEDRINK)
-        (sprite == 50) || // Date Restaurant (RADAR_SPRITE_DATEFOOD)
-        (sprite == 54) || // Gym (RADAR_SPRITE_GYM)
-        (sprite == 55) || // Impound Lot (RADAR_SPRITE_IMPOUND)
-        (sprite == 63);   // Pay 'N' Spray (RADAR_SPRITE_SPRAY)
+      int sprite = trace.m_nRadarSprite;
 
-    if (!relevant)
-      continue;
+      // Filter relevant blip sprites (commercial, utility, and social
+      // establishments)
+      bool relevant =
+          (sprite == 5) ||  // Airport (RADAR_SPRITE_AIRYARD)
+          (sprite == 6) ||  // Ammu-Nation (RADAR_SPRITE_AMMUGUN)
+          (sprite == 7) ||  // Barber (RADAR_SPRITE_BARBERS)
+          (sprite == 9) ||  // Boatyard (RADAR_SPRITE_BOATYARD)
+          (sprite == 10) || // Burger Shot (RADAR_SPRITE_BURGERSHOT)
+          (sprite == 14) || // Cluckin' Bell (RADAR_SPRITE_CHICKEN)
+          (sprite == 17) || // Diner (RADAR_SPRITE_DINER)
+          (sprite == 21) || // Girlfriend (RADAR_SPRITE_GIRLFRIEND)
+          (sprite == 22) || // Hospital (RADAR_SPRITE_HOSTPITAL)
+          (sprite == 25) || // Caligula's Casino (RADAR_SPRITE_MAFIACASINO)
+          (sprite == 27) || // Mod Garage (RADAR_SPRITE_MODGARAGE)
+          (sprite == 29) || // Pizza (RADAR_SPRITE_PIZZA)
+          (sprite == 30) || // Police (RADAR_SPRITE_POLICE)
+          (sprite == 31) || // Property Purchased (RADAR_SPRITE_PROPERTYG)
+          (sprite == 32) || // Property For Sale (RADAR_SPRITE_PROPERTYR)
+          (sprite == 33) || // Race (RADAR_SPRITE_RACE)
+          (sprite == 35) || // Safehouse (RADAR_SPRITE_SAVEGAME)
+          (sprite == 36) || // Driving School (RADAR_SPRITE_SCHOOL)
+          (sprite == 39) || // Tattoo (RADAR_SPRITE_TATTOO)
+          (sprite == 44) || // Four Dragons Casino (RADAR_SPRITE_TRIADSCASINO)
+          (sprite == 45) || // Clothes (RADAR_SPRITE_TSHIRT)
+          (sprite == 47) || // Zero's RC Shop (RADAR_SPRITE_ZERO)
+          (sprite == 48) || // Dance Club (RADAR_SPRITE_DATEDISCO)
+          (sprite == 49) || // Bar (RADAR_SPRITE_DATEDRINK)
+          (sprite == 50) || // Date Restaurant (RADAR_SPRITE_DATEFOOD)
+          (sprite == 54) || // Gym (RADAR_SPRITE_GYM)
+          (sprite == 55) || // Impound Lot (RADAR_SPRITE_IMPOUND)
+          (sprite == 63);   // Pay 'N' Spray (RADAR_SPRITE_SPRAY)
 
-    // Check if blip has been revealed
-    bool revealed = CRadar::HasThisBlipBeenRevealed(i);
-    if (!revealed)
-      continue;
+      if (!relevant)
+        continue;
 
-    // Skip blips that are hidden/undiscovered (m_nBlipDisplay == 0, i.e.
-    // BLIP_DISPLAY_NEITHER)
-    if (trace.m_nBlipDisplay == 0)
-      continue;
+      // Check if blip has been revealed
+      bool revealed = CRadar::HasThisBlipBeenRevealed(i);
+      if (!revealed)
+        continue;
 
-    // Resolve generic name based on sprite
-    std::string baseName = TR("maps.place.default");
-    switch (sprite) {
-    case 5:
-      baseName = TR("maps.place.airport");
-      break;
-    case 6:
-      baseName = TR("maps.place.ammu");
-      break;
-    case 7:
-      baseName = TR("maps.place.barber");
-      break;
-    case 9:
-      baseName = TR("maps.place.boat_dock");
-      break;
-    case 10:
-      baseName = TR("maps.place.burger_shot");
-      break;
-    case 14:
-      baseName = TR("maps.place.cluckin_bell");
-      break;
-    case 17:
-      baseName = TR("maps.place.restaurant");
-      break;
-    case 21:
-      baseName = TR("maps.place.girlfriend");
-      break;
-    case 22:
-      baseName = TR("maps.place.hospital");
-      break;
-    case 25:
-      baseName = TR("maps.place.caligulas");
-      break;
-    case 27:
-      baseName = TR("maps.place.mod_garage");
-      break;
-    case 29:
-      baseName = TR("maps.place.pizza");
-      break;
-    case 30:
-      baseName = TR("maps.place.police");
-      break;
-    case 31:
-      baseName = TR("maps.place.property_owned");
-      break;
-    case 32:
-      baseName = TR("maps.place.property_sale");
-      break;
-    case 33:
-      baseName = TR("maps.place.race");
-      break;
-    case 35:
-      baseName = TR("maps.place.safehouse");
-      break;
-    case 36:
-      baseName = TR("maps.place.flight_school");
-      break;
-    case 39:
-      baseName = TR("maps.place.tattoo");
-      break;
-    case 44:
-      baseName = TR("maps.place.four_dragons");
-      break;
-    case 45:
-      baseName = TR("maps.place.clothes");
-      break;
-    case 47:
-      baseName = TR("maps.place.zero");
-      break;
-    case 48:
-      baseName = TR("maps.place.club");
-      break;
-    case 49:
-      baseName = TR("maps.place.bar");
-      break;
-    case 50:
-      baseName = TR("maps.place.date_restaurant");
-      break;
-    case 54:
-      baseName = TR("maps.place.gym");
-      break;
-    case 55:
-      baseName = TR("maps.place.impound");
-      break;
-    case 63:
-      baseName = TR("maps.place.pay_n_spray");
-      break;
-    }
+      // Skip blips that are hidden/undiscovered (m_nBlipDisplay == 0, i.e.
+      // BLIP_DISPLAY_NEITHER)
+      if (trace.m_nBlipDisplay == 0)
+        continue;
 
-    // Resolve zone name (e.g. "Ganton")
-    std::string zoneName = "";
-    CZone *zone = CTheZones::FindSmallestZoneForPosition(trace.m_vecPos, false);
-    if (zone) {
-      const char *translatedZone = TheText.Get(zone->m_szLabel);
-      if (translatedZone && strlen(translatedZone) > 0) {
-        zoneName = translatedZone;
+      // Resolve generic name based on sprite
+      std::string baseName = TR("maps.place.default");
+      switch (sprite) {
+      case 5:
+        baseName = TR("maps.place.airport");
+        break;
+      case 6:
+        baseName = TR("maps.place.ammu");
+        break;
+      case 7:
+        baseName = TR("maps.place.barber");
+        break;
+      case 9:
+        baseName = TR("maps.place.boat_dock");
+        break;
+      case 10:
+        baseName = TR("maps.place.burger_shot");
+        break;
+      case 14:
+        baseName = TR("maps.place.cluckin_bell");
+        break;
+      case 17:
+        baseName = TR("maps.place.restaurant");
+        break;
+      case 21:
+        baseName = TR("maps.place.girlfriend");
+        break;
+      case 22:
+        baseName = TR("maps.place.hospital");
+        break;
+      case 25:
+        baseName = TR("maps.place.caligulas");
+        break;
+      case 27:
+        baseName = TR("maps.place.mod_garage");
+        break;
+      case 29:
+        baseName = TR("maps.place.pizza");
+        break;
+      case 30:
+        baseName = TR("maps.place.police");
+        break;
+      case 31:
+        baseName = TR("maps.place.property_owned");
+        break;
+      case 32:
+        baseName = TR("maps.place.property_sale");
+        break;
+      case 33:
+        baseName = TR("maps.place.race");
+        break;
+      case 35:
+        baseName = TR("maps.place.safehouse");
+        break;
+      case 36:
+        baseName = TR("maps.place.flight_school");
+        break;
+      case 39:
+        baseName = TR("maps.place.tattoo");
+        break;
+      case 44:
+        baseName = TR("maps.place.four_dragons");
+        break;
+      case 45:
+        baseName = TR("maps.place.clothes");
+        break;
+      case 47:
+        baseName = TR("maps.place.zero");
+        break;
+      case 48:
+        baseName = TR("maps.place.club");
+        break;
+      case 49:
+        baseName = TR("maps.place.bar");
+        break;
+      case 50:
+        baseName = TR("maps.place.date_restaurant");
+        break;
+      case 54:
+        baseName = TR("maps.place.gym");
+        break;
+      case 55:
+        baseName = TR("maps.place.impound");
+        break;
+      case 63:
+        baseName = TR("maps.place.pay_n_spray");
+        break;
       }
-    }
 
-    std::string fullName = baseName;
-    if (!zoneName.empty()) {
-      fullName += " (" + zoneName + ")";
-    }
+      // Resolve zone name (e.g. "Ganton")
+      std::string zoneName = "";
+      CZone *zone = CTheZones::FindSmallestZoneForPosition(trace.m_vecPos, false);
+      if (zone) {
+        const char *translatedZone = TheText.Get(zone->m_szLabel);
+        if (translatedZone && strlen(translatedZone) > 0) {
+          zoneName = translatedZone;
+        }
+      }
 
-    active.push_back({trace.m_vecPos.x, trace.m_vecPos.y, sprite,
-                      static_cast<int>(trace.m_nColour), fullName, i});
+      std::string fullName = baseName;
+      if (!zoneName.empty()) {
+        fullName += " (" + zoneName + ")";
+      }
+
+      m_cachedBlips.push_back({trace.m_vecPos.x, trace.m_vecPos.y, sprite,
+                               static_cast<int>(trace.m_nColour), fullName, i});
+    }
   }
 
-  return active;
+  return m_cachedBlips;
 }
