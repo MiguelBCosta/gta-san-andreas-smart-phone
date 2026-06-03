@@ -35,4 +35,5 @@ public:
     void onWipe() override;
     void onDraw() override;
     void onLanguageChange() override { name = TR("garage.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.garage"); }
 };

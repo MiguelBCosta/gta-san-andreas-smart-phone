@@ -11,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 enum class PhoneAnimMode { FORCED, SMOOTH };
 
@@ -91,11 +92,29 @@ public:
   bool shouldCaptureInput() const;
   bool isOpen() const { return m_isOpen; }
   PhoneApp *getCurrentApp() const { return m_currentApp; }
+  const std::vector<PhoneApp*>& getApps() const { return m_apps; }
+  void installApp(PhoneApp* app);
 
   // Call this every frame when isVisible() == true
   void draw();
 
   void resetDefaultLayout();
+
+  struct PopupState {
+    bool active = false;
+    std::string title;
+    std::string message;
+    std::string confirmText;
+    std::string cancelText;
+    std::function<void()> onConfirm = nullptr;
+    std::function<void()> onCancel = nullptr;
+  };
+
+  void showPopup(const std::string& title, const std::string& message,
+                 const std::string& confirmText, const std::string& cancelText,
+                 std::function<void()> onConfirm, std::function<void()> onCancel = nullptr);
+
+  PopupState& getPopupState() { return m_popupState; }
 
   struct AppVisualState {
     float x = -1.0f;
@@ -130,6 +149,7 @@ private:
   bool m_dragStartedThisClick = false;
 
   std::unordered_map<std::string, AppVisualState> m_visualStates;
+  PopupState m_popupState;
 
   void drawHome(ImDrawList *draw, ImVec2 winPos);
   void drawHomeGrid(ImDrawList *draw, ImVec2 winPos);
@@ -139,4 +159,5 @@ private:
   bool drawIcon(PhoneApp *app, ImDrawList *draw, ImVec2 winPos, float curX,
                 float curY, float sz, float rounding, const char *btnId,
                 const std::string &key);
+  void drawAlertPopup(ImDrawList* draw, ImVec2 winPos);
 };

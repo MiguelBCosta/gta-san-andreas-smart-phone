@@ -9,6 +9,8 @@ BusinessApp::BusinessApp() {
     icon = ICON_FA_BUILDING;
     name = TR("business.title");
     color = ImVec4(0.196f, 0.843f, 0.294f, 1.0f); // Apple green
+    installable = true;
+    installed = false;
     dock = false;
     dockOrder = 99;
 }

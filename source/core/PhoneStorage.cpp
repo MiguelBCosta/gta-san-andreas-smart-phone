@@ -46,6 +46,14 @@ void PhoneStorage::onGameSave(int slot) {
         }
         layoutJson["dock"] = dockOrder;
 
+        nlohmann::json installedList = nlohmann::json::array();
+        for (auto* app : m_phone->m_apps) {
+            if (app->installed) {
+                installedList.push_back(app->id);
+            }
+        }
+        layoutJson["installed"] = installedList;
+
         root["layout"] = layoutJson;
     }
 
@@ -115,6 +123,29 @@ void PhoneStorage::onGameLoad(int slot) {
                 }
                 m_phone->m_dockApps = newDock;
             }
+
+            if (layoutJson.contains("installed") && layoutJson["installed"].is_array()) {
+                std::vector<std::string> installedOrder = layoutJson["installed"].get<std::vector<std::string>>();
+                for (auto* app : m_phone->m_apps) {
+                    if (app->installable) {
+                        app->installed = (std::find(installedOrder.begin(), installedOrder.end(), app->id) != installedOrder.end());
+                    }
+                }
+            } else {
+                for (auto* app : m_phone->m_apps) {
+                    if (app->installable) {
+                        app->installed = false;
+                    } else {
+                        app->installed = true;
+                    }
+                }
+            }
+
+            // Filter out any dock apps that are not installed
+            m_phone->m_dockApps.erase(
+                std::remove_if(m_phone->m_dockApps.begin(), m_phone->m_dockApps.end(),
+                               [](PhoneApp* a) { return !a->installed; }),
+                m_phone->m_dockApps.end());
         }
     } catch (const std::exception&) {
         // JSON parsing error, wipe memory to be safe

@@ -61,6 +61,8 @@ ProfileApp::ProfileApp() {
   icon = ICON_FA_USER;
   name = TR("profile.title");
   color = ImVec4(0.0f, 0.478f, 1.0f, 1.0f); // Apple blue
+  dock = true;
+  dockOrder = 3;
 }
 
 void ProfileApp::onOpen() { m_activeSubmenu = 0; }

@@ -137,6 +137,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(OutDir)lang\"</Command>
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\core\apps\ProfileApp.cpp" />
     <ClCompile Include="source\core\apps\BusinessApp.cpp" />
+    <ClCompile Include="source\core\apps\StoreApp.cpp" />
     <ClCompile Include="source\core\LocalizationManager.cpp" />
     <ClCompile Include="source\sandbox\providers\SandboxGarageProvider.cpp" />
 
@@ -189,6 +190,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(OutDir)lang\"</Command>
     <ClInclude Include="source\sandbox\providers\SandboxStatsProvider.h" />
     <ClInclude Include="source\core\apps\ProfileApp.h" />
     <ClInclude Include="source\core\apps\BusinessApp.h" />
+    <ClInclude Include="source\core\apps\StoreApp.h" />
     <ClInclude Include="source\core\providers\IBusinessProvider.h" />
     <ClInclude Include="source\core\LocalizationManager.h" />
     <ClInclude Include="source\sandbox\providers\SandboxBusinessProvider.h" />

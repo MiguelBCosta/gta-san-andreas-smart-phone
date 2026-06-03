@@ -42,4 +42,5 @@ public:
     void onOpen() override;
     void onDraw() override;
     void onLanguageChange() override { name = TR("calculator.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.calculator"); }
 };

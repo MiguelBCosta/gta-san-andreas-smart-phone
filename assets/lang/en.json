@@ -273,5 +273,19 @@
   "calculator.back": "Back",
   "calculator.history_btn": "History",
   "calculator.decimal": ".",
-  "calculator.error": "Error"
+  "calculator.error": "Error",
+  "appstore.title": "App Store",
+  "appstore.get": "GET",
+  "appstore.open": "OPEN",
+  "appstore.desc.calculator": "Solve basic math calculations.",
+  "appstore.desc.clock": "Check the local time and rest.",
+  "appstore.desc.weather": "View weather forecasts for SA cities.",
+  "appstore.desc.garage": "Call and customize saved vehicles.",
+  "appstore.desc.maps": "GPS map and navigation system.",
+  "appstore.desc.notes": "Create and manage text notes.",
+  "appstore.desc.business": "Acquire businesses and collect profits.",
+  "phone.uninstall_confirm_title": "Delete",
+  "phone.uninstall_confirm_msg": "Deleting this app will remove it from the Home Screen. Its data will not be lost.",
+  "phone.uninstall_confirm_btn": "Delete",
+  "phone.cancel": "Cancel"
 }

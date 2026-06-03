@@ -21,6 +21,7 @@
 #include "../core/apps/SettingsApp.h"
 #include "../core/apps/ProfileApp.h"
 #include "../core/apps/BusinessApp.h"
+#include "../core/apps/StoreApp.h"
 #include "../core/resources/resource.h"
 #include "providers/SandboxStatsProvider.h"
 #include "providers/SandboxBusinessProvider.h"
@@ -133,6 +134,7 @@ static SettingsApp settingsApp;
 static WeatherApp weatherApp;
 static ProfileApp profileApp;
 static BusinessApp businessApp;
+static StoreApp storeApp;
 static SandboxStatsProvider sandboxStats;
 static SandboxBusinessProvider sandboxBusiness;
 
@@ -239,6 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   phone.registerApp(&weatherApp);
   phone.registerApp(&profileApp);
   phone.registerApp(&businessApp);
+  phone.registerApp(&storeApp);
   phone.open(PhoneAnimMode::FORCED); // Always visible in sandbox
 
 
