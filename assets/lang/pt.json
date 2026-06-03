@@ -199,6 +199,14 @@
   "empresas.my_businesses": "MEUS NEGÓCIOS",
   "empresas.empty": "Nenhum negócio adquirido.",
   "empresas.accumulated": "Acumulado: $%d / $%d max",
+  "empresas.yield_blocked": "Faturamento bloqueado",
+  "empresas.blocked": "Bloqueado",
+  "empresas.no_reputation": "Sem reputação suficiente no território.",
+
+  "notes.title": "Notas",
+
+  "music.title": "Música",
+  "music.coming_soon": "Música - Em breve",
 
   "msg.intro2.ryder": "CJ, seu cabelo tá decente agora, mas seu estilo tá fraco. Passa no Binco e compra umas roupas verdes da Grove. Não passa vergonha!",
   "msg.sweet1b.sweet": "Carl, bom trabalho limpando aqueles viciados de Banton. Mas fica esperto, os Ballas não vão deixar barato. Fica de olho na quebrada.",

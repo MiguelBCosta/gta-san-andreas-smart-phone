@@ -199,6 +199,14 @@
   "empresas.my_businesses": "MY BUSINESSES",
   "empresas.empty": "No businesses acquired.",
   "empresas.accumulated": "Accumulated: $%d / $%d max",
+  "empresas.yield_blocked": "Yield blocked",
+  "empresas.blocked": "Blocked",
+  "empresas.no_reputation": "Not enough reputation in territory.",
+
+  "notes.title": "Notes",
+
+  "music.title": "Music",
+  "music.coming_soon": "Music - Coming soon",
 
   "msg.intro2.ryder": "CJ, your hair looks decent now, but your style is weak. Hit up Binco and grab some Grove green. Don't embarrass us!",
   "msg.sweet1b.sweet": "Carl, good job clearing those junkies from Banton. But stay sharp, the Ballas won't let it slide. Keep an eye on the hood.",
