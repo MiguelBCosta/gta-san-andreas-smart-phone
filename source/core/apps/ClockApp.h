@@ -37,4 +37,5 @@ public:
     void update(float dt) override;
     void onDraw() override;
     void onLanguageChange() override { name = TR("clock.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.clock"); }
 };

@@ -27,6 +27,7 @@
 #include "../core/apps/SettingsApp.h"
 #include "../core/apps/ProfileApp.h"
 #include "../core/apps/BusinessApp.h"
+#include "../core/apps/StoreApp.h"
 #include "../core/resources/resource.h"
 #include "providers/GtaStatsProvider.h"
 #include "providers/GtaBusinessProvider.h"
@@ -83,6 +84,7 @@ static PhoneCallApp phoneCallApp;
 static SettingsApp settingsApp;
 static WeatherApp weatherApp;
 static BusinessApp businessApp;
+static StoreApp storeApp;
 
 
 void RegisterGtaBaseServices() {
@@ -521,6 +523,7 @@ public:
 		phone.registerApp(&weatherApp);
 		phone.registerApp(&profileApp);
 		phone.registerApp(&businessApp);
+		phone.registerApp(&storeApp);
 
 
 		Events::initGameEvent += []() { TryInstallGameHooks(); };

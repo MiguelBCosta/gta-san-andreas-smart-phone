@@ -12,8 +12,10 @@ GarageApp::GarageApp() {
     name = TR("garage.title");
     // Accent blue/cyan color
     color = ImVec4(0.196f, 0.541f, 0.988f, 1.0f);
-    dock = true;
-    dockOrder = 4;
+    installable = true;
+    installed = false;
+    dock = false;
+    dockOrder = 99;
 }
 void GarageApp::onOpen() {
     m_selectedIdx = -1;

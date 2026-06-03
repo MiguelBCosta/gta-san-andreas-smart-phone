@@ -11,6 +11,8 @@ WeatherApp::WeatherApp() {
     icon = ICON_FA_CLOUD_SUN;
     name = TR("weather.title");
     color = ImVec4(0.25f, 0.60f, 0.90f, 1.0f);
+    installable = true;
+    installed = false;
 }
 void WeatherApp::getThemeColors(WeatherTheme theme, ImColor& topColor, ImColor& bottomColor) {
     switch (theme) {

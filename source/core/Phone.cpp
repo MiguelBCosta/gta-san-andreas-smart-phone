@@ -136,6 +136,13 @@ void Phone::closeApp() {
 }
 
 void Phone::resetDefaultLayout() {
+  for (auto *app : m_defaultApps) {
+    if (app->installable) {
+      app->installed = false;
+    } else {
+      app->installed = true;
+    }
+  }
   m_apps = m_defaultApps;
   m_dockApps.clear();
   for (auto *app : m_apps) {
@@ -156,6 +163,16 @@ void Phone::resetDefaultLayout() {
   m_pressTimer = 0.0f;
   m_dragStartedThisClick = false;
   m_visualStates.clear();
+}
+
+void Phone::installApp(PhoneApp* app) {
+  if (!app) return;
+  app->installed = true;
+  auto it = std::find(m_apps.begin(), m_apps.end(), app);
+  if (it != m_apps.end()) {
+    m_apps.erase(it);
+    m_apps.push_back(app);
+  }
 }
 
 // ============================================================
@@ -239,6 +256,24 @@ bool Phone::drawIcon(PhoneApp *app, ImDrawList *draw, ImVec2 winPos, float curX,
                   badgeText.c_str());
   }
 
+  // Draw the X delete button if in edit mode and the app is uninstallable
+  if (m_editMode && app->installable && !state.isDragging) {
+    ImVec2 deleteCenter(ax + 2.0f, ay + 2.0f);
+    float deleteRadius = 9.0f;
+
+    // Draw grey circle background
+    draw->AddCircleFilled(deleteCenter, deleteRadius, IM_COL32(40, 40, 42, 255));
+    // Draw white thin border
+    draw->AddCircle(deleteCenter, deleteRadius, IM_COL32(255, 255, 255, 180), 16, 1.0f);
+
+    // Draw the small white X
+    ImFont* font = ImGui::GetFont();
+    float xFontSize = deleteRadius * 1.1f;
+    ImVec2 textSz = font->CalcTextSizeA(xFontSize, FLT_MAX, 0.0f, ICON_FA_TIMES);
+    ImVec2 textPos(deleteCenter.x - textSz.x / 2.0f, deleteCenter.y - textSz.y / 2.0f + 0.5f);
+    draw->AddText(font, xFontSize, textPos, IM_COL32(255, 255, 255, 255), ICON_FA_TIMES);
+  }
+
   // Invisible button for click detection
   ImGui::SetCursorPos(ImVec2(curX + wiggleX, curY + wiggleY));
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -248,6 +283,40 @@ bool Phone::drawIcon(PhoneApp *app, ImDrawList *draw, ImVec2 winPos, float curX,
   bool clicked = ImGui::Button(btnId, ImVec2(sz, sz));
   ImGui::PopStyleVar();
   ImGui::PopStyleColor(3);
+
+  // Check if delete button was clicked
+  bool clickedDelete = false;
+  if (m_editMode && app->installable && !state.isDragging) {
+    ImVec2 deleteCenter(ax + 2.0f, ay + 2.0f);
+    float deleteRadius = 9.0f;
+    ImVec2 mousePos = ImGui::GetIO().MousePos;
+    float dx = mousePos.x - deleteCenter.x;
+    float dy = mousePos.y - deleteCenter.y;
+    if (dx * dx + dy * dy <= deleteRadius * deleteRadius) {
+      if (ImGui::IsMouseClicked(0)) {
+        clickedDelete = true;
+      }
+    }
+  }
+
+  if (clickedDelete) {
+    showPopup(
+        std::string(TR("phone.uninstall_confirm_title")) + " \"" + app->name + "\"?",
+        TR("phone.uninstall_confirm_msg"),
+        TR("phone.uninstall_confirm_btn"),
+        TR("phone.cancel"),
+        [this, app]() {
+          app->installed = false;
+          auto it = std::find(m_dockApps.begin(), m_dockApps.end(), app);
+          if (it != m_dockApps.end()) {
+            m_dockApps.erase(it);
+          }
+        }
+    );
+    m_pressedKey = "";
+    m_pressTimer = 0.0f;
+    return false;
+  }
 
   bool active = ImGui::IsItemActive();
   float dt = ImGui::GetIO().DeltaTime;
@@ -474,6 +543,8 @@ void Phone::drawHomeGrid(ImDrawList *draw, ImVec2 winPos) {
 
   for (int i = 0; i < (int)m_apps.size(); i++) {
     auto *app = m_apps[i];
+    if (!app->installed)
+      continue;
     if (curY + ICON_SZ > maxY)
       break;
 
@@ -783,6 +854,11 @@ void Phone::draw() {
   // 6. Status bar
   drawStatusBar();
 
+  // 7. Alert popup (drawn on top of everything)
+  if (m_popupState.active) {
+    drawAlertPopup(draw, winPos);
+  }
+
   ImGui::End();
   ImGui::PopStyleVar();
   ImGui::PopStyleColor();
@@ -831,4 +907,114 @@ void Phone::drawStatusBar() {
   ImGui::SetWindowFontScale(1.0f);
 
   ImGui::PopStyleColor();
+}
+
+void Phone::showPopup(const std::string& title, const std::string& message,
+                      const std::string& confirmText, const std::string& cancelText,
+                      std::function<void()> onConfirm, std::function<void()> onCancel) {
+  m_popupState.active = true;
+  m_popupState.title = title;
+  m_popupState.message = message;
+  m_popupState.confirmText = confirmText;
+  m_popupState.cancelText = cancelText;
+  m_popupState.onConfirm = onConfirm;
+  m_popupState.onCancel = onCancel;
+}
+
+void Phone::drawAlertPopup(ImDrawList* draw, ImVec2 winPos) {
+  ImVec2 pMin(winPos.x + BEZEL, winPos.y + BEZEL);
+  ImVec2 pMax(winPos.x + PH_W - BEZEL, winPos.y + PH_H - BEZEL);
+
+  // 1. Darken the screen background with soft fade
+  draw->AddRectFilled(pMin, pMax, IM_COL32(0, 0, 0, 160), SCR_R);
+
+  // Block clicks to elements underneath
+  ImGui::SetCursorScreenPos(pMin);
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+  ImGui::Button("##block_clicks", ImVec2(SCREEN_W, PH_H - BEZEL * 2.0f));
+  ImGui::PopStyleColor(3);
+
+  // 2. Alert Box dimensions
+  float alertW = 240.0f;
+  
+  // Calculate text sizes to determine height
+  ImVec2 titleSize = ImGui::CalcTextSize(m_popupState.title.c_str());
+  
+  // Wrap message text
+  float maxTextW = alertW - 32.0f;
+  ImFont* font = ImGui::GetFont();
+  ImVec2 msgSize = ImGui::CalcTextSize(m_popupState.message.c_str(), nullptr, false, maxTextW);
+  
+  float titlePadding = 18.0f;
+  float msgPadding = 8.0f;
+  float buttonHeight = 44.0f;
+  
+  float alertH = titlePadding + titleSize.y + msgPadding + msgSize.y + 18.0f + buttonHeight;
+  
+  float ax = pMin.x + (SCREEN_W - alertW) / 2.0f;
+  float ay = pMin.y + (PH_H - BEZEL * 2.0f - alertH) / 2.0f;
+  
+  ImVec2 boxMin(ax, ay);
+  ImVec2 boxMax(ax + alertW, ay + alertH);
+  
+  // Draw Alert Box BG (frosted translucent dark gray card, iPhone style)
+  draw->AddRectFilled(boxMin, boxMax, IM_COL32(28, 28, 30, 240), 14.0f);
+  // Draw thin border
+  draw->AddRect(boxMin, boxMax, IM_COL32(255, 255, 255, 12), 14.0f, 0, 1.0f);
+  
+  // Title
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+  ImGui::SetCursorScreenPos(ImVec2(ax + (alertW - titleSize.x)/2.0f, ay + titlePadding));
+  ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+  ImGui::SetWindowFontScale(1.1f);
+  ImGui::Text("%s", m_popupState.title.c_str());
+  ImGui::SetWindowFontScale(1.0f);
+  ImGui::PopFont();
+  ImGui::PopStyleColor();
+  
+  // Message
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
+  ImGui::SetCursorScreenPos(ImVec2(ax + 16.0f, ay + titlePadding + titleSize.y + msgPadding));
+  ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+  ImGui::PushTextWrapPos(ax + alertW - 16.0f);
+  ImGui::TextUnformatted(m_popupState.message.c_str());
+  ImGui::PopTextWrapPos();
+  ImGui::PopStyleVar();
+  ImGui::PopStyleColor();
+  
+  // Draw divider line above buttons
+  float dividerY = ay + alertH - buttonHeight;
+  draw->AddLine(ImVec2(ax, dividerY), ImVec2(ax + alertW, dividerY), IM_COL32(255, 255, 255, 30));
+  
+  // Two buttons: Cancel (Left) and Confirm (Right)
+  float halfW = alertW / 2.0f;
+  
+  // Draw vertical divider
+  draw->AddLine(ImVec2(ax + halfW, dividerY), ImVec2(ax + halfW, ay + alertH), IM_COL32(255, 255, 255, 30));
+  
+  // Cancel Button (Left)
+  ImGui::SetCursorScreenPos(ImVec2(ax, dividerY));
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0,0,0,0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(255, 255, 255, 10));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(255, 255, 255, 20));
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.039f, 0.518f, 1.0f, 1.0f)); // iOS Blue
+  if (ImGui::Button((m_popupState.cancelText + "##cancel").c_str(), ImVec2(halfW, buttonHeight))) {
+    m_popupState.active = false;
+    if (m_popupState.onCancel) m_popupState.onCancel();
+  }
+  ImGui::PopStyleColor(4);
+  
+  // Confirm Button (Right)
+  ImGui::SameLine(0, 0);
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0,0,0,0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(255, 255, 255, 10));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(255, 255, 255, 20));
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.27f, 0.22f, 1.0f)); // iOS Red
+  if (ImGui::Button((m_popupState.confirmText + "##confirm").c_str(), ImVec2(halfW, buttonHeight))) {
+    m_popupState.active = false;
+    if (m_popupState.onConfirm) m_popupState.onConfirm();
+  }
+  ImGui::PopStyleColor(4);
 }

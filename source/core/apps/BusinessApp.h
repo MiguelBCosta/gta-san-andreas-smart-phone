@@ -29,4 +29,5 @@ public:
     void update(float dt) override;
     void onDraw() override;
     void onLanguageChange() override { name = TR("business.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.business"); }
 };

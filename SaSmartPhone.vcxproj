@@ -159,6 +159,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(GTA_SA_DIR)\modloader\sasmartphon
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\core\apps\ProfileApp.cpp" />
     <ClCompile Include="source\core\apps\BusinessApp.cpp" />
+    <ClCompile Include="source\core\apps\StoreApp.cpp" />
     <ClCompile Include="source\core\LocalizationManager.cpp" />
     <ClCompile Include="source\gta\providers\GtaMapProvider.cpp" />
 
@@ -214,6 +215,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(GTA_SA_DIR)\modloader\sasmartphon
     <ClInclude Include="source\gta\providers\GtaStatsProvider.h" />
     <ClInclude Include="source\core\apps\ProfileApp.h" />
     <ClInclude Include="source\core\apps\BusinessApp.h" />
+    <ClInclude Include="source\core\apps\StoreApp.h" />
     <ClInclude Include="source\core\providers\IBusinessProvider.h" />
     <ClInclude Include="source\core\LocalizationManager.h" />
     <ClInclude Include="source\gta\providers\GtaBusinessProvider.h" />

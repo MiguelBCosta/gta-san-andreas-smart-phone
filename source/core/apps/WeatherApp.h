@@ -17,4 +17,5 @@ public:
 
     void onDraw() override;
     void onLanguageChange() override { name = TR("weather.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.weather"); }
 };

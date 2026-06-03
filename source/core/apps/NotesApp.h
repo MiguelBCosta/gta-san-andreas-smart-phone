@@ -15,4 +15,5 @@ public:
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
     void onLanguageChange() override { name = TR("notes.title"); }
+    std::string getAppDescription() const override { return TR("appstore.desc.notes"); }
 };

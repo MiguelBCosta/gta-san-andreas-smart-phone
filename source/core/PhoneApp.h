@@ -14,8 +14,13 @@ public:
     ImVec4 color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
     bool dock = false;
     int dockOrder = 99;
+    bool installable = false;
+    bool installed = true;
 
     virtual ~PhoneApp() = default;
+
+    // Get AppStore description
+    virtual std::string getAppDescription() const { return ""; }
 
     // Get current notification badge count (default 0, overridden by apps like MessagesApp)
     virtual int getBadgeCount() const { return 0; }

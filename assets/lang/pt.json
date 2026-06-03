@@ -273,5 +273,19 @@
   "calculator.back": "Voltar",
   "calculator.history_btn": "Histórico",
   "calculator.decimal": ",",
-  "calculator.error": "Erro"
+  "calculator.error": "Erro",
+  "appstore.title": "App Store",
+  "appstore.get": "OBTER",
+  "appstore.open": "ABRIR",
+  "appstore.desc.calculator": "Resolva contas matemáticas básicas.",
+  "appstore.desc.clock": "Veja a hora local e descanse.",
+  "appstore.desc.weather": "Previsão do tempo para as cidades de SA.",
+  "appstore.desc.garage": "Chame e tune seus carros.",
+  "appstore.desc.maps": "Mapa com GPS e navegação.",
+  "appstore.desc.notes": "Crie e gerencie notas de texto.",
+  "appstore.desc.business": "Adquira empresas e recolha lucros.",
+  "phone.uninstall_confirm_title": "Apagar",
+  "phone.uninstall_confirm_msg": "Apagar este aplicativo irá removê-lo da Tela de Início. Seus dados não serão perdidos.",
+  "phone.uninstall_confirm_btn": "Apagar",
+  "phone.cancel": "Cancelar"
 }

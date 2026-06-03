@@ -39,6 +39,8 @@ CalculatorApp::CalculatorApp() {
     icon = ICON_FA_CALCULATOR;
     name = TR("calculator.title");
     color = ImVec4(0.12f, 0.12f, 0.14f, 1.0f); // Sleek iOS-like dark bg icon
+    installable = true;
+    installed = false;
     m_showHistory = false;
     clearAll();
 }

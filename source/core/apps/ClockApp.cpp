@@ -17,6 +17,8 @@ ClockApp::ClockApp() {
     icon = ICON_FA_CLOCK;
     name = TR("clock.title");
     color = ImVec4(0.85f, 0.48f, 0.08f, 1.0f);
+    installable = true;
+    installed = false;
 }
 
 const char* ClockApp::getPeriodo(int h) {

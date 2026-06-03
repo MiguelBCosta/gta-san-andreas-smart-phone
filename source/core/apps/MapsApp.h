@@ -25,8 +25,12 @@ public:
         icon = ICON_FA_MAP_MARKED_ALT;
         name = TR("maps.title");
         color = ImVec4(0.18f, 0.72f, 0.30f, 1.0f);
+        installable = true;
+        installed = false;
         m_scroll = ImVec2(1536.0f, 1536.0f);
     }
+
+    std::string getAppDescription() const override { return TR("appstore.desc.maps"); }
 
     void onOpen() override;
     void onClose() override;

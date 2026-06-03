@@ -9,6 +9,8 @@ NotesApp::NotesApp() {
     icon      = ICON_FA_STICKY_NOTE;
     name = TR("notes.title");
     color     = ImVec4(1.0f, 0.8f, 0.2f, 1.0f);
+    installable = true;
+    installed = false;
     dock      = false;
     dockOrder = 99;
 }
