@@ -16,16 +16,16 @@ private:
 public:
     SandboxBusinessProvider() {
         m_businesses = {
-            {"grove", "Casa do CJ", "Rendimento do territorio da Grove Street.", ICON_FA_HOME, 0, 10000, 10000, true, 0},
-            {"robois", "Roboi's Food Mart", "Ponto de entregas em Los Santos.", ICON_FA_SHOPPING_CART, 10000, 2000, 2000, false, 0},
-            {"zero", "Zero's RC Shop", "Loja de aeromodelos em San Fierro.", ICON_FA_HELICOPTER, 30000, 5000, 5000, false, 0},
-            {"wang", "Wang Cars", "Concessionaria em San Fierro.", ICON_FA_CAR, 50000, 8000, 8000, false, 0},
-            {"hippy", "Hippy Shopper", "Loja de conveniencia em San Fierro.", ICON_FA_STORE, 12000, 2000, 2000, false, 0},
-            {"vank_hoff", "Vank Hoff Hotel", "Servico de manobrista em San Fierro.", ICON_FA_HOTEL, 20000, 2000, 2000, false, 0},
-            {"rs_haul", "RS Haul", "Empresa de fretes em Flint County.", ICON_FA_TRUCK, 25000, 2000, 2000, false, 0},
-            {"quarry", "Hunter Quarry", "Pedreira industrial em Las Venturas.", ICON_FA_INDUSTRY, 40000, 10000, 10000, false, 0},
-            {"airstrip", "Verdant Meadows", "Aerodromo privado no deserto.", ICON_FA_PLANE, 80000, 10000, 10000, false, 0},
-            {"burger", "Burger Shot LV", "Franquia de fast food em Las Venturas.", ICON_FA_HAMBURGER, 15000, 2000, 2000, false, 0}
+            {"grove", "Casa do CJ", "Rendimento do territorio da Grove Street.", ICON_FA_HOME, 0, 10000, 10000, true, 0, true},
+            {"robois", "Roboi's Food Mart", "Ponto de entregas em Los Santos.", ICON_FA_SHOPPING_CART, 10000, 2000, 2000, false, 0, true},
+            {"zero", "Zero's RC Shop", "Loja de aeromodelos em San Fierro.", ICON_FA_HELICOPTER, 30000, 5000, 5000, false, 0, true},
+            {"wang", "Wang Cars", "Concessionaria em San Fierro.", ICON_FA_CAR, 50000, 8000, 8000, false, 0, true},
+            {"hippy", "Hippy Shopper", "Loja de conveniencia em San Fierro.", ICON_FA_STORE, 12000, 2000, 2000, false, 0, true},
+            {"vank_hoff", "Vank Hoff Hotel", "Servico de manobrista em San Fierro.", ICON_FA_HOTEL, 20000, 2000, 2000, false, 0, true},
+            {"rs_haul", "RS Haul", "Empresa de fretes em Flint County.", ICON_FA_TRUCK, 25000, 2000, 2000, false, 0, true},
+            {"quarry", "Hunter Quarry", "Pedreira industrial em Las Venturas.", ICON_FA_INDUSTRY, 40000, 10000, 10000, false, 0, true},
+            {"airstrip", "Verdant Meadows", "Aerodromo privado no deserto.", ICON_FA_PLANE, 80000, 10000, 10000, false, 0, true},
+            {"burger", "Burger Shot LV", "Franquia de fast food em Las Venturas.", ICON_FA_HAMBURGER, 15000, 2000, 2000, false, 0, true}
         };
         m_profitFloats.resize(m_businesses.size(), 0.0f);
     }

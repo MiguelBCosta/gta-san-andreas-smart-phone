@@ -22,8 +22,18 @@ void EmpresasApp::RefreshData() {
     if (m_businessProvider.isValid()) {
         std::vector<BusinessInfo> list = m_businessProvider->GetBusinesses();
         m_cachedBusinesses.clear();
+        
+        // 1. Find and add "grove" first (always first, even if not fully unlocked/active)
+        auto groveIt = std::find_if(list.begin(), list.end(), [](const BusinessInfo& b) {
+            return b.id == "grove";
+        });
+        if (groveIt != list.end()) {
+            m_cachedBusinesses.push_back(*groveIt);
+        }
+        
+        // 2. Add other businesses only if they are owned and not "grove"
         for (const auto& b : list) {
-            if (b.owned) {
+            if (b.id != "grove" && b.owned) {
                 m_cachedBusinesses.push_back(b);
             }
         }
@@ -58,8 +68,10 @@ void EmpresasApp::onDraw() {
     int totalYield = 0;
     int totalProfit = 0;
     for (const auto& b : m_cachedBusinesses) {
-        totalYield += b.dailyYield;
-        totalProfit += b.currentProfit;
+        if (b.unlocked) {
+            totalYield += b.dailyYield;
+            totalProfit += b.currentProfit;
+        }
     }
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -179,63 +191,87 @@ void EmpresasApp::onDraw() {
         float iconSize = 32.0f;
         ImVec2 iconMin = ImVec2(itemMin.x + 12.0f, itemMin.y + 12.0f);
         ImVec2 iconMax = ImVec2(iconMin.x + iconSize, iconMin.y + iconSize);
-        ImColor iconCol = ImColor(50, 200, 100, 35);
+        ImColor iconCol = b.unlocked ? ImColor(50, 200, 100, 35) : ImColor(120, 120, 120, 35);
         drawList->AddRectFilled(iconMin, iconMax, iconCol, 8.0f);
         
         ImGui::SetCursorScreenPos(ImVec2(iconMin.x + (iconSize - ImGui::CalcTextSize(b.icon.c_str()).x)/2.0f, iconMin.y + (iconSize - ImGui::GetTextLineHeight())/2.0f));
-        ImGui::TextColored(ImVec4(0.2f, 0.85f, 0.4f, 1.0f), "%s", b.icon.c_str());
+        ImVec4 iconTextCol = b.unlocked ? ImVec4(0.2f, 0.85f, 0.4f, 1.0f) : ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+        ImGui::TextColored(iconTextCol, "%s", b.icon.c_str());
 
         // 2. Texts
         ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 10.0f));
         ImGui::Text("%s", b.name.c_str());
         
-        ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 26.0f));
-        ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.4f, 1.0f), "$%d / dia", b.dailyYield);
+        if (!b.unlocked) {
+            ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 26.0f));
+            ImGui::TextColored(ImVec4(0.85f, 0.35f, 0.35f, 1.0f), "Faturamento bloqueado");
 
-        // 3. Right Action button
-        ImVec2 actSize = ImVec2(76.0f, 24.0f);
-        ImGui::SetCursorScreenPos(ImVec2(itemMax.x - actSize.x - 12.0f, itemMin.y + 12.0f));
-        
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
-        if (b.currentProfit == 0) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
-            ImGui::Button("Coletado", actSize);
-            ImGui::PopStyleColor(3);
+            // Disabled Right Action button
+            ImVec2 actSize = ImVec2(80.0f, 24.0f);
+            ImGui::SetCursorScreenPos(ImVec2(itemMax.x - actSize.x - 12.0f, itemMin.y + 12.0f));
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.25f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.25f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.3f));
+            ImGui::Button("Bloqueado", actSize);
+            ImGui::PopStyleColor(4);
+            ImGui::PopStyleVar();
+
+            // Lock message at the bottom
+            ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 54.0f));
+            ImGui::SetWindowFontScale(0.9f);
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.4f), "Sem reputacao suficiente no territorio.");
+            ImGui::SetWindowFontScale(1.0f);
         } else {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.23f, 0.9f, 0.35f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.75f, 0.25f, 1.0f));
-            std::string btnLbl = "$" + std::to_string(b.currentProfit);
-            if (ImGui::Button(btnLbl.c_str(), actSize)) {
-                m_businessProvider->CollectProfit(b.id);
-                SetFeedback("Lucro resgatado!");
-                RefreshData();
-            }
-            ImGui::PopStyleColor(3);
-        }
-        ImGui::PopStyleVar();
+            ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 26.0f));
+            ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.4f, 1.0f), "$%d / dia", b.dailyYield);
 
-        // 4. Progress bar
-        float progress = static_cast<float>(b.currentProfit) / b.maxProfit;
-        progress = std::clamp(progress, 0.0f, 1.0f);
-        
-        ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 50.0f));
-        
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.25f, 0.25f, 0.28f, 0.4f));
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
-        
-        ImGui::ProgressBar(progress, ImVec2(width - 24.0f, 5.0f), "");
-        
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(2);
-        
-        ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 60.0f));
-        ImGui::SetWindowFontScale(0.85f);
-        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 0.85f), "Acumulado: $%d / $%d max", b.currentProfit, b.maxProfit);
-        ImGui::SetWindowFontScale(1.0f);
+            // 3. Right Action button
+            ImVec2 actSize = ImVec2(76.0f, 24.0f);
+            ImGui::SetCursorScreenPos(ImVec2(itemMax.x - actSize.x - 12.0f, itemMin.y + 12.0f));
+            
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
+            if (b.currentProfit == 0) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
+                ImGui::Button("Coletado", actSize);
+                ImGui::PopStyleColor(3);
+            } else {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.23f, 0.9f, 0.35f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.75f, 0.25f, 1.0f));
+                std::string btnLbl = "$" + std::to_string(b.currentProfit);
+                if (ImGui::Button(btnLbl.c_str(), actSize)) {
+                    m_businessProvider->CollectProfit(b.id);
+                    SetFeedback("Lucro resgatado!");
+                    RefreshData();
+                }
+                ImGui::PopStyleColor(3);
+            }
+            ImGui::PopStyleVar();
+
+            // 4. Progress bar
+            float progress = static_cast<float>(b.currentProfit) / b.maxProfit;
+            progress = std::clamp(progress, 0.0f, 1.0f);
+            
+            ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 50.0f));
+            
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.25f, 0.25f, 0.28f, 0.4f));
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+            
+            ImGui::ProgressBar(progress, ImVec2(width - 24.0f, 5.0f), "");
+            
+            ImGui::PopStyleVar();
+            ImGui::PopStyleColor(2);
+            
+            ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 60.0f));
+            ImGui::SetWindowFontScale(0.85f);
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 0.85f), "Acumulado: $%d / $%d max", b.currentProfit, b.maxProfit);
+            ImGui::SetWindowFontScale(1.0f);
+        }
         
         ImGui::PopID();
         ImGui::SetCursorScreenPos(ImVec2(itemStart.x, itemStart.y + itemHeight));

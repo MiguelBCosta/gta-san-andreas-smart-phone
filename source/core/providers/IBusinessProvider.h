@@ -12,6 +12,7 @@ struct BusinessInfo {
     int dailyYield;
     bool owned;
     int currentProfit;
+    bool unlocked = true;
 };
 
 class IBusinessProvider {
