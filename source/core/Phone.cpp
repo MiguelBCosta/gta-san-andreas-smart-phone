@@ -928,14 +928,6 @@ void Phone::drawAlertPopup(ImDrawList* draw, ImVec2 winPos) {
   // 1. Darken the screen background with soft fade
   draw->AddRectFilled(pMin, pMax, IM_COL32(0, 0, 0, 160), SCR_R);
 
-  // Block clicks to elements underneath
-  ImGui::SetCursorScreenPos(pMin);
-  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
-  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
-  ImGui::Button("##block_clicks", ImVec2(SCREEN_W, PH_H - BEZEL * 2.0f));
-  ImGui::PopStyleColor(3);
-
   // 2. Alert Box dimensions
   float alertW = 240.0f;
   
@@ -958,6 +950,16 @@ void Phone::drawAlertPopup(ImDrawList* draw, ImVec2 winPos) {
   
   ImVec2 boxMin(ax, ay);
   ImVec2 boxMax(ax + alertW, ay + alertH);
+
+  // Block clicks to elements underneath ONLY if the mouse is outside the popup card
+  if (!ImGui::IsMouseHoveringRect(boxMin, boxMax)) {
+    ImGui::SetCursorScreenPos(pMin);
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+    ImGui::Button("##block_clicks", ImVec2(SCREEN_W, PH_H - BEZEL * 2.0f));
+    ImGui::PopStyleColor(3);
+  }
   
   // Draw Alert Box BG (frosted translucent dark gray card, iPhone style)
   draw->AddRectFilled(boxMin, boxMax, IM_COL32(28, 28, 30, 240), 14.0f);
@@ -974,15 +976,48 @@ void Phone::drawAlertPopup(ImDrawList* draw, ImVec2 winPos) {
   ImGui::PopFont();
   ImGui::PopStyleColor();
   
-  // Message
-  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
-  ImGui::SetCursorScreenPos(ImVec2(ax + 16.0f, ay + titlePadding + titleSize.y + msgPadding));
-  ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + maxTextW);
-  ImGui::TextUnformatted(m_popupState.message.c_str());
-  ImGui::PopTextWrapPos();
-  ImGui::PopStyleVar();
-  ImGui::PopStyleColor();
+  // Message (Centered & Wrapped)
+  {
+    ImVec2 msgPos(ax + 16.0f, ay + titlePadding + titleSize.y + msgPadding);
+    std::string s(m_popupState.message);
+    std::vector<std::string> words;
+    size_t start = 0;
+    while (true) {
+      size_t pos_space = s.find(' ', start);
+      if (pos_space == std::string::npos) {
+        words.push_back(s.substr(start));
+        break;
+      }
+      words.push_back(s.substr(start, pos_space - start));
+      start = pos_space + 1;
+    }
+
+    std::vector<std::string> lines;
+    std::string currentLine = "";
+    float fontSize = ImGui::GetFontSize();
+    for (const auto& word : words) {
+      std::string testLine = currentLine.empty() ? word : (currentLine + " " + word);
+      ImVec2 sz = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, testLine.c_str());
+      if (sz.x > maxTextW && !currentLine.empty()) {
+        lines.push_back(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (!currentLine.empty()) {
+      lines.push_back(currentLine);
+    }
+
+    float curY = msgPos.y;
+    ImU32 textCol = IM_COL32(217, 217, 219, 255);
+    for (const auto& line : lines) {
+      ImVec2 sz = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, line.c_str());
+      float curX = msgPos.x + (maxTextW - sz.x) / 2.0f;
+      draw->AddText(font, fontSize, ImVec2(curX, curY), textCol, line.c_str());
+      curY += fontSize + 3.0f; // Line height spacing
+    }
+  }
   
   // Draw divider line above buttons
   float dividerY = ay + alertH - buttonHeight;
