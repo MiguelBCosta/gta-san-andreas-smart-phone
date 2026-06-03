@@ -70,6 +70,18 @@ void LocalizationManager::ScanLanguages() {
 void LocalizationManager::SetLanguage(const std::string& langCode) {
     m_currentLang = langCode;
     LoadLanguage(langCode);
+
+    for (const auto& cb : m_callbacks) {
+        if (cb) {
+            cb();
+        }
+    }
+}
+
+void LocalizationManager::RegisterCallback(std::function<void()> cb) {
+    if (cb) {
+        m_callbacks.push_back(cb);
+    }
 }
 
 const std::string& LocalizationManager::GetCurrentLanguage() const {

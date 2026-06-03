@@ -36,4 +36,5 @@ public:
     void onOpen() override;
     void update(float dt) override;
     void onDraw() override;
+    void onLanguageChange() override { name = TR("clock.title"); }
 };

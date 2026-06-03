@@ -93,48 +93,77 @@ void SettingsApp::onDraw() {
         
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
-        ImGui::BeginChild("##settings_rows", ImVec2(ImGui::GetContentRegionAvail().x, 96.0f), true, ImGuiWindowFlags_NoScrollbar);
+        ImGui::BeginChild("##settings_rows", ImVec2(ImGui::GetContentRegionAvail().x, 88.0f), true, ImGuiWindowFlags_NoScrollbar);
         
-        // Custom interactive row for iOS-like styling (no hover or active background highlight)
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        
+        // Custom interactive row for iOS-like styling with subtle interactive highlights
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.03f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.0f, 1.0f, 1.0f, 0.07f));
         
         // --- Row: Wallpaper ---
-        if (ImGui::Selectable("##wp_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 32.0f))) {
+        ImVec2 itemMin1 = ImGui::GetCursorScreenPos();
+        if (ImGui::Selectable("##wp_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 38.0f))) {
             m_menuState = 1; // Go to Wallpaper Sub-page
         }
         
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 28.0f);
-        ImGui::Indent(8.0f);
-        ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_IMAGE);
-        ImGui::SameLine();
-        ImGui::Text("%s", TR("settings.wallpaper"));
-        ImGui::SameLine(ImGui::GetWindowWidth() - 30.0f);
-        ImGui::TextDisabled(ICON_FA_CHEVRON_RIGHT);
-        ImGui::Unindent(8.0f);
-        
-        // Thin divider between rows
-        ImVec2 divCursor = ImGui::GetCursorScreenPos();
-        ImGui::GetWindowDrawList()->AddLine(
-            ImVec2(divCursor.x + 36.0f, divCursor.y),
-            ImVec2(divCursor.x + ImGui::GetContentRegionAvail().x, divCursor.y),
-            IM_COL32(255, 255, 255, 20));
-        ImGui::Spacing();
+        // Render custom elements on top of the selectable
+        {
+            float sz = 24.0f;
+            ImVec2 rectMin = ImVec2(itemMin1.x + 8.0f, itemMin1.y + (38.0f - sz) * 0.5f);
+            ImVec2 rectMax = ImVec2(rectMin.x + sz, rectMin.y + sz);
+            
+            // Draw iOS Wallpaper blue background
+            drawList->AddRectFilled(rectMin, rectMax, IM_COL32(0, 122, 255, 255), 6.0f);
+            
+            // Draw Icon
+            ImVec2 textSz = ImGui::CalcTextSize(ICON_FA_IMAGE);
+            ImVec2 iconPos = ImVec2(rectMin.x + (sz - textSz.x) * 0.5f + 1.0f, rectMin.y + (sz - textSz.y) * 0.5f + 1.0f);
+            drawList->AddText(iconPos, IM_COL32(255, 255, 255, 255), ICON_FA_IMAGE);
+            
+            // Draw Label
+            ImVec2 textPos = ImVec2(rectMax.x + 12.0f, itemMin1.y + (38.0f - ImGui::GetTextLineHeight()) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), TR("settings.wallpaper"));
+            
+            // Draw Chevron
+            ImVec2 chevronPos = ImVec2(itemMin1.x + ImGui::GetWindowWidth() - 30.0f, itemMin1.y + (38.0f - ImGui::GetTextLineHeight()) * 0.5f);
+            drawList->AddText(chevronPos, IM_COL32(255, 255, 255, 100), ICON_FA_CHEVRON_RIGHT);
+            
+            // Draw thin divider line aligned with text
+            ImVec2 divStart = ImVec2(itemMin1.x + 44.0f, itemMin1.y + 38.0f);
+            ImVec2 divEnd = ImVec2(itemMin1.x + ImGui::GetContentRegionAvail().x, itemMin1.y + 38.0f);
+            drawList->AddLine(divStart, divEnd, IM_COL32(255, 255, 255, 20));
+        }
         
         // --- Row: Language ---
-        if (ImGui::Selectable("##lang_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 32.0f))) {
+        ImVec2 itemMin2 = ImGui::GetCursorScreenPos();
+        if (ImGui::Selectable("##lang_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 38.0f))) {
             m_menuState = 2; // Go to Language Sub-page
         }
         
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 28.0f);
-        ImGui::Indent(8.0f);
-        ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_GLOBE);
-        ImGui::SameLine();
-        ImGui::Text("%s", TR("settings.language"));
-        ImGui::SameLine(ImGui::GetWindowWidth() - 30.0f);
-        ImGui::TextDisabled(ICON_FA_CHEVRON_RIGHT);
-        ImGui::Unindent(8.0f);
+        // Render custom elements on top of the selectable
+        {
+            float sz = 24.0f;
+            ImVec2 rectMin = ImVec2(itemMin2.x + 8.0f, itemMin2.y + (38.0f - sz) * 0.5f);
+            ImVec2 rectMax = ImVec2(rectMin.x + sz, rectMin.y + sz);
+            
+            // Draw iOS Settings green background
+            drawList->AddRectFilled(rectMin, rectMax, IM_COL32(38, 140, 64, 255), 6.0f);
+            
+            // Draw Icon
+            ImVec2 textSz = ImGui::CalcTextSize(ICON_FA_GLOBE);
+            ImVec2 iconPos = ImVec2(rectMin.x + (sz - textSz.x) * 0.5f + 1.0f, rectMin.y + (sz - textSz.y) * 0.5f + 1.0f);
+            drawList->AddText(iconPos, IM_COL32(255, 255, 255, 255), ICON_FA_GLOBE);
+            
+            // Draw Label
+            ImVec2 textPos = ImVec2(rectMax.x + 12.0f, itemMin2.y + (38.0f - ImGui::GetTextLineHeight()) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), TR("settings.language"));
+            
+            // Draw Chevron
+            ImVec2 chevronPos = ImVec2(itemMin2.x + ImGui::GetWindowWidth() - 30.0f, itemMin2.y + (38.0f - ImGui::GetTextLineHeight()) * 0.5f);
+            drawList->AddText(chevronPos, IM_COL32(255, 255, 255, 100), ICON_FA_CHEVRON_RIGHT);
+        }
         
         ImGui::PopStyleColor(3);
         
@@ -346,9 +375,15 @@ void SettingsApp::onDraw() {
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
         
-        float rowH = 46.0f;
+        float rowH = 38.0f; // Uniform 38px row height matching Settings main menu
         float listH = languages.size() * rowH;
-        ImGui::BeginChild("##lang_list", ImVec2(ImGui::GetContentRegionAvail().x, listH), true, ImGuiWindowFlags_NoScrollbar);
+        ImGui::BeginChild("##lang_list", ImVec2(ImGui::GetContentRegionAvail().x, listH + 12.0f), true, ImGuiWindowFlags_NoScrollbar);
+        
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.03f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.0f, 1.0f, 1.0f, 0.07f));
         
         for (size_t i = 0; i < languages.size(); i++) {
             const auto& lang = languages[i];
@@ -356,44 +391,33 @@ void SettingsApp::onDraw() {
             
             ImGui::PushID((int)i);
             
-            ImGui::PushStyleColor(ImGuiCol_Header,        ImVec4(0, 0, 0, 0));
-            ImGui::PushStyleColor(ImGuiCol_HeaderHovered,  ImVec4(1, 1, 1, 0.05f));
-            ImGui::PushStyleColor(ImGuiCol_HeaderActive,   ImVec4(1, 1, 1, 0.1f));
-            
-            if (ImGui::Selectable("##lang_sel", false, ImGuiSelectableFlags_None, ImVec2(0, rowH - 4.0f))) {
+            ImVec2 itemMin = ImGui::GetCursorScreenPos();
+            if (ImGui::Selectable("##lang_sel", false, ImGuiSelectableFlags_None, ImVec2(0, rowH))) {
                 LocalizationManager::Get().SetLanguage(lang.code);
-                // Update app name immediately
-                name = TR("settings.title");
+                name = TR("settings.title"); // Update title immediately
             }
-            ImGui::PopStyleColor(3);
             
-            // Content drawn over the selectable
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (rowH - 4.0f) + (rowH - ImGui::GetTextLineHeight()) / 2.0f);
-            ImGui::Indent(12.0f);
-            ImGui::Text("%s", lang.name.c_str());
+            // Draw language display name over the selectable
+            ImVec2 textPos = ImVec2(itemMin.x + 12.0f, itemMin.y + (rowH - ImGui::GetTextLineHeight()) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), lang.name.c_str());
             
-            // Check mark for active language
+            // Draw iOS classic checkmark in blue for active language
             if (isSelected) {
-                ImGui::SameLine(ImGui::GetWindowWidth() - 36.0f);
-                ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_CHECK);
+                ImVec2 checkPos = ImVec2(itemMin.x + ImGui::GetWindowWidth() - 36.0f, itemMin.y + (rowH - ImGui::GetTextLineHeight()) * 0.5f);
+                drawList->AddText(checkPos, IM_COL32(10, 132, 255, 255), ICON_FA_CHECK);
             }
-            ImGui::Unindent(12.0f);
             
-            // Divider between rows (except last)
+            // Draw thin divider line aligned with item content
             if (i < languages.size() - 1) {
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (rowH - ImGui::GetTextLineHeight()) / 2.0f);
-                ImVec2 divPos = ImGui::GetCursorScreenPos();
-                ImGui::GetWindowDrawList()->AddLine(
-                    ImVec2(divPos.x + 36.0f, divPos.y),
-                    ImVec2(divPos.x + ImGui::GetContentRegionAvail().x, divPos.y),
-                    IM_COL32(255, 255, 255, 20));
-                ImGui::Spacing();
-            } else {
-                ImGui::Dummy(ImVec2(0.0f, 0.0f));
+                ImVec2 divStart = ImVec2(itemMin.x + 12.0f, itemMin.y + rowH);
+                ImVec2 divEnd = ImVec2(itemMin.x + ImGui::GetContentRegionAvail().x, itemMin.y + rowH);
+                drawList->AddLine(divStart, divEnd, IM_COL32(255, 255, 255, 20));
             }
             
             ImGui::PopID();
         }
+        
+        ImGui::PopStyleColor(3);
         
         ImGui::EndChild();
         ImGui::PopStyleColor();

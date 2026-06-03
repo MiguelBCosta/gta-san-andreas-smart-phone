@@ -32,6 +32,7 @@ public:
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
     bool requiresMouse() const override;
+    void onLanguageChange() override { name = TR("phone.title"); }
 
 private:
     PhoneCallState m_callState = PhoneCallState::IDLE;

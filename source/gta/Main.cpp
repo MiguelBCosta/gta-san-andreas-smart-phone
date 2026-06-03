@@ -95,6 +95,7 @@ void RegisterGtaBaseServices() {
 	ServiceContainer::registerService<IMessageProvider>(&gtaMessage);
 	ServiceContainer::registerService<IStatsProvider>(&gtaStats);
 	ServiceContainer::registerService<IBusinessProvider>(&gtaBusiness);
+	ServiceContainer::registerService<Phone>(&phone);
 }
 
 

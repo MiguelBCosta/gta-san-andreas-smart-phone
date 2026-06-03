@@ -49,6 +49,7 @@ public:
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
+    void onLanguageChange() override { name = TR("settings.title"); }
 
     // Wallpaper drawing helper called by Phone chassis renderer
     void DrawWallpaper(ImDrawList* draw, ImVec2 pMin, ImVec2 pMax, float rounding);

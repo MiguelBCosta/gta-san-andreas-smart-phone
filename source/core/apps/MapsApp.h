@@ -32,4 +32,5 @@ public:
     void onClose() override;
     void onDraw() override;
     bool onBack() override;
+    void onLanguageChange() override { name = TR("maps.title"); }
 };

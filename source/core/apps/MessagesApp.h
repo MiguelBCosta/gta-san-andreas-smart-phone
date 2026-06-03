@@ -43,6 +43,7 @@ public:
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
     int getBadgeCount() const override { return m_badgeCount; }
+    void onLanguageChange() override { name = TR("messages.title"); }
 
 private:
     Inject<IMessageProvider> m_provider;

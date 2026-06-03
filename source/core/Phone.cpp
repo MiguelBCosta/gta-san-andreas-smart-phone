@@ -9,7 +9,12 @@
 // PUBLIC API
 // ============================================================
 
-Phone::Phone() { m_storage.setPhone(this); }
+Phone::Phone() { 
+  m_storage.setPhone(this); 
+  LocalizationManager::Get().RegisterCallback([this]() {
+    this->updateLanguage();
+  });
+}
 
 void Phone::toggle(PhoneAnimMode mode) {
   if (m_isOpen)
@@ -86,6 +91,9 @@ bool Phone::shouldCaptureInput() const {
 }
 
 void Phone::registerApp(PhoneApp *app) {
+  // Translate app properties immediately upon registration
+  app->onLanguageChange();
+
   // Check if app is already registered
   auto it = std::find(m_apps.begin(), m_apps.end(), app);
   if (it == m_apps.end()) {
@@ -106,6 +114,12 @@ void Phone::registerApp(PhoneApp *app) {
     }
   }
   m_storage.addApp(app);
+}
+
+void Phone::updateLanguage() {
+  for (auto* app : m_apps) {
+    app->onLanguageChange();
+  }
 }
 
 void Phone::openApp(PhoneApp *app) {

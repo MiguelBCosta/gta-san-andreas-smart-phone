@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 // ---------------------------------------------------------------------------
 // Macro de acesso rápido às strings traduzidas
@@ -45,6 +46,9 @@ public:
     // Fallback: retorna a própria chave se não encontrada.
     const char* Translate(const char* key) const;
 
+    // Registra um callback a ser disparado quando o idioma ativo muda
+    void RegisterCallback(std::function<void()> cb);
+
 private:
     LocalizationManager() = default;
     LocalizationManager(const LocalizationManager&) = delete;
@@ -57,4 +61,5 @@ private:
     std::string m_currentLang = "en";
     std::unordered_map<std::string, std::string> m_strings;
     std::vector<LanguageInfo> m_availableLanguages;
+    std::vector<std::function<void()>> m_callbacks;
 };

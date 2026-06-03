@@ -34,4 +34,5 @@ public:
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
     void onDraw() override;
+    void onLanguageChange() override { name = TR("garage.title"); }
 };

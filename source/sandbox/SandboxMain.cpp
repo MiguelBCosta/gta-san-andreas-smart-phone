@@ -148,6 +148,7 @@ void RegisterSandboxServices(IDirect3DDevice9* device) {
     ServiceContainer::registerService<IMapProvider>(&sandboxMap);
     ServiceContainer::registerService<IStatsProvider>(&sandboxStats);
     ServiceContainer::registerService<IBusinessProvider>(&sandboxBusiness);
+    ServiceContainer::registerService<Phone>(&phone);
 
 
     static SandboxAvatarProvider sandboxAvatarProvider(device);
@@ -218,8 +219,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ImGui_ImplWin32_Init(hwnd);
   ImGui_ImplDX9_Init(g_pd3dDevice);
 
-  // Setup Phone services using extracted helper
-  LocalizationManager::Get().Init("");
+  // Resolve directory where sandbox executable is located to load assets correctly
+  char execPathBuf[MAX_PATH];
+  GetModuleFileNameA(nullptr, execPathBuf, MAX_PATH);
+  std::string execPath(execPathBuf);
+  size_t lastSlash = execPath.find_last_of("\\/");
+  std::string basePath = (lastSlash != std::string::npos) ? execPath.substr(0, lastSlash + 1) : "";
+  LocalizationManager::Get().Init(basePath);
   RegisterSandboxServices(g_pd3dDevice);
   phone.registerApp(&calcApp);
   phone.registerApp(&clockApp);

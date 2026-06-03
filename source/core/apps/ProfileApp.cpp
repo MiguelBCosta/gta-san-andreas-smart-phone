@@ -98,6 +98,8 @@ void ProfileApp::onDraw() {
 }
 
 void ProfileApp::drawMainMenu() {
+  ImGui::BeginChild("##profile_main_scroll", ImGui::GetContentRegionAvail(), false, ImGuiWindowFlags_None);
+
   ImGui::Spacing();
 
   // 1. Render CJ Avatar circular
@@ -152,73 +154,74 @@ void ProfileApp::drawMainMenu() {
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
 
-  float rowHeight = 44.0f;
-  float menuHeight = 5 * rowHeight;
+  float rowHeight = 38.0f;
 
+  static float cardHeight = 202.0f;
   ImGui::BeginChild("##submenus_list",
-                    ImVec2(ImGui::GetContentRegionAvail().x, menuHeight), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, cardHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY = ImGui::GetCursorPosY();
 
   auto drawRow = [&](int idSub, const char *icon, const char *label,
-                     ImVec4 color) {
+                     ImU32 bgCol) {
     ImGui::PushID(idSub);
 
-    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1, 1, 1, 0.05f));
-    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1, 1, 1, 0.1f));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.03f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.0f, 1.0f, 1.0f, 0.07f));
 
-    if (ImGui::Selectable(
-            "##select_row", false, ImGuiSelectableFlags_None,
-            ImVec2(ImGui::GetContentRegionAvail().x, rowHeight - 2.0f))) {
+    ImVec2 itemMin = ImGui::GetCursorScreenPos();
+    if (ImGui::Selectable("##select_row", false, ImGuiSelectableFlags_None,
+                          ImVec2(0, rowHeight))) {
       m_activeSubmenu = idSub;
     }
     ImGui::PopStyleColor(3);
 
-    // Content
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - rowHeight +
-                         (rowHeight - ImGui::GetTextLineHeight()) / 2.0f);
-    ImGui::Indent(12.0f);
+    // Render custom elements on top of the selectable
+    {
+      float sz = 24.0f;
+      ImVec2 rectMin = ImVec2(itemMin.x + 8.0f, itemMin.y + (rowHeight - sz) * 0.5f);
+      ImVec2 rectMax = ImVec2(rectMin.x + sz, rectMin.y + sz);
 
-    // Icon
-    ImGui::TextColored(color, "%s", icon);
-    ImGui::SameLine();
-    ImGui::Text("%s", label);
+      // Draw rounded background for the icon
+      drawList->AddRectFilled(rectMin, rectMax, bgCol, 6.0f);
 
-    // Chevron
-    ImGui::SameLine(ImGui::GetWindowWidth() - 36.0f);
-    ImGui::TextDisabled(ICON_FA_CHEVRON_RIGHT);
+      // Centered Icon (visually balanced for FA glyphs inside the 24x24 box)
+      ImVec2 textSz = ImGui::CalcTextSize(icon);
+      ImVec2 iconPos = ImVec2(rectMin.x + (sz - textSz.x) * 0.5f + 1.0f, rectMin.y + (sz - textSz.y) * 0.5f + 1.0f);
+      drawList->AddText(iconPos, IM_COL32(255, 255, 255, 255), icon);
 
-    ImGui::Unindent(12.0f);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
-                         (rowHeight - ImGui::GetTextLineHeight()) / 2.0f);
+      // Draw Label
+      ImVec2 labelPos = ImVec2(rectMax.x + 12.0f, itemMin.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f);
+      drawList->AddText(labelPos, IM_COL32(255, 255, 255, 255), label);
 
-    if (idSub < 5) {
-      ImVec2 nextCursor = ImGui::GetCursorScreenPos();
-      ImGui::GetWindowDrawList()->AddLine(
-          ImVec2(nextCursor.x + 36.0f, nextCursor.y),
-          ImVec2(nextCursor.x + ImGui::GetContentRegionAvail().x, nextCursor.y),
-          IM_COL32(255, 255, 255, 20));
-      ImGui::Spacing();
-    } else {
-      ImGui::Dummy(ImVec2(0.0f, 0.0f));
+      // Draw Chevron
+      ImVec2 chevronPos = ImVec2(itemMin.x + ImGui::GetWindowWidth() - 30.0f, itemMin.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f);
+      drawList->AddText(chevronPos, IM_COL32(255, 255, 255, 100), ICON_FA_CHEVRON_RIGHT);
+
+      // Draw thin divider line aligned with text
+      if (idSub < 5) {
+        ImVec2 divStart = ImVec2(itemMin.x + 44.0f, itemMin.y + rowHeight);
+        ImVec2 divEnd = ImVec2(itemMin.x + ImGui::GetContentRegionAvail().x, itemMin.y + rowHeight);
+        drawList->AddLine(divStart, divEnd, IM_COL32(255, 255, 255, 20));
+      }
     }
 
     ImGui::PopID();
   };
 
-  drawRow(1, ICON_FA_USER, TR("profile.player"), ImVec4(0.0f, 0.478f, 1.0f, 1.0f)); // Blue
-  drawRow(2, ICON_FA_AWARD, TR("profile.skills"),
-          ImVec4(1.0f, 0.584f, 0.0f, 1.0f)); // Orange
-  drawRow(3, ICON_FA_USERS, TR("profile.gang"),
-          ImVec4(0.196f, 0.843f, 0.294f, 1.0f)); // Green
-  drawRow(4, ICON_FA_SHIELD_ALT, TR("profile.crimes"),
-          ImVec4(1.0f, 0.231f, 0.188f, 1.0f)); // Red
-  drawRow(5, ICON_FA_CHART_LINE, TR("profile.progress"),
-          ImVec4(0.686f, 0.322f, 0.871f, 1.0f)); // Purple
+  drawRow(1, ICON_FA_USER, TR("profile.player"), IM_COL32(0, 122, 255, 255)); // Blue
+  drawRow(2, ICON_FA_AWARD, TR("profile.skills"), IM_COL32(255, 149, 0, 255)); // Orange
+  drawRow(3, ICON_FA_USERS, TR("profile.gang"), IM_COL32(52, 199, 89, 255)); // Green
+  drawRow(4, ICON_FA_SHIELD_ALT, TR("profile.crimes"), IM_COL32(255, 59, 48, 255)); // Red
+  drawRow(5, ICON_FA_CHART_LINE, TR("profile.progress"), IM_COL32(175, 82, 222, 255)); // Purple
 
-  ImGui::EndChild();
+  cardHeight = ImGui::GetCursorPosY() - startY + 12.0f;
+  ImGui::EndChild(); // ##submenus_list
   ImGui::PopStyleColor();
   ImGui::PopStyleVar();
+
+  ImGui::EndChild(); // ##profile_main_scroll
 }
 
 void ProfileApp::drawStatRow(const char *label, const char *value,
@@ -277,9 +280,11 @@ void ProfileApp::drawJogadorMenu() {
 
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
+  static float cardHeight = 408.0f;
   ImGui::BeginChild("##jogador_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 360), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, cardHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY = ImGui::GetCursorPosY();
 
   // Dinheiro
   char moneyBuf[32];
@@ -330,11 +335,12 @@ void ProfileApp::drawJogadorMenu() {
   drawStatRow(TR("profile.meals"), mealsBuf, ICON_FA_UTENSILS,
               ImVec4(0.95f, 0.60f, 0.10f, 1.0f));
 
-  ImGui::EndChild();
+  cardHeight = ImGui::GetCursorPosY() - startY + 12.0f;
+  ImGui::EndChild(); // ##jogador_card
   ImGui::PopStyleColor();
   ImGui::PopStyleVar();
 
-  ImGui::EndChild();
+  ImGui::EndChild(); // ##jogador_scroll
 }
 
 void ProfileApp::drawHabilidadesMenu() {
@@ -349,9 +355,11 @@ void ProfileApp::drawHabilidadesMenu() {
 
   // Group 1: Veiculos
   ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("profile.vehicles_label"));
+  static float veiculosHeight = 180.0f;
   ImGui::BeginChild("##veiculos_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 190.0f), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, veiculosHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY1 = ImGui::GetCursorPosY();
   drawStatProgressBar(TR("profile.car"), stats.drivingSkill, ICON_FA_CAR,
                       ImVec4(0.0f, 0.478f, 1.0f, 1.0f));
   drawStatProgressBar(TR("profile.bike"), stats.bikeSkill, ICON_FA_MOTORCYCLE,
@@ -360,15 +368,18 @@ void ProfileApp::drawHabilidadesMenu() {
                       ImVec4(1.0f, 0.584f, 0.0f, 1.0f));
   drawStatProgressBar(TR("profile.airplane"), stats.flyingSkill, ICON_FA_PLANE,
                       ImVec4(0.686f, 0.322f, 0.871f, 1.0f));
+  veiculosHeight = ImGui::GetCursorPosY() - startY1 + 12.0f;
   ImGui::EndChild();
 
   ImGui::Spacing();
 
   // Group 2: Armas
   ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("profile.weapons_label"));
+  static float armasHeight = 474.0f;
   ImGui::BeginChild("##armas_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 490.0f), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, armasHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY2 = ImGui::GetCursorPosY();
   drawStatProgressBar(TR("profile.pistol"), stats.pistolSkill, ICON_FA_CROSSHAIRS,
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   drawStatProgressBar(TR("profile.silenced"), stats.silencedPistolSkill, ICON_FA_CROSSHAIRS,
@@ -391,6 +402,7 @@ void ProfileApp::drawHabilidadesMenu() {
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
   drawStatProgressBar(TR("profile.sniper"), stats.sniperSkill, ICON_FA_CROSSHAIRS,
                       ImVec4(1.0f, 0.231f, 0.188f, 1.0f));
+  armasHeight = ImGui::GetCursorPosY() - startY2 + 12.0f;
   ImGui::EndChild();
 
   ImGui::PopStyleColor();
@@ -408,9 +420,11 @@ void ProfileApp::drawGangMenu() {
 
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
+  static float cardHeight = 300.0f;
   ImGui::BeginChild("##gang_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 330.0f), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, cardHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY = ImGui::GetCursorPosY();
 
   // Respeito
   drawStatProgressBar(TR("profile.respect"), stats.respect, ICON_FA_STAR,
@@ -451,11 +465,12 @@ void ProfileApp::drawGangMenu() {
   drawStatRow(TR("profile.max_recruits"), maxRecBuf, ICON_FA_USER_PLUS,
               ImVec4(0.686f, 0.322f, 0.871f, 1.0f));
 
-  ImGui::EndChild();
+  cardHeight = ImGui::GetCursorPosY() - startY + 12.0f;
+  ImGui::EndChild(); // ##gang_card
   ImGui::PopStyleColor();
   ImGui::PopStyleVar();
 
-  ImGui::EndChild();
+  ImGui::EndChild(); // ##gang_scroll
 }
 
 void ProfileApp::drawCrimesMenu() {
@@ -467,9 +482,11 @@ void ProfileApp::drawCrimesMenu() {
 
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
+  static float cardHeight = 216.0f;
   ImGui::BeginChild("##crimes_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 260.0f), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, cardHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY = ImGui::GetCursorPosY();
 
   char killedBuf[16];
   sprintf_s(killedBuf, sizeof(killedBuf), "%d", stats.peopleKilled);
@@ -501,11 +518,12 @@ void ProfileApp::drawCrimesMenu() {
   drawStatRow(TR("profile.evaded"), evadeBuf, ICON_FA_RUNNING,
               ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
 
-  ImGui::EndChild();
+  cardHeight = ImGui::GetCursorPosY() - startY + 12.0f;
+  ImGui::EndChild(); // ##crimes_card
   ImGui::PopStyleColor();
   ImGui::PopStyleVar();
 
-  ImGui::EndChild();
+  ImGui::EndChild(); // ##crimes_scroll
 }
 
 void ProfileApp::drawProgressoMenu() {
@@ -517,15 +535,17 @@ void ProfileApp::drawProgressoMenu() {
 
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
+  static float cardHeight = 326.0f;
   ImGui::BeginChild("##progresso_card",
-                    ImVec2(ImGui::GetContentRegionAvail().x, 390.0f), true,
-                    ImGuiWindowFlags_NoScrollbar);
+                    ImVec2(ImGui::GetContentRegionAvail().x, cardHeight), true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  float startY = ImGui::GetCursorPosY();
 
   // Conclusao
   drawStatProgressBar(TR("profile.completion"), stats.completionPercentage,
                       ICON_FA_CHART_PIE, ImVec4(0.0f, 0.478f, 1.0f, 1.0f));
 
-  // Missions Story
+  // Story Missions
   char missBuf[32];
   sprintf_s(missBuf, sizeof(missBuf), "%d / %d", stats.storyMissionsCompleted,
             stats.storyMissionsTotal);
@@ -579,7 +599,12 @@ void ProfileApp::drawProgressoMenu() {
   drawStatRow(TR("profile.snapshots"), snapshotsBuf, ICON_FA_IMAGE,
               ImVec4(0.686f, 0.322f, 0.871f, 1.0f));
 
-  // Indicator highlight for 100% completion
+  cardHeight = ImGui::GetCursorPosY() - startY + 12.0f;
+  ImGui::EndChild(); // ##progresso_card
+  ImGui::PopStyleColor();
+  ImGui::PopStyleVar();
+
+  // Indicator highlight for 100% completion (drawn outside card so it scrolls below it)
   if (stats.completionPercentage >= 100.0f) {
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button,
@@ -589,9 +614,5 @@ void ProfileApp::drawProgressoMenu() {
     ImGui::PopStyleColor();
   }
 
-  ImGui::EndChild();
-  ImGui::PopStyleColor();
-  ImGui::PopStyleVar();
-
-  ImGui::EndChild();
+  ImGui::EndChild(); // ##progresso_scroll
 }
