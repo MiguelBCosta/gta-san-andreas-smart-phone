@@ -34,7 +34,7 @@ const char* SettingsApp::PRESET_GRADIENT_NAMES[PRESET_COUNT] = {
 SettingsApp::SettingsApp() {
     id = "settings";
     icon = ICON_FA_COG;
-    name = "Ajustes";
+    name = TR("settings.title");
     color = ImVec4(0.45f, 0.45f, 0.50f, 1.0f);
     dock = false;
     dockOrder = 99;
@@ -86,36 +86,57 @@ static void DrawInlineColorWheel(const char* label, ImVec4& color) {
 }
 
 void SettingsApp::onDraw() {
-    // 0: Settings Menu, 1: Wallpaper sub-page
+    // 0: Settings Menu, 1: Wallpaper sub-page, 2: Language sub-page
     if (m_menuState == 0) {
         ImGui::Spacing();
-        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "GERAL");
+        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("settings.general"));
         
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
-        ImGui::BeginChild("##wp_row_container", ImVec2(ImGui::GetContentRegionAvail().x, 48.0f), true, ImGuiWindowFlags_NoScrollbar);
+        ImGui::BeginChild("##settings_rows", ImVec2(ImGui::GetContentRegionAvail().x, 96.0f), true, ImGuiWindowFlags_NoScrollbar);
         
         // Custom interactive row for iOS-like styling (no hover or active background highlight)
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
         ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
         ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
         
+        // --- Row: Wallpaper ---
         if (ImGui::Selectable("##wp_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 32.0f))) {
             m_menuState = 1; // Go to Wallpaper Sub-page
         }
         
-        ImGui::PopStyleColor(3);
-        
-        // Draw content over the selectable
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 28.0f);
         ImGui::Indent(8.0f);
         ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_IMAGE);
         ImGui::SameLine();
-        ImGui::Text("Papel de Parede");
-        
+        ImGui::Text("%s", TR("settings.wallpaper"));
         ImGui::SameLine(ImGui::GetWindowWidth() - 30.0f);
         ImGui::TextDisabled(ICON_FA_CHEVRON_RIGHT);
         ImGui::Unindent(8.0f);
+        
+        // Thin divider between rows
+        ImVec2 divCursor = ImGui::GetCursorScreenPos();
+        ImGui::GetWindowDrawList()->AddLine(
+            ImVec2(divCursor.x + 36.0f, divCursor.y),
+            ImVec2(divCursor.x + ImGui::GetContentRegionAvail().x, divCursor.y),
+            IM_COL32(255, 255, 255, 20));
+        ImGui::Spacing();
+        
+        // --- Row: Language ---
+        if (ImGui::Selectable("##lang_row_action", false, ImGuiSelectableFlags_None, ImVec2(0, 32.0f))) {
+            m_menuState = 2; // Go to Language Sub-page
+        }
+        
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 28.0f);
+        ImGui::Indent(8.0f);
+        ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_GLOBE);
+        ImGui::SameLine();
+        ImGui::Text("%s", TR("settings.language"));
+        ImGui::SameLine(ImGui::GetWindowWidth() - 30.0f);
+        ImGui::TextDisabled(ICON_FA_CHEVRON_RIGHT);
+        ImGui::Unindent(8.0f);
+        
+        ImGui::PopStyleColor(3);
         
         ImGui::EndChild();
         ImGui::PopStyleColor();
@@ -163,15 +184,15 @@ void SettingsApp::onDraw() {
             return clicked;
         };
 
-        if (renderTab("Sólido", WallpaperType::SOLID)) {
+        if (renderTab(TR("settings.wp.solid"), WallpaperType::SOLID)) {
             m_config.type = WallpaperType::SOLID;
         }
         ImGui::SameLine();
-        if (renderTab("Gradiente", WallpaperType::GRADIENT)) {
+        if (renderTab(TR("settings.wp.gradient"), WallpaperType::GRADIENT)) {
             m_config.type = WallpaperType::GRADIENT;
         }
         ImGui::SameLine();
-        if (renderTab("Imagem", WallpaperType::IMAGE)) {
+        if (renderTab(TR("settings.wp.image"), WallpaperType::IMAGE)) {
             m_config.type = WallpaperType::IMAGE;
             
             // Refresh list dynamically
@@ -191,7 +212,7 @@ void SettingsApp::onDraw() {
         
         // 3. Configurations details based on active Tab
         if (m_config.type == WallpaperType::SOLID) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "PRESETS DE CORES");
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("settings.wp.color_presets"));
             ImGui::Spacing();
             
             for (int i = 0; i < PRESET_COUNT; i++) {
@@ -217,10 +238,10 @@ void SettingsApp::onDraw() {
             ImGui::Spacing();
             
             // Custom inline color wheel (Zero popups!)
-            DrawInlineColorWheel("COR PERSONALIZADA", m_config.solidColor);
+            DrawInlineColorWheel(TR("settings.wp.custom_color"), m_config.solidColor);
         }
         else if (m_config.type == WallpaperType::GRADIENT) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "PRESETS DE GRADIENTES");
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("settings.wp.gradient_presets"));
             ImGui::Spacing();
             
             for (int i = 0; i < PRESET_COUNT; i++) {
@@ -249,13 +270,13 @@ void SettingsApp::onDraw() {
             ImGui::Spacing();
             
             // Custom inline color wheels for gradient ends (Zero popups!)
-            DrawInlineColorWheel("COR SUPERIOR (PERSONALIZADA)", m_config.gradientColor1);
+            DrawInlineColorWheel(TR("settings.wp.custom_top"), m_config.gradientColor1);
             ImGui::Separator();
             ImGui::Spacing();
-            DrawInlineColorWheel("COR INFERIOR (PERSONALIZADA)", m_config.gradientColor2);
+            DrawInlineColorWheel(TR("settings.wp.custom_bottom"), m_config.gradientColor2);
         }
         else if (m_config.type == WallpaperType::IMAGE) {
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "IMAGENS DISPONÍVEIS");
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("settings.wp.available_images"));
             ImGui::SameLine(ImGui::GetContentRegionAvail().x - 25.0f);
             
             // Sync/Rescan button (circular button styled nicely)
@@ -278,7 +299,7 @@ void SettingsApp::onDraw() {
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
                 ImGui::BeginChild("##wp_empty_help", ImVec2(ImGui::GetContentRegionAvail().x, 80.0f), true);
                 
-                ImGui::TextWrapped("Nenhuma imagem encontrada na pasta 'wallpaper'.\nAdicione arquivos PNG ou JPG na pasta correspondente do mod.");
+                ImGui::TextWrapped("%s", TR("settings.wp.no_images"));
                 
                 ImGui::EndChild();
                 ImGui::PopStyleVar();
@@ -310,6 +331,75 @@ void SettingsApp::onDraw() {
         }
         
         ImGui::EndChild(); // ##wp_scrollable_container
+    }
+    else if (m_menuState == 2) {
+        // Language Selection Page
+        ImGui::BeginChild("##lang_scrollable", ImGui::GetContentRegionAvail(), false, ImGuiWindowFlags_NoBackground);
+        
+        ImGui::Spacing();
+        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("settings.lang.select"));
+        ImGui::Spacing();
+        
+        const auto& languages = LocalizationManager::Get().GetAvailableLanguages();
+        const std::string& currentLang = LocalizationManager::Get().GetCurrentLanguage();
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.18f, 0.18f, 0.20f, 0.8f));
+        
+        float rowH = 46.0f;
+        float listH = languages.size() * rowH;
+        ImGui::BeginChild("##lang_list", ImVec2(ImGui::GetContentRegionAvail().x, listH), true, ImGuiWindowFlags_NoScrollbar);
+        
+        for (size_t i = 0; i < languages.size(); i++) {
+            const auto& lang = languages[i];
+            bool isSelected = (lang.code == currentLang);
+            
+            ImGui::PushID((int)i);
+            
+            ImGui::PushStyleColor(ImGuiCol_Header,        ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered,  ImVec4(1, 1, 1, 0.05f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive,   ImVec4(1, 1, 1, 0.1f));
+            
+            if (ImGui::Selectable("##lang_sel", false, ImGuiSelectableFlags_None, ImVec2(0, rowH - 4.0f))) {
+                LocalizationManager::Get().SetLanguage(lang.code);
+                // Update app name immediately
+                name = TR("settings.title");
+            }
+            ImGui::PopStyleColor(3);
+            
+            // Content drawn over the selectable
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (rowH - 4.0f) + (rowH - ImGui::GetTextLineHeight()) / 2.0f);
+            ImGui::Indent(12.0f);
+            ImGui::Text("%s", lang.name.c_str());
+            
+            // Check mark for active language
+            if (isSelected) {
+                ImGui::SameLine(ImGui::GetWindowWidth() - 36.0f);
+                ImGui::TextColored(ImVec4(0.039f, 0.518f, 1.0f, 1.0f), ICON_FA_CHECK);
+            }
+            ImGui::Unindent(12.0f);
+            
+            // Divider between rows (except last)
+            if (i < languages.size() - 1) {
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (rowH - ImGui::GetTextLineHeight()) / 2.0f);
+                ImVec2 divPos = ImGui::GetCursorScreenPos();
+                ImGui::GetWindowDrawList()->AddLine(
+                    ImVec2(divPos.x + 36.0f, divPos.y),
+                    ImVec2(divPos.x + ImGui::GetContentRegionAvail().x, divPos.y),
+                    IM_COL32(255, 255, 255, 20));
+                ImGui::Spacing();
+            } else {
+                ImGui::Dummy(ImVec2(0.0f, 0.0f));
+            }
+            
+            ImGui::PopID();
+        }
+        
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        
+        ImGui::EndChild(); // ##lang_scrollable
     }
 }
 
@@ -406,6 +496,7 @@ void SettingsApp::onSave(nlohmann::json& out) {
     out["gradientColor2"] = { m_config.gradientColor2.x, m_config.gradientColor2.y, m_config.gradientColor2.z, m_config.gradientColor2.w };
     
     out["imageName"] = m_config.imageName;
+    out["language"] = LocalizationManager::Get().GetCurrentLanguage();
 }
 
 void SettingsApp::onLoad(const nlohmann::json& in) {
@@ -425,6 +516,11 @@ void SettingsApp::onLoad(const nlohmann::json& in) {
     
     if (in.contains("imageName") && in["imageName"].is_string()) {
         m_config.imageName = in["imageName"].get<std::string>();
+    }
+    
+    if (in.contains("language") && in["language"].is_string()) {
+        LocalizationManager::Get().SetLanguage(in["language"].get<std::string>());
+        name = TR("settings.title");
     }
 }
 

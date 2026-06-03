@@ -1,5 +1,6 @@
 #include "GarageApp.h"
 #include "../Phone.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <IconsFontAwesome5.h>
 
@@ -8,7 +9,7 @@ extern Phone phone;
 GarageApp::GarageApp() {
     id = "garage";
     icon = ICON_FA_CAR;
-    name = "Garagem";
+    name = TR("garage.title");
     // Accent blue/cyan color
     color = ImVec4(0.196f, 0.541f, 0.988f, 1.0f);
     dock = true;
@@ -240,7 +241,7 @@ void GarageApp::DrawDetailsScreen() {
     // Vehicle Name
     ImGui::Text(ICON_FA_CAR " %s", v.info.name.c_str());
     
-    std::string modelName = "Modelo ID: " + std::to_string(v.info.model);
+    std::string modelName = TR("garage.model_id") + std::to_string(v.info.model);
     ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", modelName.c_str());
     ImGui::Spacing();
     ImGui::Separator();
@@ -303,26 +304,28 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::Separator();
     };
 
-    DrawColorRow("Cor Primaria", v.info.color1);
-    DrawColorRow("Cor Secundaria", v.info.color2);
+    DrawColorRow(TR("garage.primary_color"), v.info.color1);
+    DrawColorRow(TR("garage.secondary_color"), v.info.color2);
     
-    std::string pjText = v.info.paintjob != -1 ? std::to_string(v.info.paintjob) : "Nenhuma";
-    DrawPropertyRow("Pintura Especial", pjText.c_str());
+    std::string pjText = v.info.paintjob != -1 ? std::to_string(v.info.paintjob) : TR("garage.none");
+    DrawPropertyRow(TR("garage.paintjob"), pjText.c_str());
     
-    DrawPropertyRow("Suspensao", v.info.hydraulics ? "Hidraulica" : "Padrao", v.info.hydraulics ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    DrawPropertyRow(TR("garage.suspension"), v.info.hydraulics ? TR("garage.suspension_hydraulic") : TR("garage.suspension_standard"), v.info.hydraulics ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     
-    std::string nitroStr = "Nenhum";
+    std::string nitroStr = TR("garage.none");
     for (int mod : v.info.mods) {
         if (mod == 1008) nitroStr = "2x";
         else if (mod == 1009) nitroStr = "5x";
         else if (mod == 1010) nitroStr = "10x";
     }
-    DrawPropertyRow("Nitro", nitroStr.c_str(), nitroStr != "Nenhum" ? ImVec4(0.2f, 0.6f, 1.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    DrawPropertyRow(TR("garage.nitro"), nitroStr.c_str(), nitroStr != TR("garage.none") ? ImVec4(0.2f, 0.6f, 1.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     int totalMods = (int)v.info.mods.size();
-    DrawPropertyRow("Modificacoes", (std::to_string(totalMods) + " itens").c_str());
+    char modsBuf[32];
+    sprintf_s(modsBuf, TR("garage.mods_items"), totalMods);
+    DrawPropertyRow(TR("garage.mods"), modsBuf);
 
-    DrawPropertyRow("Placa", v.info.plate.empty() ? "Padrao" : v.info.plate.c_str());
+    DrawPropertyRow(TR("garage.plate"), v.info.plate.empty() ? TR("garage.plate_default") : v.info.plate.c_str());
     
     ImGui::EndChild();
     ImGui::PopStyleVar();
@@ -347,9 +350,9 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
         
-        std::string btnText = ICON_FA_PHONE " Chamar Veiculo";
-        if (isInside) btnText += " (Bloqueado: Interior)";
-        else if (onMission) btnText += " (Bloqueado: Missao)";
+        std::string btnText = std::string(ICON_FA_PHONE " ") + TR("garage.call");
+        if (isInside) btnText += TR("garage.blocked_interior");
+        else if (onMission) btnText += TR("garage.blocked_mission");
         
         ImGui::Button(btnText.c_str(), ImVec2(-1, 36));
         
@@ -361,9 +364,9 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
         
-        std::string btnText = "Chamar Veiculo";
-        if (isSameCar) btnText += " (Ja no veiculo)";
-        else if (isNearSpawned) btnText += " (Ja perto)";
+        std::string btnText = TR("garage.call");
+        if (isSameCar) btnText += TR("garage.already_inside");
+        else if (isNearSpawned) btnText += TR("garage.already_near");
         
         if (ImGui::Button(btnText.c_str(), ImVec2(-1, 36))) {
             // No message, disabled action
@@ -376,7 +379,7 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.02f, 0.44f, 0.88f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
         
-        if (ImGui::Button(ICON_FA_PHONE " Chamar Veiculo", ImVec2(-1, 36))) {
+        if (ImGui::Button((std::string(ICON_FA_PHONE " ") + TR("garage.call")).c_str(), ImVec2(-1, 36))) {
             v.deliveryId = m_provider->TriggerDelivery(v.info);
             phone.closeApp();
         }
@@ -392,7 +395,7 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.55f, 0.30f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
         
-        if (ImGui::Button(ICON_FA_SYNC_ALT " Atualizar Tuning", ImVec2(-1, 34))) {
+        if (ImGui::Button((std::string(ICON_FA_SYNC_ALT " ") + TR("garage.update_tuning")).c_str(), ImVec2(-1, 34))) {
             VehicleInfo currentCar;
             if (m_provider->GetCurrentVehicleInfo(currentCar)) {
                 v.info.color1 = currentCar.color1;
@@ -409,7 +412,7 @@ void GarageApp::DrawDetailsScreen() {
     // 3. Renomear Section
     if (m_renamingIdx == m_selectedIdx) {
         ImGui::Spacing();
-        ImGui::Text("Renomear Veiculo:");
+        ImGui::Text(TR("garage.rename_title"));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
         ImGui::InputText("##rename_val", m_renameBuf, sizeof(m_renameBuf));
         ImGui::PopStyleVar();
@@ -419,7 +422,7 @@ void GarageApp::DrawDetailsScreen() {
         
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.65f, 0.35f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
-        if (ImGui::Button("Ok", ImVec2(btnW, 30))) {
+        if (ImGui::Button(TR("garage.ok"), ImVec2(btnW, 30))) {
             if (m_renameBuf[0] != '\0') {
                 v.info.name = m_renameBuf;
             }
@@ -432,14 +435,14 @@ void GarageApp::DrawDetailsScreen() {
         
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.40f, 0.40f, 0.42f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
-        if (ImGui::Button("Cancelar", ImVec2(btnW, 30))) {
+        if (ImGui::Button(TR("garage.cancel"), ImVec2(btnW, 30))) {
             m_renamingIdx = -1;
         }
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
     } else if (m_editingPlateIdx == m_selectedIdx) {
         ImGui::Spacing();
-        ImGui::Text("Placa do Veiculo (max 8 caracteres):");
+        ImGui::Text(TR("garage.plate_title"));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
         ImGui::InputText("##plate_val", m_plateBuf, sizeof(m_plateBuf));
         ImGui::PopStyleVar();
@@ -449,7 +452,7 @@ void GarageApp::DrawDetailsScreen() {
         
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.65f, 0.35f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
-        if (ImGui::Button("Ok##plate", ImVec2(btnW, 30))) {
+        if (ImGui::Button((std::string(TR("garage.ok")) + "##plate").c_str(), ImVec2(btnW, 30))) {
             v.info.plate = m_plateBuf;
             m_editingPlateIdx = -1;
         }
@@ -460,7 +463,7 @@ void GarageApp::DrawDetailsScreen() {
         
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.40f, 0.40f, 0.42f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
-        if (ImGui::Button("Cancelar##plate", ImVec2(btnW, 30))) {
+        if (ImGui::Button((std::string(TR("garage.cancel")) + "##plate").c_str(), ImVec2(btnW, 30))) {
             m_editingPlateIdx = -1;
         }
         ImGui::PopStyleVar();
@@ -472,14 +475,14 @@ void GarageApp::DrawDetailsScreen() {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.20f, 0.22f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
         
-        if (ImGui::Button(ICON_FA_EDIT " Renomear Veiculo", ImVec2(-1, 34))) {
+        if (ImGui::Button((std::string(ICON_FA_EDIT " ") + TR("garage.rename_btn")).c_str(), ImVec2(-1, 34))) {
             m_renamingIdx = m_selectedIdx;
             m_editingPlateIdx = -1;
             strncpy_s(m_renameBuf, sizeof(m_renameBuf), v.info.name.c_str(), _TRUNCATE);
         }
         
         ImGui::Spacing();
-        if (ImGui::Button(ICON_FA_EDIT " Customizar Placa", ImVec2(-1, 34))) {
+        if (ImGui::Button((std::string(ICON_FA_EDIT " ") + TR("garage.plate_btn")).c_str(), ImVec2(-1, 34))) {
             m_editingPlateIdx = m_selectedIdx;
             m_renamingIdx = -1;
             strncpy_s(m_plateBuf, sizeof(m_plateBuf), v.info.plate.c_str(), _TRUNCATE);
@@ -496,7 +499,7 @@ void GarageApp::DrawDetailsScreen() {
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.70f, 0.16f, 0.16f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
     
-    if (ImGui::Button(ICON_FA_TRASH_ALT " Excluir Veiculo", ImVec2(-1, 34))) {
+    if (ImGui::Button((std::string(ICON_FA_TRASH_ALT " ") + TR("garage.delete")).c_str(), ImVec2(-1, 34))) {
         m_vehicles.erase(m_vehicles.begin() + m_selectedIdx);
         m_selectedIdx = -1;
         m_renamingIdx = -1;
@@ -522,9 +525,9 @@ void GarageApp::DrawListScreen() {
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.28f, 1.0f));
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 
-                std::string btnText = ICON_FA_PLUS_CIRCLE " Salvar Veiculo";
-                if (isInside) btnText += " (Bloqueado: Interior)";
-                else if (onMission) btnText += " (Bloqueado: Missao)";
+                std::string btnText = std::string(ICON_FA_PLUS_CIRCLE " ") + TR("garage.save_current");
+                if (isInside) btnText += TR("garage.blocked_interior");
+                else if (onMission) btnText += TR("garage.blocked_mission");
 
                 ImGui::Button(btnText.c_str(), ImVec2(-1, 35));
 
@@ -536,7 +539,7 @@ void GarageApp::DrawListScreen() {
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.55f, 0.30f, 1.0f));
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 
-                if (ImGui::Button(ICON_FA_PLUS_CIRCLE " Salvar Veiculo Atual", ImVec2(-1, 35))) {
+                if (ImGui::Button((std::string(ICON_FA_PLUS_CIRCLE " ") + TR("garage.save_current")).c_str(), ImVec2(-1, 35))) {
                     if (m_vehicles.size() >= 12) {
                         // Limit reached
                     } else {
@@ -556,12 +559,12 @@ void GarageApp::DrawListScreen() {
     }
 
     // Vehicle List Header
-    ImGui::Text("Seus Veiculos (%d/12):", (int)m_vehicles.size());
+    ImGui::Text(TR("garage.my_vehicles"), (int)m_vehicles.size());
     ImGui::Spacing();
 
     if (m_vehicles.empty()) {
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-        ImGui::TextWrapped("Nenhum veiculo salvo neste slot.");
+        ImGui::TextWrapped(TR("garage.empty"));
         ImGui::PopStyleColor();
         return;
     }
@@ -607,7 +610,7 @@ void GarageApp::DrawListScreen() {
 
 void GarageApp::onDraw() {
     if (!m_provider) {
-        ImGui::Text("Servico indisponivel.");
+        ImGui::Text(TR("garage.no_provider"));
         return;
     }
 

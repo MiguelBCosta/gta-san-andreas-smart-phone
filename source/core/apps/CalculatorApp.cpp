@@ -1,4 +1,5 @@
 #include "CalculatorApp.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <cmath>
 #include <cstdio>
@@ -36,7 +37,7 @@ static void RotateVertices(ImDrawList* drawList, int vtxStart, ImVec2 center, fl
 CalculatorApp::CalculatorApp() {
     id = "calculator";
     icon = ICON_FA_CALCULATOR;
-    name = "Calculadora";
+    name = TR("calculator.title");
     color = ImVec4(0.12f, 0.12f, 0.14f, 1.0f); // Sleek iOS-like dark bg icon
     m_showHistory = false;
     clearAll();
@@ -134,7 +135,7 @@ void CalculatorApp::calculate() {
         result = m_firstOperand * secondOperand;
     } else if (op == "/") {
         if (secondOperand == 0.0) {
-            m_currentInput = "Erro";
+            m_currentInput = TR("calculator.error");
             m_pendingOperator = "";
             m_isNewInput = true;
             m_hasDecimal = false;
@@ -154,7 +155,7 @@ void CalculatorApp::calculate() {
 }
 
 void CalculatorApp::toggleSign() {
-    if (m_currentInput == "0" || m_currentInput == "Erro") return;
+    if (m_currentInput == "0" || m_currentInput == TR("calculator.error")) return;
     
     if (m_currentInput[0] == '-') {
         m_currentInput = m_currentInput.substr(1);
@@ -183,7 +184,7 @@ void CalculatorApp::applyPercentage() {
 
 void CalculatorApp::backspace() {
     if (m_isNewInput) return; // Ignore if it's showing a final calculation result
-    if (m_currentInput == "Erro" || m_currentInput == "0" || m_currentInput.empty()) {
+    if (m_currentInput == TR("calculator.error") || m_currentInput == "0" || m_currentInput.empty()) {
         m_currentInput = "0";
         return;
     }
@@ -223,7 +224,7 @@ void CalculatorApp::addHistoryItem(double op1, const std::string& op, double op2
 
 std::string CalculatorApp::formatDisplayValue(double val) {
     if (std::isnan(val) || std::isinf(val)) {
-        return "Erro";
+        return TR("calculator.error");
     }
     
     // Whole number check within representation limits
@@ -258,7 +259,7 @@ std::string CalculatorApp::formatDisplayValue(double val) {
 }
 
 void CalculatorApp::drawHistoryView() {
-    ImGui::Text(ICON_FA_HISTORY " Histórico de Cálculos");
+    ImGui::Text((std::string(ICON_FA_HISTORY " ") + TR("calculator.history_title")).c_str());
     ImGui::Separator();
     ImGui::Spacing();
     
@@ -268,9 +269,9 @@ void CalculatorApp::drawHistoryView() {
     if (m_history.empty()) {
         ImGui::SetCursorPosY(ImGui::GetContentRegionAvail().y / 2.0f - 10.0f);
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 0.8f));
-        float textW = ImGui::CalcTextSize("Nenhum histórico disponível").x;
+        float textW = ImGui::CalcTextSize(TR("calculator.no_history")).x;
         ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - textW) / 2.0f);
-        ImGui::Text("Nenhum histórico disponível");
+        ImGui::Text(TR("calculator.no_history"));
         ImGui::PopStyleColor();
     } else {
         // Draw items in reverse chronological order (latest first)
@@ -339,7 +340,7 @@ void CalculatorApp::drawHistoryView() {
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.25f, 0.12f, 0.12f, 0.8f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.15f, 0.15f, 0.95f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.45f, 0.18f, 0.18f, 1.0f));
-    if (ImGui::Button("Limpar", ImVec2(btnW, 30.0f))) {
+    if (ImGui::Button(TR("calculator.clear"), ImVec2(btnW, 30.0f))) {
         m_history.clear();
     }
     ImGui::PopStyleColor(3);
@@ -349,7 +350,7 @@ void CalculatorApp::drawHistoryView() {
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.18f, 0.18f, 0.25f, 0.85f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.28f, 0.38f, 0.95f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.38f, 0.38f, 0.48f, 1.0f));
-    if (ImGui::Button("Voltar", ImVec2(btnW, 30.0f))) {
+    if (ImGui::Button(TR("calculator.back"), ImVec2(btnW, 30.0f))) {
         m_showHistory = false;
     }
     ImGui::PopStyleColor(3);
@@ -380,7 +381,7 @@ void CalculatorApp::onDraw() {
     ImGui::PushStyleColor(ImGuiCol_Text,           ImVec4(0.7f, 0.7f, 0.75f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
     
-    if (ImGui::Button(ICON_FA_HISTORY " Histórico", ImVec2(90.0f, 25.0f))) {
+    if (ImGui::Button((std::string(ICON_FA_HISTORY " ") + TR("calculator.history_btn")).c_str(), ImVec2(90.0f, 25.0f))) {
         m_showHistory = true;
     }
     ImGui::PopStyleVar();
@@ -410,7 +411,7 @@ void CalculatorApp::onDraw() {
     ImGui::SetWindowFontScale(1.0f); // Restore base scale
     
     // Backspace button (left aligned, same vertical level as the display numbers)
-    if (!m_isNewInput && m_currentInput != "0" && m_currentInput != "Erro") {
+    if (!m_isNewInput && m_currentInput != "0" && m_currentInput != TR("calculator.error")) {
         float btnHeight = 30.0f;
         float btnWidth = 35.0f;
         // Vertically center the backspace button relative to the display number text height
@@ -569,7 +570,7 @@ void CalculatorApp::onDraw() {
     }
     
     ImGui::SameLine();
-    if (CalcButton(",", ImVec2(btnSz, btnSz), cDarkGray, cDarkGrayHover, cDarkGrayActive, cWhite)) {
+    if (CalcButton(TR("calculator.decimal"), ImVec2(btnSz, btnSz), cDarkGray, cDarkGrayHover, cDarkGrayActive, cWhite)) {
         inputDecimal();
     }
     

@@ -111,6 +111,9 @@
     <ClCompile Include="source\core\apps\EmpresasApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
+    <ClCompile Include="source\core\LocalizationManager.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
   </ItemGroup>
 
   <ItemGroup>
@@ -224,6 +227,9 @@
     </ClInclude>
     <ClInclude Include="source\sandbox\providers\SandboxBusinessProvider.h">
       <Filter>source\sandbox\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\LocalizationManager.h">
+      <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>
 

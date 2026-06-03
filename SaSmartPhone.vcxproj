@@ -99,6 +99,7 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
 
 xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
 xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartphone\avatar\" 
+xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(GTA_SA_DIR)\modloader\sasmartphone\lang\" 
 
 )</Command>
     </PostBuildEvent>
@@ -135,6 +136,7 @@ xcopy /Y "$(TargetPath)" "$(GTA_SA_DIR)\modloader\sasmartphone\"
 
 xcopy /Y /S /I "$(ProjectDir)assets\wallpaper\*" "$(GTA_SA_DIR)\modloader\sasmartphone\wallpaper\" 
 xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartphone\avatar\" 
+xcopy /Y /S /I "$(ProjectDir)assets\lang\*" "$(GTA_SA_DIR)\modloader\sasmartphone\lang\" 
 
 )</Command>
     </PostBuildEvent>
@@ -157,6 +159,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartph
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\core\apps\ProfileApp.cpp" />
     <ClCompile Include="source\core\apps\EmpresasApp.cpp" />
+    <ClCompile Include="source\core\LocalizationManager.cpp" />
     <ClCompile Include="source\gta\providers\GtaMapProvider.cpp" />
 
     <ClCompile Include="vendor\imgui\imgui.cpp" />
@@ -212,6 +215,7 @@ xcopy /Y /S /I "$(ProjectDir)assets\avatar\*" "$(GTA_SA_DIR)\modloader\sasmartph
     <ClInclude Include="source\core\apps\ProfileApp.h" />
     <ClInclude Include="source\core\apps\EmpresasApp.h" />
     <ClInclude Include="source\core\providers\IBusinessProvider.h" />
+    <ClInclude Include="source\core\LocalizationManager.h" />
     <ClInclude Include="source\gta\providers\GtaBusinessProvider.h" />
     <ClInclude Include="vendor\fontawesome\IconsFontAwesome5.h" />
 

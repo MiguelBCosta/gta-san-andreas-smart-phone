@@ -1,4 +1,5 @@
 #include "MapsApp.h"
+#include "../LocalizationManager.h"
 #include <cmath>
 #include <algorithm>
 
@@ -7,39 +8,39 @@
 #endif
 
 static void GetCategoryMeta(int sprite, std::string& name, const char*& icon, ImVec4& color) {
-    name = "Local";
+    name = TR("maps.place.default");
     icon = ICON_FA_MAP_MARKER_ALT;
     color = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
     
     switch (sprite) {
-        case 5:  name = "Aeroporto"; icon = ICON_FA_PLANE; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
-        case 6:  name = "Ammu-Nation"; icon = ICON_FA_CROSSHAIRS; color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
-        case 7:  name = "Barbearia"; icon = ICON_FA_CUT; color = ImVec4(1.0f, 0.6f, 0.1f, 1.0f); break;
-        case 9:  name = "Doca de Barcos"; icon = ICON_FA_SHIP; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
-        case 10: name = "Burger Shot"; icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 14: name = "Cluckin' Bell"; icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 17: name = "Restaurante"; icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 21: name = "Namorada"; icon = ICON_FA_HEART; color = ImVec4(1.0f, 0.4f, 0.7f, 1.0f); break;
-        case 22: name = "Hospital"; icon = ICON_FA_HOSPITAL; color = ImVec4(1.0f, 0.18f, 0.33f, 1.0f); break;
-        case 25: name = "Caligula's Palace"; icon = ICON_FA_DICE; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 27: name = "Garagem de Modificacao"; icon = ICON_FA_WRENCH; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
-        case 29: name = "Pizzaria"; icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 30: name = "Delegacia de Policia"; icon = ICON_FA_SHIELD_ALT; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
-        case 31: name = "Propriedade Adquirida"; icon = ICON_FA_HOME; color = ImVec4(0.2f, 0.8f, 0.3f, 1.0f); break;
-        case 32: name = "Propriedade a Venda"; icon = ICON_FA_HOME; color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f); break;
-        case 33: name = "Torneio de Corrida"; icon = ICON_FA_TROPHY; color = ImVec4(1.0f, 0.84f, 0.0f, 1.0f); break;
-        case 35: name = "Casa de Salvo"; icon = ICON_FA_HOME; color = ImVec4(0.2f, 0.8f, 0.3f, 1.0f); break;
-        case 36: name = "Escola de Pilotagem"; icon = ICON_FA_GRADUATION_CAP; color = ImVec4(0.7f, 0.3f, 0.9f, 1.0f); break;
-        case 39: name = "Estudio de Tatuagem"; icon = ICON_FA_PAINT_BRUSH; color = ImVec4(1.0f, 0.6f, 0.1f, 1.0f); break;
-        case 44: name = "Cassino Four Dragons"; icon = ICON_FA_DICE; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 45: name = "Loja de Roupas"; icon = ICON_FA_TSHIRT; color = ImVec4(0.4f, 0.3f, 0.8f, 1.0f); break;
-        case 47: name = "Loja do Zero"; icon = ICON_FA_GAMEPAD; color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
-        case 48: name = "Club de Danca"; icon = ICON_FA_MUSIC; color = ImVec4(0.64f, 0.0f, 1.0f, 1.0f); break;
-        case 49: name = "Bar"; icon = ICON_FA_GLASS_MARTINI_ALT; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 50: name = "Restaurante de Encontro"; icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
-        case 54: name = "Academia"; icon = ICON_FA_DUMBBELL; color = ImVec4(0.7f, 0.3f, 0.9f, 1.0f); break;
-        case 55: name = "Patio de Apreensao"; icon = ICON_FA_CAR; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
-        case 63: name = "Pay 'N' Spray"; icon = ICON_FA_WRENCH; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 5:  name = TR("maps.place.airport"); icon = ICON_FA_PLANE; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 6:  name = TR("maps.place.ammu"); icon = ICON_FA_CROSSHAIRS; color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
+        case 7:  name = TR("maps.place.barber"); icon = ICON_FA_CUT; color = ImVec4(1.0f, 0.6f, 0.1f, 1.0f); break;
+        case 9:  name = TR("maps.place.boat_dock"); icon = ICON_FA_SHIP; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 10: name = TR("maps.place.burger_shot"); icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 14: name = TR("maps.place.cluckin_bell"); icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 17: name = TR("maps.place.restaurant"); icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 21: name = TR("maps.place.girlfriend"); icon = ICON_FA_HEART; color = ImVec4(1.0f, 0.4f, 0.7f, 1.0f); break;
+        case 22: name = TR("maps.place.hospital"); icon = ICON_FA_HOSPITAL; color = ImVec4(1.0f, 0.18f, 0.33f, 1.0f); break;
+        case 25: name = TR("maps.place.caligulas"); icon = ICON_FA_DICE; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 27: name = TR("maps.place.mod_garage"); icon = ICON_FA_WRENCH; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 29: name = TR("maps.place.pizza"); icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 30: name = TR("maps.place.police"); icon = ICON_FA_SHIELD_ALT; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 31: name = TR("maps.place.property_owned"); icon = ICON_FA_HOME; color = ImVec4(0.2f, 0.8f, 0.3f, 1.0f); break;
+        case 32: name = TR("maps.place.property_sale"); icon = ICON_FA_HOME; color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f); break;
+        case 33: name = TR("maps.place.race"); icon = ICON_FA_TROPHY; color = ImVec4(1.0f, 0.84f, 0.0f, 1.0f); break;
+        case 35: name = TR("maps.place.safehouse"); icon = ICON_FA_HOME; color = ImVec4(0.2f, 0.8f, 0.3f, 1.0f); break;
+        case 36: name = TR("maps.place.flight_school"); icon = ICON_FA_GRADUATION_CAP; color = ImVec4(0.7f, 0.3f, 0.9f, 1.0f); break;
+        case 39: name = TR("maps.place.tattoo"); icon = ICON_FA_PAINT_BRUSH; color = ImVec4(1.0f, 0.6f, 0.1f, 1.0f); break;
+        case 44: name = TR("maps.place.four_dragons"); icon = ICON_FA_DICE; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 45: name = TR("maps.place.clothes"); icon = ICON_FA_TSHIRT; color = ImVec4(0.4f, 0.3f, 0.8f, 1.0f); break;
+        case 47: name = TR("maps.place.zero"); icon = ICON_FA_GAMEPAD; color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
+        case 48: name = TR("maps.place.club"); icon = ICON_FA_MUSIC; color = ImVec4(0.64f, 0.0f, 1.0f, 1.0f); break;
+        case 49: name = TR("maps.place.bar"); icon = ICON_FA_GLASS_MARTINI_ALT; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 50: name = TR("maps.place.date_restaurant"); icon = ICON_FA_UTENSILS; color = ImVec4(1.0f, 0.8f, 0.0f, 1.0f); break;
+        case 54: name = TR("maps.place.gym"); icon = ICON_FA_DUMBBELL; color = ImVec4(0.7f, 0.3f, 0.9f, 1.0f); break;
+        case 55: name = TR("maps.place.impound"); icon = ICON_FA_CAR; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
+        case 63: name = TR("maps.place.pay_n_spray"); icon = ICON_FA_WRENCH; color = ImVec4(0.1f, 0.6f, 1.0f, 1.0f); break;
     }
 }
 
@@ -89,7 +90,7 @@ bool MapsApp::onBack() {
 
 void MapsApp::onDraw() {
     if (!m_mapProvider) {
-        ImGui::Text("Nenhum provedor de mapa.");
+        ImGui::Text(TR("maps.no_provider"));
         return;
     }
 
@@ -101,7 +102,7 @@ void MapsApp::onDraw() {
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 1, 1, 0.2f));
     
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10.0f);
-    ImGui::Text("Mapa");
+    ImGui::Text(TR("maps.title"));
     ImGui::SameLine(ImGui::GetWindowWidth() - 40.0f);
     
     if (ImGui::Button(m_showSidebar ? ICON_FA_MAP : ICON_FA_LIST)) {
@@ -340,7 +341,7 @@ void MapsApp::onDraw() {
         
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
         ImGui::Indent(15.0f);
-        ImGui::Text("Locais Disponíveis");
+        ImGui::Text(TR("maps.available_places"));
         ImGui::Unindent(15.0f);
         ImGui::Spacing();
         ImGui::Separator();
@@ -351,7 +352,7 @@ void MapsApp::onDraw() {
         
         if (hasWp) {
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.9f, 0.2f, 0.2f, 0.8f));
-            if (ImGui::Button(ICON_FA_TRASH_ALT " Remover Rota GPS", ImVec2(viewportSize.x - 30.0f, 35.0f))) {
+            if (ImGui::Button((std::string(ICON_FA_TRASH_ALT " ") + TR("maps.remove_route")).c_str(), ImVec2(viewportSize.x - 30.0f, 35.0f))) {
                 m_mapProvider->ClearWaypoint();
                 m_showSidebar = false;
             }
@@ -364,7 +365,7 @@ void MapsApp::onDraw() {
         
         if (blips.empty()) {
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20.0f);
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Nenhum local descoberto.");
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("maps.no_places"));
         } else {
             // Get unique sprite categories from discovered blips
             std::vector<int> uniqueSprites;
@@ -444,7 +445,7 @@ void MapsApp::onDraw() {
                     ImGui::SetCursorPosY(idx * 45.0f + 5.0f);
                     
                     char btnId[32];
-                    sprintf(btnId, "Ir##%d", sprite);
+                    sprintf(btnId, "%s##%d", TR("maps.go"), sprite);
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.04f, 0.52f, 1.0f, 0.9f));
                     if (ImGui::Button(btnId, ImVec2(40.0f, 26.0f))) {
                         // Find closest blip of this sprite type to player
@@ -493,10 +494,10 @@ void MapsApp::onDraw() {
                 ImGui::PopStyleColor();
             };
             
-            drawCategoryList("Safehouses", safehouses);
-            drawCategoryList("Lojas", shops);
-            drawCategoryList("Serviços", services);
-            drawCategoryList("Outros", others);
+            drawCategoryList(TR("maps.safehouses"), safehouses);
+            drawCategoryList(TR("maps.shops"), shops);
+            drawCategoryList(TR("maps.services"), services);
+            drawCategoryList(TR("maps.others"), others);
         }
         
         ImGui::EndChild();

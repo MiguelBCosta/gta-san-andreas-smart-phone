@@ -2,6 +2,7 @@
 #include "../Phone.h"
 #include "../providers/IMessageProvider.h"
 #include "../providers/IAvatarProvider.h"
+#include "../LocalizationManager.h"
 #include <IconsFontAwesome5.h>
 #include <cstring>
 #include <algorithm>
@@ -27,67 +28,43 @@ struct StorySmsTrigger {
 //  30 DRUGS1   Just Business          |  89 CASINO5  Intensive Care
 //  32 MUSIC2   Madd Dogg's Rhymes     |  92 CASIN10  Saint Mark's Bistro
 //  38 LA1FIN2  The Green Sabre        | 101 HEIST9   Breaking the Bank
-//  39 BCRASH1  Badlands               | 112 FINALEC  End Of The Line (3)
+//  39 BCRASH1  Badlands               | 112 FINALEC  End Of The Line
+
 static const std::vector<StorySmsTrigger> g_storySmsTriggers = {
     // === LOS SANTOS ===
-    // INTRO2 (ID 12) — Ryder: CJ visits barber with Ryder, pizza shop robbery
-    { "intro2", "ryder", "CJ, seu cabelo tá decente agora, mas seu estilo tá fraco. Passa no Binco e compra umas roupas verdes da Grove. Não passa vergonha!" },
-    // SWEET1B (ID 14) — Cleaning The Hood: clear crack dealers from the neighborhood
-    { "sweet1b", "sweet", "Carl, bom trabalho limpando aqueles viciados de Banton. Mas fica esperto, os Ballas não vão deixar barato. Fica de olho na quebrada." },
-    // SWEET6 (ID 19) — Cesar Vialpando: lowrider competition, CJ meets Cesar
-    { "sweet6", "kendl", "Carl, obrigada por não brigar com o Cesar. Ele é um bom homem, você vai ver. E vê se não bate o carro de corrida dele!" },
-    { "sweet6", "cesar", "Hey CJ, você manda bem no volante, mano. Se quiser correr valendo grana na pista clandestina, me dá um salve. Respeito." },
-    // RYDER2 (ID 26) — Robbing Uncle Sam: rob National Guard depot
-    { "ryder2", "ryder", "CJ, nós roubamos o exército, cara! Eu sou um gênio militar! Guarda bem aquelas caixas, vamos precisar delas pra mostrar quem manda." },
-    // MUSIC2 (ID 32) — Madd Dogg's Rhymes: steal rhyme book for OG Loc
-    { "music2", "ogloc", "Carl, esse livro de rimas é ouro! Minhas letras tão de outro mundo agora. O OG Loc tá na área! Respeito!" },
-    // DRUGS1 (ID 30) — Just Business: CJ and Smoke vs Russian mobsters
-    { "drugs1", "smoke", "Carl, aquele trabalho com os russos foi tenso, mas você mandou bem, irmão. A Grove Street é forte quando trabalhamos juntos!" },
-    // DRUGS3 (ID 23) — Gray Imports: investigate arms deal at docks for C.R.A.S.H.
-    { "drugs3", "crash", "Carl, você fez um belo serviço com os russos nas docas. É bom ver você sendo útil. Continue assim e talvez a gente não te incomode tanto..." },
-    // CRASH4 (ID 21) — Doberman: take over Glen Park from the Ballas
-    { "crash4", "sweet", "Carl, Glen Park é nosso! É assim que se faz. Mas o território é quente, os Ballas vão tentar retomar. Fique sempre armado." },
-    // LA1FIN2 (ID 38) — The Green Sabre: Sweet arrested, CJ exiled to countryside
-    { "la1fin2", "cesar", "CJ, deu tudo errado, os Ballas armaram uma emboscada e o Sweet tá preso. Fica escondido aí no interior, não volta pra LS!" },
-
+    { "intro2",   "ryder",     "msg.intro2.ryder"   },
+    { "sweet1b",  "sweet",     "msg.sweet1b.sweet"  },
+    { "sweet6",   "kendl",     "msg.sweet6.kendl"   },
+    { "sweet6",   "cesar",     "msg.sweet6.cesar"   },
+    { "ryder2",   "ryder",     "msg.ryder2.ryder"   },
+    { "music2",   "ogloc",     "msg.music2.ogloc"   },
+    { "drugs1",   "smoke",     "msg.drugs1.smoke"   },
+    { "drugs3",   "crash",     "msg.drugs3.crash"   },
+    { "crash4",   "sweet",     "msg.crash4.sweet"   },
+    { "la1fin2",  "cesar",     "msg.la1fin2.cesar"  },
     // === COUNTRYSIDE ===
-    // BCRASH1 (ID 39) — Badlands: kill informant for Tenpenny in the countryside
-    { "bcrash1", "cesar", "CJ, a Kendl tá segura aqui comigo no interior. Fiquei sabendo que a fumaça de Los Santos tá se espalhando. Fica de olho, mano." },
-    { "bcrash1", "crash", "Carl, gostou do ar do campo? Espero que o informante esteja bem silenciado. Fique por perto, tenho mais tarefas para você." },
-    // TRUTH1 (ID 46) — Body Harvest: steal harvester for The Truth
-    { "truth1", "truth", "Carl, a colheitadeira já está coletando a energia cósmica. O governo nos vigia através das vacas, irmão. Fique longe do asfalto!" },
-
+    { "bcrash1",  "cesar",     "msg.bcrash1.cesar"  },
+    { "bcrash1",  "crash",     "msg.bcrash1.crash"  },
+    { "truth1",   "truth",     "msg.truth1.truth"   },
     // === SAN FIERRO ===
-    // SYN2 (ID 59) — Jizzy: work for Jizzy B to infiltrate the Loco Syndicate
-    { "syn2", "woozie", "Carl, soube que você se infiltrou no Loco Syndicate. Tenha cuidado com o Jizzy, ele é traiçoeiro. Se precisar, meus homens estão prontos." },
-    // STEAL4 (ID 69) — Customs Fast Track: steal car from ship at docks (Wang Cars)
-    { "steal4", "cesar", "CJ, aquele carro que pegamos nas docas é uma máquina, cara! Já limpei a numeração e deixei na Wang Cars. Passa lá!" },
-    // STEAL5 (ID 70) — Puncture Wounds: steal car using stingers (Wang Cars)
-    { "steal5", "cesar", "Mano, os furos de pneus funcionaram perfeito! A Wang Cars tá rendendo uma grana preta agora. Valeu pela ajuda, CJ." },
-    // SYN7 (ID 63) — Yay Ka-Boom-Boom: blow up Syndicate crack factory
-    { "syn7", "toreno", "Carl, você achou que eu estava morto? Engenhoso explodir aquela fábrica. Venha até a minha pista no deserto se quiser ver o Sweet livre." },
-
+    { "syn2",     "woozie",    "msg.syn2.woozie"    },
+    { "steal4",   "cesar",     "msg.steal4.cesar"   },
+    { "steal5",   "cesar",     "msg.steal5.cesar"   },
+    { "syn7",     "toreno",    "msg.syn7.toreno"    },
     // === DESERT ===
-    // DESERT5 (ID 83) — Learning to Fly: flying school at Verdant Meadows
-    { "desert5", "toreno", "Carl, parabéns pelas suas asas. Agora você é oficialmente um piloto descartável do governo. Venha receber suas ordens de voo." },
-
+    { "desert5",  "toreno",    "msg.desert5.toreno" },
     // === LAS VENTURAS ===
-    // CASINO5 (ID 89) — Intensive Care: rescue Johnny Sindacco from ambulance
-    { "casino5", "rosenberg", "Carl, obrigado por tirar o Johnny da ambulância. Se a máfia dos Sindacco descobre que ele morreu sob meus cuidados, eu seria história!" },
-    // CASIN10 (ID 92) — Saint Mark's Bistro: kill Forelli family in Liberty City
-    { "casin10", "salvatore", "Carl, você fez um trabalho limpo em Liberty City. Os Forelli receberam a lição deles. Você tem o meu respeito, garoto." },
-    // HEIST9 (ID 101) — Breaking the Bank at Caligula's: the casino heist
-    { "heist9", "woozie", "Carl, o roubo ao Caligula's foi lendário! Os Triades mandam lembranças. A sua parte do cofre foi limpa e depositada. Nós fizemos história!" },
-
+    { "casino5",  "rosenberg", "msg.casino5.rosenberg" },
+    { "casin10",  "salvatore", "msg.casin10.salvatore" },
+    { "heist9",   "woozie",    "msg.heist9.woozie"  },
     // === RETORNO A LOS SANTOS ===
-    // FINALEC (ID 112) — End Of The Line (parte 3): Tenpenny dies, Grove Street wins
-    { "finalec", "sweet", "Carl... Nós conseguimos. A Grove Street está no topo, os traidores se foram e o Tenpenny tá no inferno. Orgulho de você, irmão. Nós vencemos." },
+    { "finalec",  "sweet",     "msg.finalec.sweet"  },
 };
 
 MessagesApp::MessagesApp() {
     id = "messages";
     icon = ICON_FA_COMMENT;
-    name = "SMS";
+    name = TR("messages.title");
     color = ImVec4(0.20f, 0.78f, 0.35f, 1.0f); // iOS SMS Green
     dock = true;
     dockOrder = 2;
@@ -169,7 +146,8 @@ void MessagesApp::update(float dt) {
         // Find if this mission triggers any SMS
         for (const auto& trigger : g_storySmsTriggers) {
             if (trigger.missionId == completedMission) {
-                addIncomingMessage(trigger.contactId, trigger.text);
+                // trigger.text is now a translation key
+                addIncomingMessage(trigger.contactId, TR(trigger.text.c_str()));
             }
         }
         m_provider->ResetCompletedMission();
@@ -248,7 +226,7 @@ void MessagesApp::drawThreadsList() {
 
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
         ImGui::SetWindowFontScale(1.25f);
-        std::string titleStr = "Sem Mensagens";
+        std::string titleStr = TR("messages.empty");
         float titleW = ImGui::CalcTextSize(titleStr.c_str()).x;
         ImGui::SetCursorPosX((contentW - titleW) / 2.0f);
         ImGui::Text("%s", titleStr.c_str());
@@ -514,31 +492,31 @@ void MessagesApp::drawChatView(const Contact* contact, ChatThread* thread) {
         std::string cid = contact->id;
         
         if (cid == "sweet") {
-            replyText = "Tô resolvendo umas paradas com a Grove, Carl. Fica esperto nas ruas.";
+            replyText = TR("msg.reply.sweet");
         } else if (cid == "ryder") {
-            replyText = "Não enche, CJ! Eu sou um gênio muito ocupado para ficar mandando SMS.";
+            replyText = TR("msg.reply.ryder");
         } else if (cid == "smoke") {
-            replyText = "Deus abençoe, CJ. Agora estou fazendo um lanchinho. Nos falamos depois.";
+            replyText = TR("msg.reply.smoke");
         } else if (cid == "cesar") {
-            replyText = "Hey mano, tô na garagem mexendo nos motores. Se cuida.";
+            replyText = TR("msg.reply.cesar");
         } else if (cid == "kendl") {
-            replyText = "Estou ocupada arrumando nossa nova casa. Não cause problemas, Carl.";
+            replyText = TR("msg.reply.kendl");
         } else if (cid == "ogloc") {
-            replyText = "Yo! Estou escrevendo minhas rimas, CJ! O som não para!";
+            replyText = TR("msg.reply.ogloc");
         } else if (cid == "crash") {
-            replyText = "Não me mande mensagens a menos que eu mande primeiro, Johnson. Eu sou a lei aqui.";
+            replyText = TR("msg.reply.crash");
         } else if (cid == "truth") {
-            replyText = "As ondas eletromagnéticas do seu celular estão abrindo portais, cara! Desliga isso!";
+            replyText = TR("msg.reply.truth");
         } else if (cid == "woozie") {
-            replyText = "Carl, estou no cassino resolvendo negócios dos Triades. Até mais.";
+            replyText = TR("msg.reply.woozie");
         } else if (cid == "toreno") {
-            replyText = "Este número não é seguro. Não envie mensagens para mim.";
+            replyText = TR("msg.reply.toreno");
         } else if (cid == "rosenberg") {
-            replyText = "Carl! Estou tendo um ataque de pânico aqui! Não posso digitar agora!";
+            replyText = TR("msg.reply.rosenberg");
         } else if (cid == "salvatore") {
-            replyText = "Você acha que eu tenho tempo para SMS, garoto? Me ligue quando tiver o meu dinheiro!";
+            replyText = TR("msg.reply.salvatore");
         } else {
-            replyText = "Estou ocupado agora, CJ. Nos falamos depois.";
+            replyText = TR("msg.reply.default");
         }
 
         // Add reply after a tiny virtual delay

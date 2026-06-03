@@ -2,6 +2,7 @@
 #include "../PhoneApp.h"
 #include "../providers/IWallpaperProvider.h"
 #include "../ServiceContainer.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <string>
 #include <vector>
@@ -27,7 +28,7 @@ private:
     bool m_wallpapersLoaded = false;
     
     // UI Navigation State
-    // 0: Settings List, 1: Wallpaper Menu
+    // 0: Settings List, 1: Wallpaper Menu, 2: Language Menu
     int m_menuState = 0;
 
     // Presets

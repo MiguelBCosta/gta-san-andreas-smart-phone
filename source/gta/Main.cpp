@@ -13,6 +13,7 @@
 #include <plugin.h>
 
 #include "../core/Phone.h"
+#include "../core/LocalizationManager.h"
 #include "../core/ServiceContainer.h"
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/ClockApp.h"
@@ -479,9 +480,30 @@ void TryInstallGameHooks() {
 }
 
 // ---- Plugin Entry ----
+static void getAnchorAddress() {}
+
+static std::string GetModDirectory() {
+	char path[MAX_PATH];
+	HMODULE hm = NULL;
+	if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | 
+						   GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+						   (LPCSTR)&getAnchorAddress, &hm)) {
+		GetModuleFileNameA(hm, path, sizeof(path));
+		std::string sPath(path);
+		size_t pos = sPath.find_last_of("\\/");
+		if (pos != std::string::npos) {
+			return sPath.substr(0, pos + 1);
+		}
+	}
+	return "";
+}
+
 class SaSmartPhone {
 public:
 	SaSmartPhone() {
+		// Initialize localization
+		LocalizationManager::Get().Init(GetModDirectory());
+
 		// Register base services using extracted helper
 		RegisterGtaBaseServices();
 

@@ -7,6 +7,7 @@
 #include <windows.h>
 
 #include "../core/Phone.h"
+#include "../core/LocalizationManager.h"
 #include "../core/ServiceContainer.h"
 #include "../core/apps/CalculatorApp.h"
 #include "../core/apps/ClockApp.h"
@@ -218,6 +219,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   ImGui_ImplDX9_Init(g_pd3dDevice);
 
   // Setup Phone services using extracted helper
+  LocalizationManager::Get().Init("");
   RegisterSandboxServices(g_pd3dDevice);
   phone.registerApp(&calcApp);
   phone.registerApp(&clockApp);

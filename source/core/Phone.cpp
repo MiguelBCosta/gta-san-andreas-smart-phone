@@ -1,6 +1,7 @@
 #include "Phone.h"
 #include "providers/IPhoneCallProvider.h"
 #include "apps/SettingsApp.h"
+#include "LocalizationManager.h"
 #include <IconsFontAwesome5.h>
 #include <cmath>
 
@@ -590,7 +591,7 @@ void Phone::drawCurrentApp(ImDrawList *draw, ImVec2 winPos) {
   ImGui::PushStyleColor(ImGuiCol_Text,
                         ImVec4(0.039f, 0.518f, 1.0f, 1.0f)); // iOS Blue
 
-  if (ImGui::Button(ICON_FA_CHEVRON_LEFT " Voltar",
+  if (ImGui::Button((std::string(ICON_FA_CHEVRON_LEFT " ") + TR("phone.back")).c_str(),
                     ImVec2(HEADER_BTN_W, HEADER_BTN_H))) {
     if (!app->onBack()) {
       closeApp();
