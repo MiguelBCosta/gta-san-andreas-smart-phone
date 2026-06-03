@@ -23,16 +23,16 @@ private:
     };
 
     std::vector<PredefinedBusiness> m_predefined = {
-        {"grove",    "empresas.name.grove",    "empresas.desc.grove",    ICON_FA_HOME,         0,     10000, 10000,  2498.382f, -1686.124f},
-        {"robois",   "empresas.name.robois",   "empresas.desc.robois",   ICON_FA_SHOPPING_CART,10000,  2000,  2000,  1356.000f, -1757.813f},
-        {"zero",     "empresas.name.zero",     "empresas.desc.zero",     ICON_FA_HELICOPTER,  30000,  5000,  5000, -2242.663f,   136.890f},
-        {"wang",     "empresas.name.wang",     "empresas.desc.wang",     ICON_FA_CAR,         50000,  8000,  8000, -1969.186f,   282.167f},
-        {"hippy",    "empresas.name.hippy",    "empresas.desc.hippy",    ICON_FA_STORE,       12000,  2000,  2000, -2593.539f,    59.140f},
-        {"vank_hoff","empresas.name.vank_hoff","empresas.desc.vank_hoff",ICON_FA_HOTEL,       20000,  2000,  2000, -1753.717f,   958.960f},
-        {"rs_haul",  "empresas.name.rs_haul",  "empresas.desc.rs_haul",  ICON_FA_TRUCK,       25000,  2000,  2000,   -79.584f, -1135.762f},
-        {"quarry",   "empresas.name.quarry",   "empresas.desc.quarry",   ICON_FA_INDUSTRY,    40000, 10000, 10000,   819.781f,   855.206f},
-        {"airstrip", "empresas.name.airstrip", "empresas.desc.airstrip", ICON_FA_PLANE,       80000, 10000, 10000,   426.234f,  2530.609f},
-        {"burger",   "empresas.name.burger",   "empresas.desc.burger",   ICON_FA_HAMBURGER,   15000,  2000,  2000,  1888.564f,  2086.109f}
+        {"grove",    "business.name.grove",    "business.desc.grove",    ICON_FA_HOME,         0,     10000, 10000,  2498.382f, -1686.124f},
+        {"robois",   "business.name.robois",   "business.desc.robois",   ICON_FA_SHOPPING_CART,10000,  2000,  2000,  1356.000f, -1757.813f},
+        {"zero",     "business.name.zero",     "business.desc.zero",     ICON_FA_HELICOPTER,  30000,  5000,  5000, -2242.663f,   136.890f},
+        {"wang",     "business.name.wang",     "business.desc.wang",     ICON_FA_CAR,         50000,  8000,  8000, -1969.186f,   282.167f},
+        {"hippy",    "business.name.hippy",    "business.desc.hippy",    ICON_FA_STORE,       12000,  2000,  2000, -2593.539f,    59.140f},
+        {"vank_hoff","business.name.vank_hoff","business.desc.vank_hoff",ICON_FA_HOTEL,       20000,  2000,  2000, -1753.717f,   958.960f},
+        {"rs_haul",  "business.name.rs_haul",  "business.desc.rs_haul",  ICON_FA_TRUCK,       25000,  2000,  2000,   -79.584f, -1135.762f},
+        {"quarry",   "business.name.quarry",   "business.desc.quarry",   ICON_FA_INDUSTRY,    40000, 10000, 10000,   819.781f,   855.206f},
+        {"airstrip", "business.name.airstrip", "business.desc.airstrip", ICON_FA_PLANE,       80000, 10000, 10000,   426.234f,  2530.609f},
+        {"burger",   "business.name.burger",   "business.desc.burger",   ICON_FA_HAMBURGER,   15000,  2000,  2000,  1888.564f,  2086.109f}
     };
 
     // Returns the index into m_predefined nearest to the given X/Y position.

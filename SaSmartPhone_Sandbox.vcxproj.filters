@@ -108,7 +108,7 @@
     <ClCompile Include="source\core\apps\MessagesApp.cpp" />
     <ClCompile Include="source\core\apps\MapsApp.cpp" />
     <ClCompile Include="source\core\apps\ProfileApp.cpp" />
-    <ClCompile Include="source\core\apps\EmpresasApp.cpp">
+    <ClCompile Include="source\core\apps\BusinessApp.cpp">
       <Filter>source\core\apps</Filter>
     </ClCompile>
     <ClCompile Include="source\core\LocalizationManager.cpp">
@@ -219,7 +219,7 @@
     <ClInclude Include="source\core\providers\IStatsProvider.h" />
     <ClInclude Include="source\sandbox\providers\SandboxStatsProvider.h" />
     <ClInclude Include="source\core\apps\ProfileApp.h" />
-    <ClInclude Include="source\core\apps\EmpresasApp.h">
+    <ClInclude Include="source\core\apps\BusinessApp.h">
       <Filter>source\core\apps</Filter>
     </ClInclude>
     <ClInclude Include="source\core\providers\IBusinessProvider.h">

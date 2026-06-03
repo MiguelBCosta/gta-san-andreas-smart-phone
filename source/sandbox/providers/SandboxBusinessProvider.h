@@ -17,16 +17,16 @@ private:
 public:
     SandboxBusinessProvider() {
         m_businesses = {
-            {"grove", "empresas.name.grove", "empresas.desc.grove", ICON_FA_HOME, 0, 10000, 10000, true, 0, true},
-            {"robois", "empresas.name.robois", "empresas.desc.robois", ICON_FA_SHOPPING_CART, 10000, 2000, 2000, false, 0, true},
-            {"zero", "empresas.name.zero", "empresas.desc.zero", ICON_FA_HELICOPTER, 30000, 5000, 5000, false, 0, true},
-            {"wang", "empresas.name.wang", "empresas.desc.wang", ICON_FA_CAR, 50000, 8000, 8000, false, 0, true},
-            {"hippy", "empresas.name.hippy", "empresas.desc.hippy", ICON_FA_STORE, 12000, 2000, 2000, false, 0, true},
-            {"vank_hoff", "empresas.name.vank_hoff", "empresas.desc.vank_hoff", ICON_FA_HOTEL, 20000, 2000, 2000, false, 0, true},
-            {"rs_haul", "empresas.name.rs_haul", "empresas.desc.rs_haul", ICON_FA_TRUCK, 25000, 2000, 2000, false, 0, true},
-            {"quarry", "empresas.name.quarry", "empresas.desc.quarry", ICON_FA_INDUSTRY, 40000, 10000, 10000, false, 0, true},
-            {"airstrip", "empresas.name.airstrip", "empresas.desc.airstrip", ICON_FA_PLANE, 80000, 10000, 10000, false, 0, true},
-            {"burger", "empresas.name.burger", "empresas.desc.burger", ICON_FA_HAMBURGER, 15000, 2000, 2000, false, 0, true}
+            {"grove", "business.name.grove", "business.desc.grove", ICON_FA_HOME, 0, 10000, 10000, true, 0, true},
+            {"robois", "business.name.robois", "business.desc.robois", ICON_FA_SHOPPING_CART, 10000, 2000, 2000, false, 0, true},
+            {"zero", "business.name.zero", "business.desc.zero", ICON_FA_HELICOPTER, 30000, 5000, 5000, false, 0, true},
+            {"wang", "business.name.wang", "business.desc.wang", ICON_FA_CAR, 50000, 8000, 8000, false, 0, true},
+            {"hippy", "business.name.hippy", "business.desc.hippy", ICON_FA_STORE, 12000, 2000, 2000, false, 0, true},
+            {"vank_hoff", "business.name.vank_hoff", "business.desc.vank_hoff", ICON_FA_HOTEL, 20000, 2000, 2000, false, 0, true},
+            {"rs_haul", "business.name.rs_haul", "business.desc.rs_haul", ICON_FA_TRUCK, 25000, 2000, 2000, false, 0, true},
+            {"quarry", "business.name.quarry", "business.desc.quarry", ICON_FA_INDUSTRY, 40000, 10000, 10000, false, 0, true},
+            {"airstrip", "business.name.airstrip", "business.desc.airstrip", ICON_FA_PLANE, 80000, 10000, 10000, false, 0, true},
+            {"burger", "business.name.burger", "business.desc.burger", ICON_FA_HAMBURGER, 15000, 2000, 2000, false, 0, true}
         };
         m_profitFloats.resize(m_businesses.size(), 0.0f);
     }
