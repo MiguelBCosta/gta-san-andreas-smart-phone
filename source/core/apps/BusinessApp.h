@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class EmpresasApp : public PhoneApp {
+class BusinessApp : public PhoneApp {
 private:
     Inject<IBusinessProvider> m_businessProvider;
     Inject<IStatsProvider> m_statsProvider;
@@ -22,11 +22,11 @@ private:
     void RefreshData();
 
 public:
-    EmpresasApp();
+    BusinessApp();
 
     void onOpen() override;
     void onClose() override;
     void update(float dt) override;
     void onDraw() override;
-    void onLanguageChange() override { name = TR("empresas.title"); }
+    void onLanguageChange() override { name = TR("business.title"); }
 };

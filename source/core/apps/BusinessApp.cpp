@@ -1,25 +1,25 @@
-#include "EmpresasApp.h"
+#include "BusinessApp.h"
 #include <imgui.h>
 #include <algorithm>
 #include <cstdio>
 #include "../LocalizationManager.h"
 
-EmpresasApp::EmpresasApp() {
-    id = "empresas";
+BusinessApp::BusinessApp() {
+    id = "business";
     icon = ICON_FA_BUILDING;
-    name = TR("empresas.title");
+    name = TR("business.title");
     color = ImVec4(0.196f, 0.843f, 0.294f, 1.0f); // Apple green
     dock = false;
     dockOrder = 99;
 }
 
-void EmpresasApp::onOpen() {
+void BusinessApp::onOpen() {
     m_feedbackMsg = "";
     m_feedbackTimer = 0.0f;
     RefreshData();
 }
 
-void EmpresasApp::RefreshData() {
+void BusinessApp::RefreshData() {
     if (m_businessProvider.isValid()) {
         std::vector<BusinessInfo> list = m_businessProvider->GetBusinesses();
         m_cachedBusinesses.clear();
@@ -41,9 +41,9 @@ void EmpresasApp::RefreshData() {
     }
 }
 
-void EmpresasApp::onClose() {}
+void BusinessApp::onClose() {}
 
-void EmpresasApp::update(float dt) {
+void BusinessApp::update(float dt) {
     if (m_businessProvider.isValid()) {
         m_businessProvider->Update(dt);
     }
@@ -55,14 +55,14 @@ void EmpresasApp::update(float dt) {
     }
 }
 
-void EmpresasApp::SetFeedback(const std::string& msg, float duration) {
+void BusinessApp::SetFeedback(const std::string& msg, float duration) {
     m_feedbackMsg = msg;
     m_feedbackTimer = duration;
 }
 
-void EmpresasApp::onDraw() {
+void BusinessApp::onDraw() {
     if (!m_businessProvider.isValid()) {
-        ImGui::TextColored(ImVec4(1, 0, 0, 1), TR("empresas.no_provider"));
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), TR("business.no_provider"));
         return;
     }
 
@@ -94,19 +94,19 @@ void EmpresasApp::onDraw() {
     
     // Total Yield
     ImGui::SetCursorScreenPos(ImVec2(cardMin.x + 15.0f, cardMin.y + 12.0f));
-    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("empresas.daily_yield"));
+    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("business.daily_yield"));
     ImGui::SetCursorScreenPos(ImVec2(cardMin.x + 15.0f, cardMin.y + 26.0f));
     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
     ImGui::SetWindowFontScale(1.1f);
     char perDayBuf[32];
-    sprintf_s(perDayBuf, sizeof(perDayBuf), TR("empresas.per_day"), totalYield);
+    sprintf_s(perDayBuf, sizeof(perDayBuf), TR("business.per_day"), totalYield);
     ImGui::Text("%s", perDayBuf);
     ImGui::SetWindowFontScale(1.0f);
     ImGui::PopFont();
 
     // Pending Profit
     ImGui::SetCursorScreenPos(ImVec2(cardMin.x + 15.0f, cardMin.y + 50.0f));
-    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("empresas.available_profit"));
+    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("business.available_profit"));
     ImGui::SetCursorScreenPos(ImVec2(cardMin.x + 15.0f, cardMin.y + 64.0f));
     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
     ImGui::SetWindowFontScale(1.3f);
@@ -124,15 +124,15 @@ void EmpresasApp::onDraw() {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.4f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.4f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.2f, 0.2f, 0.4f));
-        ImGui::Button(TR("empresas.collected"), btnSize);
+        ImGui::Button(TR("business.collected"), btnSize);
         ImGui::PopStyleColor(3);
     } else {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.23f, 0.9f, 0.35f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.75f, 0.25f, 1.0f));
-        if (ImGui::Button(TR("empresas.collect"), btnSize)) {
+        if (ImGui::Button(TR("business.collect"), btnSize)) {
             m_businessProvider->CollectAllProfits();
-            SetFeedback(TR("empresas.profits_collected"));
+            SetFeedback(TR("business.profits_collected"));
             RefreshData();
         }
         ImGui::PopStyleColor(3);
@@ -153,7 +153,7 @@ void EmpresasApp::onDraw() {
     ImGui::Spacing();
 
     // Title and Refresh Button
-    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("empresas.my_businesses"));
+    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("business.my_businesses"));
     ImGui::SameLine(width - 32.0f);
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 1, 1, 0.08f));
@@ -168,11 +168,15 @@ void EmpresasApp::onDraw() {
 
     // Start List Scroll Child
     ImGui::BeginChild("##scroll_list", ImGui::GetContentRegionAvail(), false, ImGuiWindowFlags_None);
+    ImDrawList* childDrawList = ImGui::GetWindowDrawList();
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
+    
+    float childWidth = ImGui::GetContentRegionAvail().x;
+    float cardWidth = childWidth - 6.0f; // Leave a 6px gap for the scrollbar/right border
     
     if (m_cachedBusinesses.empty()) {
         ImGui::SetCursorPosY(20.0f);
-        ImGui::TextColored(ImVec4(1, 1, 1, 0.4f), TR("empresas.empty"));
+        ImGui::TextColored(ImVec4(1, 1, 1, 0.4f), TR("business.empty"));
         ImGui::Spacing();
     }
 
@@ -181,21 +185,21 @@ void EmpresasApp::onDraw() {
         
         float itemHeight = 90.0f;
         ImVec2 itemStart = ImGui::GetCursorScreenPos();
-        ImGui::Dummy(ImVec2(width, itemHeight));
+        ImGui::Dummy(ImVec2(cardWidth, itemHeight));
         
         ImVec2 itemMin = itemStart;
-        ImVec2 itemMax = ImVec2(itemStart.x + width, itemStart.y + itemHeight);
+        ImVec2 itemMax = ImVec2(itemStart.x + cardWidth, itemStart.y + itemHeight);
         
-        // Card BG
-        drawList->AddRectFilled(itemMin, itemMax, ImGui::GetColorU32(ImVec4(0.18f, 0.18f, 0.20f, 0.8f)), 12.0f);
-        drawList->AddRect(itemMin, itemMax, ImGui::GetColorU32(ImVec4(1, 1, 1, 0.04f)), 12.0f);
+        // Card BG (using childDrawList for proper scroll clipping)
+        childDrawList->AddRectFilled(itemMin, itemMax, ImGui::GetColorU32(ImVec4(0.18f, 0.18f, 0.20f, 0.8f)), 12.0f);
+        childDrawList->AddRect(itemMin, itemMax, ImGui::GetColorU32(ImVec4(1, 1, 1, 0.04f)), 12.0f);
         
         // 1. Icon Bg
         float iconSize = 32.0f;
         ImVec2 iconMin = ImVec2(itemMin.x + 12.0f, itemMin.y + 12.0f);
         ImVec2 iconMax = ImVec2(iconMin.x + iconSize, iconMin.y + iconSize);
         ImColor iconCol = b.unlocked ? ImColor(50, 200, 100, 35) : ImColor(120, 120, 120, 35);
-        drawList->AddRectFilled(iconMin, iconMax, iconCol, 8.0f);
+        childDrawList->AddRectFilled(iconMin, iconMax, iconCol, 8.0f);
         
         ImGui::SetCursorScreenPos(ImVec2(iconMin.x + (iconSize - ImGui::CalcTextSize(b.icon.c_str()).x)/2.0f, iconMin.y + (iconSize - ImGui::GetTextLineHeight())/2.0f));
         ImVec4 iconTextCol = b.unlocked ? ImVec4(0.2f, 0.85f, 0.4f, 1.0f) : ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
@@ -207,7 +211,7 @@ void EmpresasApp::onDraw() {
         
         if (!b.unlocked) {
             ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 26.0f));
-            ImGui::TextColored(ImVec4(0.85f, 0.35f, 0.35f, 1.0f), "%s", TR("empresas.yield_blocked"));
+            ImGui::TextColored(ImVec4(0.85f, 0.35f, 0.35f, 1.0f), "%s", TR("business.yield_blocked"));
 
             // Disabled Right Action button
             ImVec2 actSize = ImVec2(80.0f, 24.0f);
@@ -217,19 +221,19 @@ void EmpresasApp::onDraw() {
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.25f, 0.2f));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.25f, 0.2f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.3f));
-            ImGui::Button(TR("empresas.blocked"), actSize);
+            ImGui::Button(TR("business.blocked"), actSize);
             ImGui::PopStyleColor(4);
             ImGui::PopStyleVar();
 
             // Lock message at the bottom
             ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 54.0f));
             ImGui::SetWindowFontScale(0.9f);
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.4f), "%s", TR("empresas.no_reputation"));
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.4f), "%s", TR("business.no_reputation"));
             ImGui::SetWindowFontScale(1.0f);
         } else {
             ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 52.0f, itemMin.y + 26.0f));
             char perDayItem[32];
-            sprintf_s(perDayItem, sizeof(perDayItem), TR("empresas.per_day"), b.dailyYield);
+            sprintf_s(perDayItem, sizeof(perDayItem), TR("business.per_day"), b.dailyYield);
             ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.4f, 1.0f), "%s", perDayItem);
 
             // 3. Right Action button
@@ -241,7 +245,7 @@ void EmpresasApp::onDraw() {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.2f, 0.2f, 0.35f));
-                ImGui::Button(TR("empresas.collected"), actSize);
+                ImGui::Button(TR("business.collected"), actSize);
                 ImGui::PopStyleColor(3);
             } else {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.196f, 0.843f, 0.294f, 1.0f));
@@ -250,7 +254,7 @@ void EmpresasApp::onDraw() {
                 std::string btnLbl = "$" + std::to_string(b.currentProfit);
                 if (ImGui::Button(btnLbl.c_str(), actSize)) {
                     m_businessProvider->CollectProfit(b.id);
-                    SetFeedback(TR("empresas.profit_collected"));
+                    SetFeedback(TR("business.profit_collected"));
                     RefreshData();
                 }
                 ImGui::PopStyleColor(3);
@@ -267,7 +271,7 @@ void EmpresasApp::onDraw() {
             ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.25f, 0.25f, 0.28f, 0.4f));
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
             
-            ImGui::ProgressBar(progress, ImVec2(width - 24.0f, 5.0f), "");
+            ImGui::ProgressBar(progress, ImVec2(cardWidth - 24.0f, 5.0f), "");
             
             ImGui::PopStyleVar();
             ImGui::PopStyleColor(2);
@@ -275,7 +279,7 @@ void EmpresasApp::onDraw() {
             ImGui::SetCursorScreenPos(ImVec2(itemMin.x + 12.0f, itemMin.y + 60.0f));
             ImGui::SetWindowFontScale(0.85f);
             char accumBuf[64];
-            sprintf_s(accumBuf, sizeof(accumBuf), TR("empresas.accumulated"), b.currentProfit, b.maxProfit);
+            sprintf_s(accumBuf, sizeof(accumBuf), TR("business.accumulated"), b.currentProfit, b.maxProfit);
             ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 0.85f), "%s", accumBuf);
             ImGui::SetWindowFontScale(1.0f);
         }
