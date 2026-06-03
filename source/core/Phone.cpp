@@ -1,6 +1,7 @@
 #include "Phone.h"
 #include "providers/IPhoneCallProvider.h"
 #include "apps/SettingsApp.h"
+#include "LocalizationManager.h"
 #include <IconsFontAwesome5.h>
 #include <cmath>
 
@@ -8,7 +9,12 @@
 // PUBLIC API
 // ============================================================
 
-Phone::Phone() { m_storage.setPhone(this); }
+Phone::Phone() { 
+  m_storage.setPhone(this); 
+  LocalizationManager::Get().RegisterCallback([this]() {
+    this->updateLanguage();
+  });
+}
 
 void Phone::toggle(PhoneAnimMode mode) {
   if (m_isOpen)
@@ -85,6 +91,9 @@ bool Phone::shouldCaptureInput() const {
 }
 
 void Phone::registerApp(PhoneApp *app) {
+  // Translate app properties immediately upon registration
+  app->onLanguageChange();
+
   // Check if app is already registered
   auto it = std::find(m_apps.begin(), m_apps.end(), app);
   if (it == m_apps.end()) {
@@ -105,6 +114,12 @@ void Phone::registerApp(PhoneApp *app) {
     }
   }
   m_storage.addApp(app);
+}
+
+void Phone::updateLanguage() {
+  for (auto* app : m_apps) {
+    app->onLanguageChange();
+  }
 }
 
 void Phone::openApp(PhoneApp *app) {
@@ -590,7 +605,7 @@ void Phone::drawCurrentApp(ImDrawList *draw, ImVec2 winPos) {
   ImGui::PushStyleColor(ImGuiCol_Text,
                         ImVec4(0.039f, 0.518f, 1.0f, 1.0f)); // iOS Blue
 
-  if (ImGui::Button(ICON_FA_CHEVRON_LEFT " Voltar",
+  if (ImGui::Button((std::string(ICON_FA_CHEVRON_LEFT " ") + TR("phone.back")).c_str(),
                     ImVec2(HEADER_BTN_W, HEADER_BTN_H))) {
     if (!app->onBack()) {
       closeApp();

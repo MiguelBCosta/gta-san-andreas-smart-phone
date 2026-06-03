@@ -82,6 +82,11 @@ jobs:
           if (Test-Path assets/avatar) {
               Copy-Item -Path assets/avatar -Destination sasmartphone/ -Recurse -Force
           }
+          
+          # Copy lang folder
+          if (Test-Path assets/lang) {
+              Copy-Item -Path assets/lang -Destination sasmartphone/ -Recurse -Force
+          }
 
       - name: Create Zip Archive
         shell: powershell

@@ -2,6 +2,7 @@
 #include "../PhoneApp.h"
 #include "../providers/IWallpaperProvider.h"
 #include "../ServiceContainer.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <string>
 #include <vector>
@@ -27,7 +28,7 @@ private:
     bool m_wallpapersLoaded = false;
     
     // UI Navigation State
-    // 0: Settings List, 1: Wallpaper Menu
+    // 0: Settings List, 1: Wallpaper Menu, 2: Language Menu
     int m_menuState = 0;
 
     // Presets
@@ -48,6 +49,7 @@ public:
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
+    void onLanguageChange() override { name = TR("settings.title"); }
 
     // Wallpaper drawing helper called by Phone chassis renderer
     void DrawWallpaper(ImDrawList* draw, ImVec2 pMin, ImVec2 pMax, float rounding);

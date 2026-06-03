@@ -1,5 +1,6 @@
 #pragma once
 #include "../PhoneApp.h"
+#include "../LocalizationManager.h"
 #include "../providers/IMapProvider.h"
 #include "../ServiceContainer.h"
 #include <IconsFontAwesome5.h>
@@ -22,7 +23,7 @@ public:
     MapsApp() {
         id = "maps";
         icon = ICON_FA_MAP_MARKED_ALT;
-        name = "Mapa";
+        name = TR("maps.title");
         color = ImVec4(0.18f, 0.72f, 0.30f, 1.0f);
         m_scroll = ImVec2(1536.0f, 1536.0f);
     }
@@ -31,4 +32,5 @@ public:
     void onClose() override;
     void onDraw() override;
     bool onBack() override;
+    void onLanguageChange() override { name = TR("maps.title"); }
 };

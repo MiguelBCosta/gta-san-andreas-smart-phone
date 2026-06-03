@@ -14,4 +14,5 @@ public:
     void onSave(nlohmann::json& out) override;
     void onLoad(const nlohmann::json& in) override;
     void onWipe() override;
+    void onLanguageChange() override { name = TR("notes.title"); }
 };

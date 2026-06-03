@@ -1,4 +1,5 @@
 #pragma once
+#include "LocalizationManager.h"
 #include <string>
 #include <imgui.h>
 #include <nlohmann/json.hpp>
@@ -55,6 +56,9 @@ public:
 
     // Called when a new game starts or the device is wiped. Reset your app's state.
     virtual void onWipe() {}
+
+    // Called when the active language is changed
+    virtual void onLanguageChange() {}
 };
 
 // Force rebuild to resolve ABI mismatch caused by adding badgeCount

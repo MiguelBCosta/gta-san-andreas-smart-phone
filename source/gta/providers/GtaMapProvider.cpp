@@ -1,4 +1,5 @@
 #include "GtaMapProvider.h"
+#include "../../core/LocalizationManager.h"
 #include <RenderWare.h>
 #include <cstdio>
 #include <game_sa/CMenuManager.h>
@@ -197,91 +198,91 @@ std::vector<MapBlip> GtaMapProvider::GetActiveBlips() {
       continue;
 
     // Resolve generic name based on sprite
-    std::string baseName = "Local";
+    std::string baseName = TR("maps.place.default");
     switch (sprite) {
     case 5:
-      baseName = "Aeroporto";
+      baseName = TR("maps.place.airport");
       break;
     case 6:
-      baseName = "Ammu-Nation";
+      baseName = TR("maps.place.ammu");
       break;
     case 7:
-      baseName = "Barbearia";
+      baseName = TR("maps.place.barber");
       break;
     case 9:
-      baseName = "Doca de Barcos";
+      baseName = TR("maps.place.boat_dock");
       break;
     case 10:
-      baseName = "Burger Shot";
+      baseName = TR("maps.place.burger_shot");
       break;
     case 14:
-      baseName = "Cluckin' Bell";
+      baseName = TR("maps.place.cluckin_bell");
       break;
     case 17:
-      baseName = "Restaurante";
+      baseName = TR("maps.place.restaurant");
       break;
     case 21:
-      baseName = "Namorada";
+      baseName = TR("maps.place.girlfriend");
       break;
     case 22:
-      baseName = "Hospital";
+      baseName = TR("maps.place.hospital");
       break;
     case 25:
-      baseName = "Caligula's Palace";
+      baseName = TR("maps.place.caligulas");
       break;
     case 27:
-      baseName = "Garagem de Modificacao";
+      baseName = TR("maps.place.mod_garage");
       break;
     case 29:
-      baseName = "Pizzaria";
+      baseName = TR("maps.place.pizza");
       break;
     case 30:
-      baseName = "Delegacia de Policia";
+      baseName = TR("maps.place.police");
       break;
     case 31:
-      baseName = "Propriedade Adquirida";
+      baseName = TR("maps.place.property_owned");
       break;
     case 32:
-      baseName = "Propriedade a Venda";
+      baseName = TR("maps.place.property_sale");
       break;
     case 33:
-      baseName = "Torneio de Corrida";
+      baseName = TR("maps.place.race");
       break;
     case 35:
-      baseName = "Casa de Salvo";
+      baseName = TR("maps.place.safehouse");
       break;
     case 36:
-      baseName = "Escola de Pilotagem";
+      baseName = TR("maps.place.flight_school");
       break;
     case 39:
-      baseName = "Estudio de Tatuagem";
+      baseName = TR("maps.place.tattoo");
       break;
     case 44:
-      baseName = "Cassino Four Dragons";
+      baseName = TR("maps.place.four_dragons");
       break;
     case 45:
-      baseName = "Loja de Roupas";
+      baseName = TR("maps.place.clothes");
       break;
     case 47:
-      baseName = "Loja do Zero";
+      baseName = TR("maps.place.zero");
       break;
     case 48:
-      baseName = "Club de Danca";
+      baseName = TR("maps.place.club");
       break;
     case 49:
-      baseName = "Bar";
+      baseName = TR("maps.place.bar");
       break;
     case 50:
-      baseName = "Restaurante de Encontro";
+      baseName = TR("maps.place.date_restaurant");
       break;
     case 54:
-      baseName = "Academia";
+      baseName = TR("maps.place.gym");
       break;
     case 55:
-      baseName = "Patio de Apreensao";
+      baseName = TR("maps.place.impound");
       break;
     case 63:
-      baseName = "Pay 'N' Spray";
+      baseName = TR("maps.place.pay_n_spray");
       break;
     }
 

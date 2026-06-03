@@ -26,4 +26,5 @@ public:
     void onClose() override;
     bool onBack() override;
     void onDraw() override;
+    void onLanguageChange() override { name = TR("profile.title"); }
 };

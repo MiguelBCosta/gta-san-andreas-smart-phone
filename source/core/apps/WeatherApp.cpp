@@ -1,5 +1,6 @@
 #include "WeatherApp.h"
 #include "../providers/IWeatherProvider.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <IconsFontAwesome5.h>
 #include <string>
@@ -8,7 +9,7 @@
 WeatherApp::WeatherApp() {
     id = "weather";
     icon = ICON_FA_CLOUD_SUN;
-    name = "Clima";
+    name = TR("weather.title");
     color = ImVec4(0.25f, 0.60f, 0.90f, 1.0f);
 }
 void WeatherApp::getThemeColors(WeatherTheme theme, ImColor& topColor, ImColor& bottomColor) {
@@ -55,7 +56,7 @@ int WeatherApp::getSimulatedTemp(WeatherTheme theme, float rain) {
 
 void WeatherApp::onDraw() {
     if (!m_weatherProvider) {
-        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Nenhum provedor de clima!");
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), TR("weather.no_provider"));
         return;
     }
 
@@ -128,7 +129,7 @@ void WeatherApp::onDraw() {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
         
         ImGui::AlignTextToFramePadding();
-        ImGui::Text(ICON_FA_TINT "  Chuva:");
+        ImGui::Text(ICON_FA_TINT "  %s", TR("weather.rain"));
         ImGui::SameLine();
         
         // Barra de progresso azul estilizada para intensidade da chuva
@@ -148,7 +149,7 @@ void WeatherApp::onDraw() {
     ImGui::Spacing();
 
     // 5. Próximo Clima (Previsão)
-    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), "PREVISÃO DO TEMPO");
+    ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), TR("weather.forecast"));
     ImGui::Spacing();
 
     // Reservar espaço do subcard para previsão
@@ -170,7 +171,7 @@ void WeatherApp::onDraw() {
 
     // Nome do próximo clima
     ImGui::SetCursorScreenPos(ImVec2(subMin.x + 50.0f, subMin.y + 12.0f));
-    ImGui::Text("A seguir");
+    ImGui::Text("%s", TR("weather.next"));
     ImGui::SetCursorScreenPos(ImVec2(subMin.x + 50.0f, subMin.y + 32.0f));
     ImGui::TextColored(ImVec4(1, 1, 1, 0.7f), "%s", next.name.c_str());
 

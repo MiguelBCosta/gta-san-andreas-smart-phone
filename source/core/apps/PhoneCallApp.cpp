@@ -2,6 +2,7 @@
 #include "../Phone.h"
 #include "../providers/IPhoneCallProvider.h"
 #include "../providers/IAvatarProvider.h"
+#include "../LocalizationManager.h"
 #include <IconsFontAwesome5.h>
 #include <algorithm>
 #include <cmath>
@@ -11,7 +12,7 @@ extern Phone phone;
 PhoneCallApp::PhoneCallApp() {
     id = "phone";
     icon = ICON_FA_PHONE;
-    name = "Ligar";
+    name = TR("phone.title");
     color = ImVec4(0.18f, 0.72f, 0.30f, 1.0f);
     dock = true;
     dockOrder = 1;
@@ -205,7 +206,7 @@ void PhoneCallApp::drawContactsList() {
         // 2. Title: "Sem Contatos"
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
         ImGui::SetWindowFontScale(1.25f);
-        std::string titleStr = "Sem Contatos";
+        std::string titleStr = TR("phone.no_contacts");
         float titleW = ImGui::CalcTextSize(titleStr.c_str()).x;
         ImGui::SetCursorPosX((contentW - titleW) / 2.0f);
         ImGui::Text("%s", titleStr.c_str());
@@ -275,7 +276,7 @@ void PhoneCallApp::drawIncomingCall() {
     float contentH = ImGui::GetWindowHeight();
 
     // Resolve display name
-    std::string displayName = "Desconhecido";
+    std::string displayName = TR("phone.unknown");
     Contact* activeContact = nullptr;
     for (auto& c : m_contacts) {
         if (c.id == m_activeCallerId) {
@@ -289,7 +290,7 @@ void PhoneCallApp::drawIncomingCall() {
     ImGui::SetCursorPosY(20.0f);
 
     // Subtitle: "CHAMADA DE VOZ"
-    std::string subtitle = "CHAMADA DE VOZ";
+    std::string subtitle = TR("phone.voice_call");
     ImVec2 subSize = ImGui::CalcTextSize(subtitle.c_str());
     ImGui::SetCursorPosX((contentW - subSize.x) / 2.0f);
     ImGui::TextColored(ImVec4(0.55f, 0.55f, 0.57f, 1.0f), "%s", subtitle.c_str());
@@ -354,13 +355,13 @@ void PhoneCallApp::drawIncomingCall() {
     float labelY = contentH - 38.0f;
     ImGui::SetWindowFontScale(0.85f);
 
-    std::string labelDecline = "Recusar";
+    std::string labelDecline = TR("phone.decline");
     float declSize = ImGui::CalcTextSize(labelDecline.c_str()).x;
     ImGui::SetCursorPosY(labelY);
     ImGui::SetCursorPosX(startX + (btnSize - declSize) / 2.0f);
     ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", labelDecline.c_str());
 
-    std::string labelAccept = "Aceitar";
+    std::string labelAccept = TR("phone.accept");
     float accSize = ImGui::CalcTextSize(labelAccept.c_str()).x;
     ImGui::SetCursorPosY(labelY);
     ImGui::SetCursorPosX(startX + btnSize + gap + (btnSize - accSize) / 2.0f);
@@ -374,7 +375,7 @@ void PhoneCallApp::drawActiveCall() {
     float contentH = ImGui::GetWindowHeight();
 
     // Resolve display name
-    std::string displayName = "Desconhecido";
+    std::string displayName = TR("phone.unknown");
     Contact* activeContact = nullptr;
     for (auto& c : m_contacts) {
         if (c.id == m_activeCallerId) {
@@ -439,10 +440,10 @@ void PhoneCallApp::drawActiveCall() {
 
     // Add label under the button
     float labelY = contentH - 38.0f;
-    float hangSize = ImGui::CalcTextSize("Desligar").x;
+    float hangSize = ImGui::CalcTextSize(TR("phone.hang_up")).x;
     ImGui::SetCursorPosY(labelY);
     ImGui::SetCursorPosX((contentW - hangSize) / 2.0f);
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Desligar");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), TR("phone.hang_up"));
 }
 
 void PhoneCallApp::drawAvatar(const std::string& contactId, const std::string& name, const ImVec4& color, float radius, ImVec2 pos) {

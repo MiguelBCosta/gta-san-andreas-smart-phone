@@ -41,4 +41,5 @@ public:
     CalculatorApp();
     void onOpen() override;
     void onDraw() override;
+    void onLanguageChange() override { name = TR("calculator.title"); }
 };

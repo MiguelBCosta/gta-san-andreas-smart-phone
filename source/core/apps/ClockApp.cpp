@@ -1,6 +1,7 @@
 #include "ClockApp.h"
 #include "../Phone.h"
 #include "../providers/IClockProvider.h"
+#include "../LocalizationManager.h"
 #include <IconsFontAwesome5.h>
 #include <cmath>
 #include <cstdio>
@@ -14,15 +15,15 @@ extern Phone phone;
 ClockApp::ClockApp() {
     id = "clock";
     icon = ICON_FA_CLOCK;
-    name = "Relogio";
+    name = TR("clock.title");
     color = ImVec4(0.85f, 0.48f, 0.08f, 1.0f);
 }
 
 const char* ClockApp::getPeriodo(int h) {
-    if (h >= 5 && h < 12) return "Manha";
-    else if (h >= 12 && h < 18) return "Tarde";
-    else if (h >= 18 && h < 21) return "Noite";
-    else return "Madrugada";
+    if (h >= 5 && h < 12) return TR("clock.morning");
+    else if (h >= 12 && h < 18) return TR("clock.afternoon");
+    else if (h >= 18 && h < 21) return TR("clock.evening");
+    else return TR("clock.dawn");
 }
 
 ImVec4 ClockApp::getPeriodoColor(int h) {
@@ -34,13 +35,13 @@ ImVec4 ClockApp::getPeriodoColor(int h) {
 
 const char* ClockApp::getGameDay(int d) {
     switch (d) {
-        case 1: return "Domingo";
-        case 2: return "Segunda";
-        case 3: return "Terca";
-        case 4: return "Quarta";
-        case 5: return "Quinta";
-        case 6: return "Sexta";
-        case 7: return "Sabado";
+        case 1: return TR("clock.day.sun");
+        case 2: return TR("clock.day.mon");
+        case 3: return TR("clock.day.tue");
+        case 4: return TR("clock.day.wed");
+        case 5: return TR("clock.day.thu");
+        case 6: return TR("clock.day.fri");
+        case 7: return TR("clock.day.sat");
         default: return "---";
     }
 }
@@ -129,7 +130,7 @@ void ClockApp::update(float dt) {
 void ClockApp::onDraw() {
     IClockProvider* provider = phone.getClockProvider();
     if (!provider) {
-        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Nenhum provedor de relogio!");
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), TR("clock.no_provider"));
         return;
     }
 
@@ -231,9 +232,9 @@ void ClockApp::onDraw() {
     bool allowedToSkip = provider->CanSkipTime();
 
     if (!allowedToSkip) {
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Nao e possivel descansar agora!");
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), TR("clock.cant_rest"));
     } else {
-        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Descansar ate:");
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), TR("clock.rest_until"));
         ImGui::Spacing();
 
         // Hour Slider
@@ -263,7 +264,7 @@ void ClockApp::onDraw() {
             ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.75f, 0.38f, 0.00f, 1.0f));
         }
 
-        if (ImGui::Button("Descansar", ImVec2(-1.0f, 35.0f))) {
+        if (ImGui::Button(TR("clock.rest"), ImVec2(-1.0f, 35.0f))) {
             if (canSkip) {
                 m_isSkipping = true;
                 m_state = SkipState::INITIATE;

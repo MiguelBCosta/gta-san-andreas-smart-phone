@@ -16,4 +16,5 @@ public:
     WeatherApp();
 
     void onDraw() override;
+    void onLanguageChange() override { name = TR("weather.title"); }
 };

@@ -79,6 +79,7 @@ public:
   void registerApp(PhoneApp *app);
   void openApp(PhoneApp *app);
   void closeApp();
+  void updateLanguage();
 
   // Animation API
   void toggle(PhoneAnimMode mode);

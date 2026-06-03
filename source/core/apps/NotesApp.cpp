@@ -1,4 +1,5 @@
 #include "NotesApp.h"
+#include "../LocalizationManager.h"
 #include <imgui.h>
 #include <IconsFontAwesome5.h>
 #include <cstring>
@@ -6,7 +7,7 @@
 NotesApp::NotesApp() {
     id        = "notes";
     icon      = ICON_FA_STICKY_NOTE;
-    name = "Notas";
+    name = TR("notes.title");
     color     = ImVec4(1.0f, 0.8f, 0.2f, 1.0f);
     dock      = false;
     dockOrder = 99;
