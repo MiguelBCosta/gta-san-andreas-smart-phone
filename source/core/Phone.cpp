@@ -389,6 +389,14 @@ void Phone::drawHome(ImDrawList *draw, ImVec2 winPos) {
       float cx = state.x + ICON_SZ / 2.0f;
       float cy = state.y + ICON_SZ / 2.0f;
 
+      // Filter only currently installed grid apps to determine visual slots
+      std::vector<PhoneApp*> installedGridApps;
+      for (auto* app : m_apps) {
+        if (app->installed) {
+          installedGridApps.push_back(app);
+        }
+      }
+
       int col = (int)std::round((cx - GRID_START_X - ICON_SZ / 2.0f) /
                                 (ICON_SZ + GRID_GAP_X));
       int row = (int)std::round((cy - GRID_START_Y - ICON_SZ / 2.0f) /
@@ -401,26 +409,46 @@ void Phone::drawHome(ImDrawList *draw, ImVec2 winPos) {
       if (row < 0)
         row = 0;
 
-      int maxRow = ((int)m_apps.size() - 1) / GRID_COLS;
+      int maxRow = installedGridApps.empty() ? 0 : (((int)installedGridApps.size() - 1) / GRID_COLS);
       if (row > maxRow)
         row = maxRow;
 
-      int slotIdx = row * GRID_COLS + col;
-      if (slotIdx >= (int)m_apps.size())
-        slotIdx = (int)m_apps.size() - 1;
+      int targetVisualIdx = row * GRID_COLS + col;
+      if (targetVisualIdx >= (int)installedGridApps.size())
+        targetVisualIdx = (int)installedGridApps.size() - 1;
+      if (targetVisualIdx < 0)
+        targetVisualIdx = 0;
 
-      int curIdx = -1;
-      for (int i = 0; i < (int)m_apps.size(); i++) {
-        if (m_apps[i]->id == appID) {
-          curIdx = i;
+      PhoneApp* draggingApp = nullptr;
+      int curVisualIdx = -1;
+      for (int i = 0; i < (int)installedGridApps.size(); i++) {
+        if (installedGridApps[i]->id == appID) {
+          draggingApp = installedGridApps[i];
+          curVisualIdx = i;
           break;
         }
       }
 
-      if (curIdx != -1 && curIdx != slotIdx) {
-        PhoneApp *targetApp = m_apps[curIdx];
-        m_apps.erase(m_apps.begin() + curIdx);
-        m_apps.insert(m_apps.begin() + slotIdx, targetApp);
+      if (draggingApp && curVisualIdx != -1 && curVisualIdx != targetVisualIdx) {
+        PhoneApp* targetApp = installedGridApps[targetVisualIdx];
+        
+        // Remove dragging app from its current place in master list
+        auto itDrag = std::find(m_apps.begin(), m_apps.end(), draggingApp);
+        if (itDrag != m_apps.end()) {
+          m_apps.erase(itDrag);
+        }
+        
+        // Re-insert dragging app relative to the target app's position in master list
+        auto itTarget = std::find(m_apps.begin(), m_apps.end(), targetApp);
+        if (itTarget != m_apps.end()) {
+          if (curVisualIdx < targetVisualIdx) {
+            m_apps.insert(itTarget + 1, draggingApp);
+          } else {
+            m_apps.insert(itTarget, draggingApp);
+          }
+        } else {
+          m_apps.push_back(draggingApp);
+        }
       }
     } else if (m_draggedKey.rfind("dock_", 0) == 0) {
       std::string appID = m_draggedKey.substr(5);
